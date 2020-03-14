@@ -1,19 +1,11 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
-import VueLeaflet from '@/components/VueLeaflet'
-Vue.use(Router)
+import routeConfig from '@/router/routeConfig'
+import routers from '@/router/routes.js'
 
-export default new Router({
-  routes: [
-    {
-      path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld
-    }, {
-      path: '/VueLeaflet',
-      name: 'VueLeaflet',
-      component: VueLeaflet
-    }
-  ]
+Vue.use(Router)
+const router = new Router({
+  routes: routers
 })
+router.beforeEach(routeConfig)
+export default router

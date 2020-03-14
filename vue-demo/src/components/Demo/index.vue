@@ -1,5 +1,7 @@
+<style scoped>
+</style>
 <template>
-  <div>select test function</div>
+  <div></div>
 </template>
 <script>
 export default {
@@ -7,6 +9,9 @@ export default {
     return {
 
     }
+  },
+  methods: {
+
   }
 }
 </script>
