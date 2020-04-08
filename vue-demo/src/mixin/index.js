@@ -5052,7 +5052,21 @@ export default {
     Alert
   },
   data () {
-    return { hospList }
+    return {
+      hospList,
+      windowHeight: 0,
+      windowWidth: 0
+    }
+  },
+  mounted: function () {
+    this.$nextTick(function () {
+      window.addEventListener('resize', this.GetWindowHeight)
+      window.addEventListener('resize', this.GtWindowWidth)
+      window.addEventListener('scroll', this.handleScroll)
+      // Init
+      this.GetWindowHeight()
+      this.GtWindowWidth()
+    })
   },
   computed: {
     selectPatList () {
@@ -5080,6 +5094,25 @@ export default {
     }
   },
   methods: {
+    handleScroll () {
+      this.scrolled = window.scrollY > 0
+    },
+    GetWindowHeight: function (event) {
+      this.windowHeight = document.documentElement.clientHeight
+      this.$store.commit({
+        type: 'Basic/SetWindowHeight',
+        windowWidth: document.documentElement.clientWidth
+      })
+    },
+    GtWindowWidth: function (event) {
+      var vuethis = this
+      vuethis.contentTop = 0
+      vuethis.windowWidth = document.documentElement.clientWidth
+      vuethis.$store.commit({
+        type: 'Basic/SetWindowWidth',
+        windowWidth: document.documentElement.clientWidth
+      })
+    },
     SetNewModel () {
       return {
         datastatus: '0',
@@ -5097,5 +5130,10 @@ export default {
       var _dateString = !!dateString
       return _dateString ? this.$moment(dateString, format) : null
     }
+  },
+  beforeDestroy: function () {
+    window.removeEventListener('resize', this.GetWindowHeight)
+    window.removeEventListener('resize', this.GtWindowWidth)
+    window.removeEventListener('scroll', this.handleScroll)
   }
 }
