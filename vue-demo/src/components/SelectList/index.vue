@@ -42,7 +42,7 @@
   </div>
 </template>
 <script>
-import VueLeaflet from '@/components/VueLeaflet'
+import VueLeaflet from '@/components/SelectList/VueLeaflet'
 import Mixin from '@/mixin'
 const columns = [
   {
