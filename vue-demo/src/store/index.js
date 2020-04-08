@@ -1,5 +1,9 @@
 
+import Basic from './modules/Basic'
 const store = {
+  modules: {
+    Basic: Basic
+  },
   state: {
     patList: [],
     selectPatList: [],
