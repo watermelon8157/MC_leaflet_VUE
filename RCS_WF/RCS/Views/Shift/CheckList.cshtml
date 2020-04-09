@@ -1,0 +1,566 @@
+﻿@model RCS.Models.checkListViewer
+@{
+    Layout = null;
+}
+<style type="text/css">
+    #CheckShiftPtList .symbol {
+        font-size: 14px;
+        font-weight: bolder;
+        padding: 0.2em 0;
+    }
+
+    #CheckShiftPtList .block_title {
+        position: relative;
+        font-weight: bold;
+        border-bottom: 1px solid #EDEDED;
+        background-color: #5BA198;
+        padding: 0.2em 2em;
+    }
+
+    /*#CheckShiftPtList .block_content {
+        border: 1px solid #EDEDED;
+        height: 200px;
+        border-top: none;
+        overflow-y: auto;
+    }
+
+        #CheckShiftPtList .block_content > .form-control {
+            width: 100%;
+            height: 198px;
+            resize: none;
+        }*/
+
+    #CheckShiftPtList .shift_table > tbody > tr > td.shift_dataview, #CheckShiftPtList .shift_table > thead > tr > th.shift_dataview {
+        padding: 2px !important;
+        font-size: 12px;
+    }
+
+    #CheckShiftPtList .shift_table > thead > tr > th.shift_dataview {
+        background-color: #5BA198;
+        color: #FFFFFF;
+    }
+
+    #CheckShiftPtList .shift_table > thead > tr > th > .th-inner {
+        padding: 2px !important;
+        font-size: 12px;
+    }
+
+    #CheckShiftPtList .shift_sub_title {
+        margin: 1px;
+        padding: 2px 0px;
+        border: 1px solid #5BA198;
+        border-left-width: 0.8em;
+        border-radius: 0.3em;
+    }
+
+    #CheckShiftPtList .detail-view > td > div {
+        padding: 1px;
+    }
+
+    #CheckShiftPtList .shift_i_style > div {
+        padding: 0.2em 2em;
+      
+        background-color: #EDEDED;
+    }
+</style>
+
+<!-- 交班病人清單 -->
+<div class="modal modal-wide fade modal_record" tabindex="-1" role="dialog" data-backdrop="true" id="ShiftPtModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content rcs_form">
+            <div class="modal-header col-md-12">
+                <div class="btn-group">
+                    <label>交班人：@Model.UserName</label>
+                </div>
+                <div class="btn-group pull-right" style="padding-left:5px;">
+                    <button id="shift_btn" class="btn btn-success" onclick="SaveShiftHandOver(this);" data-loading-text="確認中...">接班人確認</button>
+                    <button class="btn btn-warning" data-dismiss="modal">關閉</button>
+                </div>
+                <div id="shift_user_lab" class="pull-right">
+                    <label>接班人：</label>
+                    @Html.DropDownList("Shift_UserList", Model.UserList, new { @id = "Shift_UserList", @class = "form-control", @style = "display:inline-block;width:auto;" })
+                    <label>接班人密碼：</label>
+                    <input type="password" name="Shift_UserPwd" id="Shift_UserPwd" class="form-control" style="display:inline-block;width:160px;" />
+                </div>
+            </div>
+            <div class="modal-body" style="overflow-x:hidden;overflow-y:auto;">
+                <div id="check_list_alert" class="alert alert-warning" style="opacity: 500; display: none;"><span></span></div>
+                <table id="CheckShiftPtList" data-toggle="table" class="table table-bordered table-striped table-condensed">
+                    <thead style="background-color: #5BA198; color: #FFF;">
+                        <tr>
+                            <th data-field="S_VALUE0" data-sortable="true" data-subfield='床號' data-formatter="resettext">床號</th>
+                            <th data-field="S_VALUE1" data-subfield='病歷號碼' data-formatter="resettext">病歷號碼</th>
+                            <th data-field="S_VALUE2" data-subfield='姓名' data-formatter="resettext">姓名</th>
+                            <th data-field="I_VALUE" data-formatter="resettext">主治醫師</th> 
+                            <th data-field="hasEditRWC" data-formatter="resettext">每日呼吸器脫離評估</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var ShiftPtModalOrder = "";
+    // 暫存需要的物件
+    var check_shift_data = {};
+    // create ck editor instance
+    var b_value_2_arry = {};
+    var b_value_1_arry = {};
+    //設定bootstrapTable使用的變數
+    var tbl_s, tbl_b, tbl_a1, tbl_a2, tbl_r;
+    var listCnt = '';
+
+    $(document).ready(function () {
+        var PtList = '';
+        if ($('#care_table').bootstrapTable('getSelections').length > 0) {
+            PtList = JSON.stringify($('#care_table').bootstrapTable('getSelections'));
+        } else {
+            PtList = '';
+        }
+        $("#CheckShiftPtList").bootstrapTable({
+            url: '@Url.Content("~/Shift/CheckListDetail")',
+            method: 'post',
+            showRefresh: true,
+            silent: true,
+            sortName: "S_VALUE0",
+            queryParams: { "PtList": PtList },
+            undefinedText: '',
+            detailView: "true",
+            formatNoMatches: function () {
+                return '無任何的交班病患資料(必須有交班暫存記錄)';
+            },
+            onLoadSuccess: function (data) {
+                //初始化ckedit的矩陣
+                if (data.length <= 0) {
+                    $("#shift_btn").hide();
+                    $("#shift_user_lab").hide();
+                } else {
+                    $("#shift_btn").show();
+                    $("#shift_user_lab").show();
+                }
+            },
+            onExpandRow: function (index, row, $detail) {
+                if (Number.isInteger(listCnt) && listCnt != index) $("#CheckShiftPtList").bootstrapTable('collapseRow', listCnt);
+                listCnt = index;
+                showShiftDetail(index, row, $detail);
+            }
+        });
+
+        $('#ShiftPtModal').on('shown.bs.modal', function () {
+            $('#ShiftPtModal .modal-body').scrollTop(0);
+        });
+
+        $('#ShiftPtModalDetail').on('shown.bs.modal', function () {
+            $('#ShiftPtModalDetail .modal-body').scrollTop(0);
+        });
+
+       
+
+    });
+
+    function ReSizeModalBody() {
+        $('#ShiftPtModal .modal-body, #ShiftPtModalDetail .modal-body').outerHeight($(window).outerHeight() - 120);
+    }
+
+    function RefreashUserList() {
+        $('#Shift_UserPwd').val('');
+        $.ajax({
+            type: 'POST',
+            dataType: "json",
+            url: '@Url.Content("~/SystemManage/UserMaintain_List")',
+            success: function (data) {
+                $('#Shift_UserList').empty();
+                for (var v in data) {
+                    if (v != 'remove') {
+                        var item = data[v];
+                        if (item.P_GROUP != 'doctor')
+                            $('#Shift_UserList').append('<option value="' + item.P_VALUE + '">' + item.P_NAME + '</option>');
+                    }
+                }
+            }
+        });
+    }
+
+    //交班人確認
+    function SaveShiftHandOver(obj) {
+         $(obj).button('loading');
+        //Step 2 帳號密碼確認
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Content("~/Shift/CheckPwd")',
+            data: { 'UserNo': $('#Shift_UserList').val(), 'UserPwd': $('#Shift_UserPwd').val() },
+            success: function (data) {
+                if (data == "True") {
+                    //Step 3 執行交班作業
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Content("~/Shift/SaveShiftHandOver")',
+                        timeout: 60 * 1000,
+                        data: {
+                            'UserNo': $('#Shift_UserList').val(),
+                            'UserName': $("#Shift_UserList option:selected").text(),
+                            'PtList': encodeURIComponent(((JSON.stringify($("#CheckShiftPtList").bootstrapTable('getData')))))
+                        },
+                        success: function (data) {
+                            //debugger;
+                            if (data == "True") {
+                                showAlert('交班作業成功!', msg_stat.Info);
+                                $('#ShiftPtModal').modal('hide');
+                                $("#care_table").bootstrapTable('refresh');
+                                //$("#nav_tabs .active a[data-toggle='tabajax']").trigger("click");
+                            } else {
+                                showAlert('交班作業失敗!', msg_stat.Warning);
+                            }
+                        },
+                        complete: function () {
+                            //debugger;
+                            $(obj).button('reset');
+                        },
+                        error: function (jqXHR) {
+                            showAlert("交班作業 Step 3 發生錯誤 (" + jqXHR.status + ")", msg_stat.Danger);
+                            log(jqXHR);
+                        }
+                    });
+                } else {
+                    $(obj).button('reset');
+                    showAlert('密碼錯誤!', msg_stat.Danger);
+                }
+            },
+            error: function (jqXHR) {
+                $(obj).button('reset');
+                showAlert("交班作業 Step 2 發生錯誤 (" + jqXHR.status + ")", msg_stat.Danger);
+                log(jqXHR);
+            }
+        });
+    }
+
+    //暫存交班記錄
+    function SaveShiftDetail(index) {
+        try {
+            //check_shift_data.B_VALUE_1 = $("#b_value_1" + '_' + index).val();
+            check_shift_data.B_VALUE_1 = CKEDITOR.tools.htmlEncode(b_value_1_arry.getData());
+            check_shift_data.B_VALUE_2 = CKEDITOR.tools.htmlEncode(b_value_2_arry.getData());
+            //console.log(check_shift_data);
+            $("#index_loading").modal('show');
+            $.ajax({
+                url: "@Url.Content("~/Shift/ShiftcheckData")", type: "post", dataType: "json",
+                data: { shift_str: encodeURIComponent(JSON.stringify(check_shift_data)) },
+                success: function (data) {
+                    if (data.status != 0) {
+                        if (confirm(data.message)) {
+                            ShiftListSave(check_shift_data);
+                        } else {
+                            old_b_value_vm.show(data.attachment);
+                            $("#index_loading").modal('hide');
+                        }
+                    } else {
+                        ShiftListSave(check_shift_data);
+                    }
+                },
+                error: function () {
+                    showAlert("暫存錯誤", msg_stat.Danger);
+                }
+            });
+
+        } catch (e) {
+            var jqXHR = {
+                responseText: e,   // 要看到的錯誤原因
+                status: 500,    // 內部伺服器錯誤的代碼 << 或你有自己想用的
+                statusText: "暫存交班記錄失敗",    // 錯誤說明
+            };
+            log(jqXHR);
+            showAlert("暫存交班記錄失敗", msg_stat.Danger);
+        }
+    }
+    function ShiftListSave(sd) {
+        $.ajax({
+            url: "@Url.Content("~/Shift/ShiftSave")",
+            timeout: 10000, type: "post",
+            dataType: "json",
+            data: { shift_str: encodeURIComponent(JSON.stringify(sd)) },
+            success: function (data) {
+                showAlert(data.message, msg_stat.Success);
+                var SelectPt = $('#care_table').bootstrapTable('getSelections');
+                $("#CheckShiftPtList").bootstrapTable('refresh', {
+                    method: 'POST',
+                    url: '@Url.Content("~/Shift/CheckListDetail")',
+                    query: { "PtList": JSON.stringify(SelectPt) },
+                    silent: true,
+                    undefinedText: ''
+                }).on('load-success.bs.table', function () {
+                    $("#index_loading").modal('hide');
+
+                });
+            },
+            error: function (jqXHR) {
+                showAlert("暫存錯誤", msg_stat.Danger);
+                log(jqXHR.status);
+            }
+        });
+    }
+
+    //取得上次交班記錄
+    function last_data(index) {
+        var shift_chart_no = check_shift_data.chart_no;
+        var shift_IPD_NO = check_shift_data.IPD_NO;
+        var shift_PAT_DATA_DATE = check_shift_data.S_VALUE[6].data;  //入院日期
+        var mymessage = confirm("是否確定帶入上次入院資料?");
+        if (mymessage == true) {
+            $.ajax({
+                url: "@Url.Content("~/Shift/GetLastShiftData")",
+                type: "post",
+                dataType: "json",
+                data: { shift_chart_no: shift_chart_no, shift_IPD_NO: shift_IPD_NO, shift_PAT_DATA_DATE: shift_PAT_DATA_DATE },
+                success: function (data) {
+                    if (data != null && data.length > 0) {
+                        check_shift_data.B_VALUE_1 = data[0].B_VALUE_1;
+                        check_shift_data.B_VALUE_2 = data[0].B_VALUE_2;
+                        build_shiftList_view(check_shift_data, index);
+                    }                    
+                },
+                error: function (jqXHR) {
+                    log(jqXHR);
+                }
+            });
+        }
+        else if (mymessage == false) {
+
+        }
+    }
+
+    //重設bootstrapTable內容
+    function resettext(value, row, index) {
+        var datafield = $(this).attr("field");
+        switch (datafield) {
+            case "S_VALUE" + this.fieldIndex:
+                var subfield = $(this).attr("subfield");
+                var temp;
+                $.each(row.S_VALUE, function (key, val) {
+                    if (val.name === subfield) {
+                        temp = val.data;
+                    }
+                });
+                return temp;
+                break;
+            case "I_VALUE":
+                return (value !== null && value !== undefined && value !== '' ? value.substring(value.indexOf('主治醫師'), value.length) : "");
+                break; 
+            case "hasEditRWC":
+                //顯示呼吸器脫離評估
+                //debugger;
+                if (value) {
+                    return RWAC_vm.editBtn(row["chart_no"], row["IPD_NO"],true);
+                }else {
+                    return RWAC_vm.showIcon();
+                }
+                break;
+            case "ORD_BGN":
+                return value.replace("T", "<br />");
+                break;
+            case "item_type":
+                var tmpId = row.id.replace('weaning_tk_reason_', '');
+                return (parseInt(tmpId) < 11 ? "呼吸因素" : "非呼吸因素");
+                break;
+            case "item_text":
+                return (row.id == "weaning_st_reason_15" || row.id == "weaning_tk_plan_13" ? "主治醫師要求等待其指示：" + row.txt : row.txt);
+                break;
+        }
+    }
+
+    function resettext_tk(value, row) {
+        var item;
+        switch (this.fieldIndex) {
+            case 0:
+                var tmpId = row.id.replace('weaning_tk_reason_', '');
+                return (parseInt(tmpId) < 11 ? "呼吸因素" : "非呼吸因素");
+        }
+    }
+
+    function resettext_st(value, row) {
+        var item;
+        if (row.id == "weaning_st_reason_15" && row.txt != null && row.txt != "") {
+            item = "主治醫師要求等待其指示：" + row.txt;
+        } else {
+            item = row.txt;
+        }
+        return item;
+    }
+
+    function resettext_r(value, row) {
+        var item;
+        if (row.id == "weaning_tk_plan_13" && row.txt != null && row.txt != "") {
+            item = "主治醫師要求等待其指示：" + row.txt;
+        } else {
+            item = row.txt;
+        }
+        return item;
+    }
+
+    function resetcate_tk() {
+        return "tk_reason";
+    }
+
+    function resetcate_st() {
+        return "st_reason";
+    }
+
+    //顯示詳細資料
+    function showShiftDetail(index, row, $detail) {
+        check_shift_data = row;
+        $.ajax({
+            url: "@Url.Content("~/Shift/getShift_view")",
+            data: { index: index, chart_no: row.chart_no },
+            type: "post",
+            beforeSend: function () {
+                $("#index_loading").modal('show');
+            },
+            success: function (data) {
+                var html = [];
+                html.push('<div>');
+                html.push('<button class="btn btn-success pull-right" onclick="SaveShiftDetail(' + index + ');" data-loading-text="暫存中...">暫存</button>');
+                html.push('<button class="btn btn-info pull-right" onclick="last_data(' + index + ');" data-loading-text="帶入中...">帶入上次入院資料</button>');
+                html.push('<div class="btn-group btn-group-sm symbol" id="symbol_' + index + '">');
+                html.push('</div>');
+                html.push('</div>')
+                $detail.each(function () {
+                    this.innerHTML = html.join('') + data;
+                });
+            },
+            complete: function () {
+                // create ck editor instance
+                b_value_2_arry = CKEDITOR.replace('b_value_2' + '_' + index, {
+                    toolbar: [['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript'],
+                            ['FontSize'], ['TextColor', 'BGColor'], ['Table', 'HorizontalRule', 'Smiley', 'SpecialChar'], ['Maximize'], ['Undo', 'Redo']],
+                    height: 500,
+                    on: {
+                        focus: function (evt) {
+                            b_value_2_arry.focus();
+                            current_control = b_value_2_arry;
+                        }
+                    }
+                });
+                b_value_1_arry = CKEDITOR.replace('b_value_1' + '_' + index, {
+                    toolbar: [['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript'],
+                            ['FontSize'], ['TextColor', 'BGColor'], ['Table', 'HorizontalRule', 'Smiley', 'SpecialChar'], ['Maximize'], ['Undo', 'Redo']],
+                    height: 500,
+                    on: {
+                        focus: function (evt) {
+                            b_value_1_arry.focus();
+                            current_control = b_value_1_arry;
+                        }
+                    }
+                }); 
+                setTimeout(function () {
+                    no_match = function () {
+                        return "查無資料";
+                    }
+                    $(".tableTag_" + index).each(function () {
+                        var isShowHeader = false;
+                        if ($(this).attr('id') == 'tbl_b_' + index)
+                            isShowHeader = true;
+                        $(this).bootstrapTable({
+                            showHeader: isShowHeader,
+                            data: [],
+                            formatNoMatches: no_match
+                        });
+                    });
+                    setSymbolBtn('symbol_' + index);
+                    build_shiftList_view(row, index);
+                    $("#index_loading").modal('hide');
+                }, 500);
+            },
+            error: function (jqXHR) {
+                log(jqXHR);
+            }
+        });
+    }
+    // 建置交班檢視
+    function build_shiftList_view(sd, index) {
+        try {
+            // 處理按鈕顯示
+            setTimeout(function ()
+                {
+                    b_value_1_arry.setReadOnly(false);
+                    b_value_2_arry.setReadOnly(false);
+                },
+                0
+                );
+            if (sd.B_VALUE_2 != '') {
+                setTimeout(function ()
+                {
+                    b_value_2_arry.setData(CKEDITOR.tools.htmlDecode(sd.B_VALUE_2));
+                },
+                100
+                );
+            } else {
+                setTimeout(function ()
+                {
+                    b_value_2_arry.setData('');
+                },
+                200
+                );
+            }
+
+            if (sd.B_VALUE_1 != '') {
+                setTimeout(function ()
+                {
+                    b_value_1_arry.setData(CKEDITOR.tools.htmlDecode(sd.B_VALUE_1));
+                },
+                100
+                );
+            } else {
+                setTimeout(function ()
+                {
+                    b_value_1_arry.setData('');
+                },
+                200
+                );
+            }
+
+            // 處理資料
+            if (sd.SHIFT_NAME == "" && sd.SHIFT_DATE == "") {
+                //當班資料顯示建檔資訊(因未交班)
+                $("#shift_info_" + index).html("建檔人員:" + sd.CREATE_NAME + "&nbsp;建檔時間:" + sd.CREATE_DATE);
+            } else {
+                //歷史資料顯示交班資訊
+                $("#shift_info_" + index).html("接班人員:" + sd.SHIFT_NAME + "&nbsp;交班時間:" + sd.SHIFT_DATE);
+            }
+            $("#shift_i_info_" + index).html(sd.I_VALUE);
+            if (sd.S_VALUE != null) {
+                $("#tbl_s_" + index).bootstrapTable("load", sd.S_VALUE);
+            } else {
+                $("#tbl_s_" + index).bootstrapTable("load", []);
+            }
+            // background
+            if (sd.B_VALUE != null) {
+                $("#tbl_b_" + index).bootstrapTable("load", sd.B_VALUE);
+            } else {
+                $("#tbl_b_" + index).bootstrapTable("load", []);
+            }
+            $("#b_value_1_" + index).val("").val(sd.B_VALUE_1);
+
+            // assessment
+            if (sd.A_VALUE != null) {
+                if (sd.A_VALUE.tk_reason != null) {
+                    $("#tbl_a1_" + index).bootstrapTable("load", sd.A_VALUE.tk_reason);
+                }
+                if (sd.A_VALUE.st_reason != null) {
+                    $("#tbl_a2_" + index).bootstrapTable("load", sd.A_VALUE.st_reason);
+                }
+            } else {
+                $('#tbl_b_' + index).bootstrapTable("load", []);
+            }
+            // recommendation
+            if (sd.R_VALUE != null) {
+                $('#tbl_r_' + index).bootstrapTable("load", sd.R_VALUE);
+            } else {
+                $('#tbl_r_' + index).bootstrapTable("load", []);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    }
+</script>

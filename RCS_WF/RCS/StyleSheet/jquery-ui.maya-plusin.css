@@ -1,0 +1,126 @@
+
+body {
+    overflow: hidden;
+}
+
+/* datetime picker style for jquery-ui-1.10.4 */
+#ui-datepicker-div {
+    width: 14em;
+    font-size: 12px;
+}
+
+.ui-datepicker-calendar td, .ui-datepicker-calendar span, .ui-datepicker-calendar a {
+    width: 22px;
+    height: 22px;
+    font-size: 12px;
+}
+
+.ui-datepicker-week-end {
+    background: #b4f26e;
+}
+
+#ui-datepicker-div {
+    width: 15em;
+}
+
+.ui-widget select {
+    margin: 0px 3px;
+}
+
+/* tabs style for jquery-ui-1.10.4 */
+.ui-tabs .ui-tabs-nav .ui-tabs-anchor {
+    padding: 2px 0.8em 2px 0.8em;
+}
+
+.ui-tabs .ui-tabs-panel {
+    border-radius: 0px;
+    border: 1px solid #D285C6;
+    border-top: none;
+    background: #FFFFFF;
+}
+
+.ui-tabs .ui-tabs-nav {
+    border-radius: 0px;
+    padding: 0px;
+}
+
+/* disabled tabs don't show up */
+.ui-tabs .ui-state-disabled {
+    display: none;
+}
+
+.ui-tabs .ui-tabs-nav li a {
+    font-size: 12px;
+    font-weight: normal;
+}
+
+.ui-tabs .ui-tabs-nav li {
+    margin: 0px;
+    border-radius: 0px;
+    border: none;
+    border-right: 1px solid #CFCFCF;
+}
+
+.ui-tabs {
+    border: none;
+    background: #FFFFFF;
+}
+
+.ui-tabs .ui-tabs-panel {
+    padding: 0.5em 1.2em 0.5em 0.7em;
+}
+
+
+/* for fixedheader */
+.jquery-ui-fixedheader-datablock {
+    overflow-y: scroll;
+}
+
+.jquery-ui-fixedheader-headblock {
+    text-align: center;
+}
+
+
+
+/* jquery.editable-select 例外使用*/
+.minScrollbar {
+    max-height: 40px !important;
+}
+
+/* detetimepicker 縮放到 70% */
+.bootstrap-datetimepicker-widget {
+    -moz-transform: scale(0.85);
+    -webkit-transform: scale(0.85);
+    -o-transform: scale(0.85);
+    -ms-transform: scale(0.85);
+    transform: scale(0.85);
+    transform-origin: left top;
+}
+
+
+/* 所有tab的基本內距 */
+#main_content > .tab-content > div {
+    padding: 1em;
+}
+/* 修正bootstrapTable overflow問題 */
+.flip-scroll .bootstrap-table .fixed-table-body {
+    /*padding: 4px; 會跑位*/
+    padding: 4px;
+}
+
+.bootstrap-table button[name=refresh] {
+    height: 34px;
+}
+
+/*加大按鈕字體*/
+.btn{
+    padding:0px 8px;
+    font-size:18px;
+}
+
+/*Bootstrap Table Css overwrite*/
+.table > tbody > tr > th, 
+.table > thead > tr > th {
+    background-color: #5BA198;
+    color: #FFF;
+}

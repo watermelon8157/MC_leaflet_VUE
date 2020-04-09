@@ -1,0 +1,304 @@
+﻿@model AuthorityViewModel
+@using RCS.Models;
+@using Newtonsoft.Json;
+@{
+    //http://jsfiddle.net/jx4myuye/4/?utm_source=website&utm_medium=embed&utm_campaign=jx4myuye
+    ViewBag.Title = "Index";
+    List<string> widthList = new List<string>() { "20%;", "30%;", "50%;" };
+    List<SysParams> user_typeList = Model.viewSetting.FindAll(x => x.P_MODEL == "Authority" && x.P_GROUP == "user_type" && x.P_MANAGE == "0");
+    List<SysParams> user_levelList = Model.viewSetting.FindAll(x => x.P_GROUP == "user_level");
+    List<SysParams> user_AuthorityList = Model.viewSetting.FindAll(x => x.P_MODEL == "user_type");
+    List<SysParams> headList = Model.viewSetting.FindAll(x => x.P_MODEL == "Authority" && x.P_GROUP == "head_name");
+    List<SysParams> list = null;
+    List<SysParams> actionList = null;
+    int rowCnt = 0;
+}
+<style>
+    .row{
+        margin-right:0px;
+        margin-left: 0px;
+    }
+    .rowPadding{
+        padding-bottom: 15px;
+    }
+</style>
+<script src="~/Plugin/jquery.linq/jquery.linq.min.js"></script>
+<script type="text/javascript">
+    var isAuthorityChange = false;//權限資料是否已經改變，變更權限時詢問
+    $(document).ready(function (){
+        $('.USER_NAME').each(function () {
+            $(this).click(function () {
+                if (isAuthorityChange) {
+                    if (confirm('使用者權限已修改尚未儲存，是否放棄儲存?')) {
+                        isAuthorityChange = false;
+                        setRole_type($(this).attr('name'));
+                    } else {
+                        return false;
+                    }
+                } else {
+                    setRole_type($(this).attr('name'));
+                }
+                $('#P_MEMO_show').html($(this).attr('title'));
+            });
+        });
+
+        //DOM data資料
+        $('#role_type').data('source', JSON.parse('@Html.Raw(JsonConvert.SerializeObject(user_AuthorityList))'));//使用者清單
+        $('#role_type').data('Authority', JSON.parse('@Html.Raw(JsonConvert.SerializeObject(Model.RCS_SYS_USER_POWER))'));//權限設定
+        $('#role_type').data('user_level', JSON.parse('@Html.Raw(JsonConvert.SerializeObject(user_levelList))'));//使用者權限level
+        $('#role_type li a').click(function (e) {
+            e.preventDefault();
+            //... other code of function
+            //.preventDefault() prevents the default function of the element. so the page load will be prevented with this.
+        })
+        $('.selectpicker').selectpicker({
+            size: 5,
+            selectAllText: '完全控制',
+            deselectAllText: '取消權限',
+            multipleSeparator: ', '
+        });
+        $('.selectpicker').on('changed.bs.select', function (e) {
+            isAuthorityChange = true;
+        });
+        $('.USER_NAME').first().trigger('click');
+    });
+
+    //設定權限資料
+    function setRole_type(pId) {
+        isAuthorityChange = false;
+        $('.selectpicker').selectpicker('val', []);
+        var obj = $.Enumerable.From($('#role_type').data('Authority')).Where(function (x) { return x.ROLE_TYPE == pId }).Select(function (x) { return x }).ToArray();
+        for (var i in obj) {
+            var item = obj[i];
+            $('[data-authority="' + item.FUNCTION_LOCATION + ' ' + item.FUNCTION_NAME + '"] .selectpicker').selectpicker('val', item.ACTION_VALUE);
+        }
+    }
+    //取得權限名稱維護設定
+    function showRole_type_modal(pId) {
+        if (!isAuthorityChange) {
+            var obj = $.Enumerable.From($('#role_type').data('source')).Where(function (x) { return x.P_ID == pId }).Select(function (x) { return x }).ToArray();
+            if (obj.length > 0) {
+                console.log(obj);
+                var modal = $('#role_type_modal');
+                $('#role_type_modal').data('sorce', obj[0]);
+                modal.find('#role_type_id').val(obj[0].P_ID);
+                modal.find('#role_type_name').html(obj[0].P_NAME);
+                modal.find('#role_type_value').val(obj[0].P_VALUE);
+                modal.modal('show');
+            } else {
+                showAlert('無法修改權限!請洽資訊人員', msg_stat.Warning);
+            }
+        }
+    }
+    //儲存使用者權限相關資料
+    function saveRole_type(pBtn) {
+        var obj = $('#role_type_modal').data('sorce');
+        obj.P_VALUE = $('#role_type_modal #role_type_value').val();
+        $.ajax({
+            url: '@Url.Content("~/Authority/Role_typeSave")',
+            type: 'POST',
+            async: false,
+            beforeSend: function () {
+                pBtn.button('loading');
+            },
+            data: { objStr: encodeURIComponent(JSON.stringify(obj))},
+            success: function (data) {
+                if (data.status == 0) {
+                    showAlert(data.message, msg_stat.Success);
+                    $('#role_type').data('source', JSON.parse(data.attachment));//使用者權限
+                    $('#role_type_modal').modal('hide');
+                } else {
+                    showAlert(data.message, msg_stat.Danger);
+                }
+            },
+            error: function (jqXHR) {
+                log(jqXHR);
+                msg = '程式發生錯誤!';
+            },
+            complete: function () {
+                pBtn.button('reset');
+            }
+        });
+    }
+
+    //儲存權限
+    function saveAuthority(pBtn) {
+        var role_type = $('#role_type li[class=active] a').attr('name');
+        if (role_type === null || role_type == '' || role_type == undefined) {
+            showAlert('請選擇使用者權限!', msg_stat.Warning);
+            return false;
+        }
+        var $objJson = new Array();
+        //取得權限資料
+        $('#role_table .setAuthority').each(function () {
+            var AuthorityStr = $(this).attr('data-authority');//取得權限設定
+            //取得使用者設定權限得資料
+            var AuthorityVal = $(this).find('.selectpicker').selectpicker('val');
+            if (!(AuthorityVal === null || AuthorityVal == undefined)) {
+                var item = new Object();
+                item.ROLE_TYPE = role_type;
+                item.setAuthority = AuthorityStr;
+                item.ACTION_List = AuthorityVal;
+                $objJson.push(item);
+            }
+        });
+        if ($objJson.length > 0) {
+            $.ajax({
+                url: '@Url.Content("~/Authority/AuthoritySave")',
+                type: 'POST',
+                beforeSend: function () {
+                    pBtn.button('loading');
+                    $("#index_loading").modal('show');
+                },
+                data: { objStr: encodeURIComponent(JSON.stringify($objJson)), RT_role: role_type },
+                success: function (data) {
+                    if (data.status == 0) {
+                        showAlert(data.message, msg_stat.Success);
+                        $('#role_type').data('Authority', JSON.parse(data.attachment));//權限設定
+                        setRole_type(role_type);
+                        isAuthorityChange = false;
+                    } else {
+                        showAlert(data.message, msg_stat.Danger);
+                    }
+                },
+                error: function (jqXHR) {
+                    log(jqXHR);
+                    msg = '程式發生錯誤!';
+                },
+                complete: function () {
+                    pBtn.button('reset');
+                    $("#index_loading").modal('hide');
+                }
+            });
+        } else {
+            showAlert($('#role_type li[class=active] a').attr('title') + '尚未設定權限!', msg_stat.Warning);
+        }
+    }
+</script>
+<div class="">
+    <div class="row">
+        <div class="col-lg-4 col-md-4 col-sm-12">
+            <div class="container-fluid">
+                <div class="col-lg-12 col-md-12 col-sm-12">
+                    <div class="btn-group">
+                        @*<button style="display:none;" class="btn btn-success" onclick=""><span class="glyphicon glyphicon-user"></span>&emsp;新增權限</button>
+    <button class="btn btn-warning" onclick="saveAuthority($(this));" data-loading-text="儲存中..."><span class="glyphicon glyphicon-floppy-disk"></span>&emsp;儲存權限</button>*@
+                    </div>
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12">
+                    <ul class="nav nav-pills nav-stacked" id="role_type">
+                        <li class="active" style="background-color:#5BA198;"><a style="color:#ffffff;"><span class="glyphicon glyphicon-th-list" />&emsp;權限清單</a></li>
+                        @{
+                            for (int i = 0; i < user_typeList.Count; i++)
+                            {
+                                <li>
+                                    <a class="USER_NAME" data-toggle="tab" name="@Html.Raw(user_typeList[i].P_VALUE)" title="@Html.Raw(user_typeList[i].P_MEMO)">
+                                        <span style="cursor:pointer">@Html.Raw(user_typeList[i].P_NAME)</span>
+                                        @*<span style="cursor:pointer" class="glyphicon glyphicon-pencil pull-right"
+                                              onclick="showRole_type_modal('@(user_AuthorityList.Find(x=> x.P_GROUP == user_typeList[i].P_VALUE).P_ID)');" title="編輯院內權限代碼"></span>*@
+                                    </a>
+                                </li>
+                            }
+                        }
+                    </ul><br />
+                    <span>
+                        <span  class="label label-default"> 權限說明:</span> <br /><br />
+                       
+                        <span id="P_MEMO_show">
+                            
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8 col-md-8 col-sm-12">
+            <table class="table table-hover table-bordered table-striped" style="width:99%;">
+                <tr>
+                    <th style="width:@(widthList[0])">位置</th>
+                    <th style="width:@(widthList[1])">權限</th>
+                    <th style="width:@(widthList[2])">功能</th>
+                </tr>
+            </table>
+
+            <div style="height:700px;overflow-y:scroll;">
+                <table class="table table-hover table-bordered table-striped" style="width:100%;" id="role_table">
+                    @{
+                        for (int i = 0; i < headList.Count; i++)
+                        {
+                            list = Model.viewSetting.FindAll(x => x.P_MODEL == headList[i].P_VALUE);
+                            Model.isFunctionExists(ref list);
+                            for (int j = 0; j < list.Count; j++)
+                            {
+                                string authorityStr = headList[i].P_VALUE + " " + list[j].P_VALUE;
+                                actionList = Model.viewSetting.FindAll(x => x.P_MODEL == list[j].P_VALUE && x.P_GROUP == "action");
+                                string clickClass = headList[i].P_VALUE + " " + list[j].P_VALUE + " ";
+                                rowCnt = list.Count;
+                                <tr>
+                                    @if (j == 0)
+                                    {
+                                        <td rowspan="@(rowCnt)" class="text-center" style="width:@(widthList[0])">
+                                             @headList[i].P_NAME
+                                        </td>
+                                    }
+                                    <td style="width:@(widthList[1])" class="setAuthority" data-authority="@(authorityStr)">
+                                        @{
+                                            string isMoreAction = "";
+                                            if (actionList.Count > 1) { isMoreAction = "data-actions-box=\"true\""; }
+                                        }
+                                        @*@for (int k = 0; k < actionList.Count; k++)
+                                        {
+                                           <label><input type="checkbox" class="selectchk" name="@(actionList[k].P_VALUE)"/>&emsp;@(actionList[k].P_NAME)</label>
+                                        }*@
+                                        <select class="selectpicker show-menu-arrow @(clickClass)" @(Html.Raw(isMoreAction)) multiple title="無使用權限" disabled>
+                                            @for (int k = 0; k < actionList.Count; k++)
+                                            {
+                                                <option data-subtext="">@(actionList[k].P_NAME)</option>
+                                            }
+                                        </select>
+                                    </td>
+                                    <td data-tdfunction="@(list[j].P_VALUE)" style="width:@(widthList[2])">
+                                        @list[j].P_NAME
+                                    </td>
+                                </tr>
+                                                }
+                                            }
+
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 使用者權限 -->
+<div class="modal fade bs-example-modal-slg modal_record" tabindex="-1" role="dialog" data-backdrop="static" id="role_type_modal">
+    <div class="modal-dialog modal-slg" style="width:350px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="btn-group">
+                    <h4 class="modal-title">使用者權限</h4>
+                </div>
+                <div class="btn-group pull-right">
+                    <button class="btn btn-success" id="save" onclick="saveRole_type($(this));" data-loading-text="儲存中...">儲存</button>
+                    <button class="btn btn-warning" data-dismiss="modal">關閉</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form name="update_patient_form" id="role_type_form">
+                    <div class="row">
+                        <div class="col-md-4"><label>權限名稱</label></div>
+                        <div class="col-md-8">
+                           <span id="role_type_name"></span>
+                            <input type="hidden" name="role_type_id"id="role_type_id" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4"><label>代碼</label></div>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" id="role_type_value" name="role_type_value" placeholder="院內職權代碼" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

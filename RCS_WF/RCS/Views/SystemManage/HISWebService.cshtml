@@ -1,0 +1,71 @@
+﻿@using RCS.Models;
+@{
+    List<SysParams> methid_list = (List<SysParams>)ViewData["methid_list"];
+}
+<script type="text/javascript">
+    function GetWSData() {
+        $.ajax({
+            url: "@Url.Content("~/SystemManage/ShowWebService")",
+            type: "post",
+            data: { pMethod: $('#ddlMethod').val(), pParas: $('#txtParameters').val() },
+            dataType: "json",
+            success: function (data) {
+                if (data.errorMsg != '') 
+                    $('#txtResultJson').val(data.errorMsg);
+                else 
+                    $('#txtResultJson').val(data.returnJSON);
+                
+                $('#txtResultDataStatus').val(data.datastatus);
+                $('#ShowResult').show();
+            }
+        });
+    }
+</script>
+<div>
+    <div id="WebServiceMethodList">
+        <table>
+            <tr>
+                <td>
+                    選擇Web Service方法：
+                </td>
+                <td>
+                    @Html.DropDownList("ddlMethod", new SelectList(methid_list, "P_VALUE", "P_NAME"), new { @id = "ddlMethod", @type = "select", @class = "form-control input-sm", @style = "width:640px;display:inline-block;" })
+                </td>
+            </tr>
+            <tr>
+                <td style="padding-top:10px;">
+                    輸入參數(請以逗號(,)區隔)：
+                </td>
+                <td style="padding-top:10px;">
+                    <input type="text" class="form-control input-sm" id="txtParameters" style="width:500px;" />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    &nbsp;
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input type="button" onclick="GetWSData();" value="呼叫" />
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div id="ShowResult" style="padding-top:10px;display:none;">
+        <table>
+            <tr>
+                <td>
+                    returnJSON or errorMsg：
+                    <textarea class="form-control" id="txtResultJson" style="width:900px;height:500px;" />
+                </td>
+            </tr>
+            <tr>
+                <td style ="padding-top:10px;">
+                    datastatus：
+                    <input type="text" class="form-control" id="txtResultDataStatus" style="width:900px;" />
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,53 @@
+/* schedulingTable 樣式表 */
+@media all {
+.schedulingTable .tr {text-align:right;}
+.schedulingTable tbody td {vertical-align: middle;height:27px;}
+.schedulingTable table { border-collapse: collapse; border-bottom: 1px solid #ddd; border-left: 1px solid #ddd; font-size:14px; font-family: 'Microsoft Yahei', '黑体' }
+.schedulingTable thead td{background-color: #F5F5F5;}
+.schedulingTable table td {border:1px solid #ddd; overflow:hidden; border-left:0; border-bottom:0; text-align: center; padding: 2px; }
+.schedulingTable .trSelected {background:#EDEDED}
+.schedulingTable .tdSelected {background:#DD7057}
+.schedulingTable .pb_item {position:relative; line-height:22px; color:#fff;  margin-bottom: 2px; }
+.schedulingTable .edit_toolbar { position: absolute; left: 6px; top: -5px; }
+.schedulingTable .del {display:inline-block; width:15px; height:15px; line-height:15px; cursor:pointer; font-size:12px; margin-right:3px; background-position: 0px 2px; *background-position: 0px 3px; background-repeat: no-repeat; background-image: url(http://www.camel.com.cn/images/glyphicons-halflings_x.png);} 
+.schedulingTable .schedualitem {margin-top: 2px; margin-left: 2px; margin-right: 2px; margin-bottom: 2px;}
+.schedulingTable .pb_g, #schedulTable .toolbar_container .pb_g {background-color: #4FC7D3;}
+.schedulingTable .pb_o, #schedulTable .toolbar_container .pb_o {background-color: #FF940D;}
+.schedulingTable .pb_b, #schedulTable .toolbar_container .pb_b {background-color: #379FF9;}
+.schedulingTable .pb_gray, #schedulTable .toolbar_container .pb_gray {background-color: #ABABAB;}
+.schedulingTable .pb_defuat, #schedulTable .toolbar_container .pb_defuat {background-color: #FAA732;}
+.schedulingTable .toolbar_container {position:absolute; text-align:center; padding:1px; padding: 2px 2px 3px; border:1px solid #ddd; background-color: #fff; display:none}
+.schedulingTable .toolbar_container div {cursor:pointer; overflow:hidden; border-radius:3px; font-size:14px; padding:2px; color:#fff; margin-top: 3px }
+.schedulingTable .toolbar_container div.pb_b:hover {opacity:0.8;}
+.schedulingTable .td_remark {word-break: break-all; word-wrap:break-word;}
+.schedulingTable .remark_area {float:left; width:144px; height:100%; border:1px solid #555; margin-top: 3px; margin-bottom: 3px;}
+.schedulingTable .remark_box {float:left; width:150px; height:100%; padding-top: 3px; padding-bottom: 6px;}
+.schedulingTable .isReadOnly {display:inline-block; zoom:1; *display:inline; background-color: #51A351; color:#fff; padding:5px 8px; border-top-left-radius: 3px; border-top-right-radius: 3px; cursor:pointer; font-size:14px;}
+.schedulingTable .schedulTable_edit_on { background-color: #BD362F; }
+.schedulingTable .isReadOnly:hover {box-shadow:inset 1px 2px 3px #478F47 }
+.schedulingTable .schedulTable_edit_on:hover {box-shadow:inset 1px 2px 3px #AC312A }
+.schedulingTable .w50{width:50px;}
+.schedulingTable .min_w100{min-width:100px;}
+.schedulingTable .week_color{color:#BD362F;}
+.schedulingTable .split_color{background-color:#F5F5F5;}
+.schedulingTable .today_color{background-color: lightpink;}
+.schedulingTable .rest_td{background-color: rgba(171, 171, 171, 0.10);}
+.schedulingTable .pb_ga {background-color: rgba(79, 199, 211, 0.30);}
+.schedulingTable .pb_oa {background-color: rgba(255, 148, 13, 0.30);}
+.schedulingTable .pb_ba {background-color: rgba(55, 159, 249, 0.30);}
+.schedulingTable .pb_graya {background-color: rgba(171, 171, 171, 0.30);}
+.schedulingTable .extra_text { font-size: 0.8em; width: 32px; }
+.schedulingTable .extra_text:hover { border-color: #DD7057; }
+.schedulingTable .extra_text:disabled { border: 1px solid #ababab; background-color: #fff; }
+.schedulingTable .target_area { background-color: #f29e8b; }
+.schedulingTable .target_shift { background-color: #4FC7D3; }
+
+.scheduling_btn { font-size: 20px; font-family: 'Microsoft Yahei', '黑体'; }
+
+.schedulingExtra .extra_text { text-align: center; font-size: 1.15em; }
+.schedulingExtra .extra_text input[type="text"] { width: 46px; text-align: right; }
+.schedulingExtra .row .panel-heading { padding: 4px; margin-top: 10px; }
+
+@media screen and (max-width: 992px) {
+   #area_block .col-md-2 { display: inline-block; }
+}

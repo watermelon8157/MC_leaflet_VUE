@@ -1,0 +1,656 @@
+﻿@using RCS_Data;
+@using System.Web.Mvc; 
+@using RCSData.Models;
+@using RCS_Data.Models.ViewModels;
+
+@functions{
+    /// <summary>
+    /// 輸出病人清單樣式
+    /// </summary>
+    /// <param name="ptinfo">病人基本資料</param>
+    /// <param name="machine">呼吸器</param>
+}
+@helper setPatientListItem(IPDPatientInfo ptinfo, Ventilator machine) {
+
+    <ul class="col-md-6">
+        <li class="list-group-item list-group-item-@(ptinfo.gender == "女"?"warning":"info")">
+            <span class="glyphicon glyphicon-remove remove-btn"></span>
+            <a href="javascript:void(0);" onclick="select_pti(this);" r_id="@(ptinfo.r_id)" idno="@(ptinfo.idno)" ipd_no="@(ptinfo.ipd_no)" chart_no="@(ptinfo.chart_no)" class="list-group-item">
+                <h4>
+                    <span class="glyphicon glyphicon-user @if (ptinfo.accept_status == "1") { @("accept_case")  } " aria-hidden="true"></span>
+                    @(ptinfo.bed_no)&nbsp;&nbsp;@(ptinfo.patient_name)&nbsp;/@ptinfo.age
+                    <span class="tag tag00">CPT </span>
+                    <span class="tag tag01">O<sub>2</sub></span>
+                    <span class="tag tag02">MV</span>
+                </h4>
+            </a>
+        </li>
+    </ul>
+}
+
+@functions{
+    /// <summary>
+    /// 輸出病床區域清單
+    /// </summary>
+    /// <param name="bad_area">病床區域清單</param>
+}
+@helper setBedAreaSelect( BedArea bed_area) {
+    <option value="@(bed_area.area_code)">@(bed_area.area_title)</option>
+}
+
+@functions{
+    /// <summary>
+    /// 交班樣式 ISBAR
+    /// </summary>
+}
+@helper getShift_ISBARFrom() {
+<div class="panel panel-default">
+    <div class="panel-heading">Introduction介紹(自我介紹與確認交班對象)</div>
+    <div onmouseover="symbol_sw(this,true);" onmouseout="symbol_sw(this,false);">
+        <div tg="i_value"></div>
+        <textarea class="form-control" style="resize: none;" id="i_value" name="i_value" rows="5"></textarea>
+    </div>
+    <div class="panel-body" onmouseover="symbol_sw(this,true);" onmouseout="symbol_sw(this,false);">
+        <div tg="s_value"></div>
+        <input type="hidden" id="s_value" name="s_value" />
+        <div style="height:250px;">
+            <table id="s_valueList" data-toggle="table" class="table table-bordered table-striped table-condensed">
+                <thead style="background-color: #5BA198; color: #FFF;">
+                    <tr>
+                        <th data-field="name">名稱</th>
+                        <th data-field="data">資料</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+            
+        <div style="height:100px;">
+            <table id="s_valueList2" data-toggle="table" class="table table-bordered table-striped table-condensed">
+                <thead style="background-color: #5BA198; color: #FFF;">
+                    <tr>
+                        <th>mode</th>
+                        <th>FiO2</th>
+                        <th>PS</th>
+                        <th>PC</th>
+                        <th>PEEP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="mode"></td>
+                        <td id="FiO2"></td>
+                        <td id="PS"></td>
+                        <td id="PC"></td>
+                        <td id="PEEP"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+            
+    </div>
+    <div class="panel-heading">Background背景(過去病史/入院經過)</div>
+    <div class="panel-body" onmouseover="symbol_sw(this,true);" onmouseout="symbol_sw(this,false);">
+        <div tg="b_value_1"></div>
+        <textarea class="form-control" style="resize: none;" id="b_value_1" name="b_value_1" rows="5"></textarea>
+    </div>
+    <div class="panel-heading">Background背景(病情處置追蹤)</div>
+    <div class="panel-body" onmouseover="symbol_sw(this,true);" onmouseout="symbol_sw(this,false);">
+        <div tg="b_value_2"></div>
+        <textarea class="form-control" style="resize: none;" id="b_value_2" name="b_value_2" rows="5"></textarea>
+    </div>
+    <div class="panel-heading">Background背景(特殊用藥及治療情形)</div>
+    <div class="panel-body">
+        <table id="OrderList" data-toggle="table" class="table table-bordered table-striped table-condensed">
+            <thead style="background-color: #5BA198; color: #FFF;">
+                <tr>
+                    <th data-field="NAM">名稱</th>
+                    <th data-field="action_datetime">執行時間</th>
+                    <th data-field="action_loc">執行地點</th>
+                    <th data-field="ITEM_COD">收費碼</th>
+                    <th data-field="QTY">數量</th>
+                    <th data-field="USAGE1">頻率</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <div class="panel-heading">Assessment評估</div>
+    <div class="panel-body" onmouseover="symbol_sw(this,true);" onmouseout="symbol_sw(this,false);">
+        <div tg="a_value"></div>
+        <input type="hidden" id="a_value" name="a_value" />
+        <div style="height:280px;">
+            <div id="level1_nameA2">
+
+            </div>
+            <table id="level1_nameA2Table" data-toggle="table" class="table table-bordered table-striped table-condensed">
+                <thead style="background-color: #5BA198; color: #FFF;">
+                    <tr>
+                        <th data-field="type">項目</th>
+                        <th data-field="name">名稱</th>
+                        <th data-field="data">資料</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div style="height:250px;">
+            <div id="level1_nameA1">
+
+            </div>
+            <table id="level1_nameA1Table" data-toggle="table" class="table table-bordered table-striped table-condensed">
+                <thead style="background-color: #5BA198; color: #FFF;">
+                    <tr>
+                        <th data-field="name">名稱</th>
+                        <th data-field="data">資料</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+    <div class="panel-heading">Recommendation建議(後續處理措施)</div>
+    <div class="panel-body" onmouseover="symbol_sw(this,true);" onmouseout="symbol_sw(this,false);">
+        <div tg="r_value"></div>
+        <input type="hidden" id="r_value" name="r_value" />
+        <div id="level1_nameR">
+
+        </div>
+            <table id="RTable" data-toggle="table" class="table table-bordered table-striped table-condensed">
+                <thead style="background-color: #5BA198; color: #FFF;">
+                    <tr>
+                        <th data-field="name">名稱</th>
+                        <th data-field="data">資料</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+    </div>
+    <div class="panel-heading showRTUR">呼吸器檢測記錄</div>
+    <div class="panel-body showRTUR">
+        <table class="table table-bordered table-condensed table-striped" style="background-color:#FFF;" id="rtuserrecordTable">
+            <tr>
+                <th>記錄內容</th>
+                <th>選項</th>
+            </tr>
+            <tr>
+                <td>吸與吐氣容積相差10%內</td>
+                <td class="checkboxBlok">
+                    <label><input type="checkbox" class="checkbox-inline R_volume" name="rtUserRecord.R_volume" value="1" /> 是</label>
+                    <label><input type="checkbox" class="checkbox-inline R_volume" name="rtUserRecord.R_volume" value="2" /> 需送修</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    依病人狀況設定換氣量警報上下限<br />
+                    上限: minute volume +3〜5 L/min<br />
+                    下限: minute volume - 2〜3 L/min<br />
+                </td>
+                <td class="checkboxBlok">
+                    <label><input type="checkbox" class="checkbox-inline R_V_alert_limit" name="rtUserRecord.R_V_alert_limit" value="1" /> 是</label>
+                    <label><input type="checkbox" class="checkbox-inline R_V_alert_limit" name="rtUserRecord.R_V_alert_limit" value="3" /> NA</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    壓力警報系統測試正常
+                </td>
+                <td class="checkboxBlok">
+                    <label><input type="checkbox" class="checkbox-inline R_warning_system_normal" name="rtUserRecord.R_warning_system_normal" value="1" /> 是</label>
+                    <label><input type="checkbox" class="checkbox-inline R_warning_system_normal" name="rtUserRecord.R_warning_system_normal" value="2" /> 需送修</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    依病人狀況設定壓力警報上下限<br />
+                    上限: Peak Pressure + 10〜15cmH2O<br />
+                    下限: Peak Pressure - 3〜5cmH2O<br />
+                </td>
+                <td class="checkboxBlok">
+                    <label><input type="checkbox" class="checkbox-inline R_P_warning_system_normal" name="rtUserRecord.R_P_warning_system_normal" value="1" /> 是</label>
+                    <label><input type="checkbox" class="checkbox-inline R_P_warning_system_normal" name="rtUserRecord.R_P_warning_system_normal" value="3" /> NA</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    氧氣濃度之確認(21%、100%)
+                </td>
+                <td class="checkboxBlok">
+                    <label><input type="checkbox" class="checkbox-inline R_O2_density" name="rtUserRecord.R_O2_density" value="1" /> 是</label>
+                    <label><input type="checkbox" class="checkbox-inline R_O2_density" name="rtUserRecord.R_O2_density" value="2" /> 需送修</label>
+                    <label><input type="checkbox" class="checkbox-inline R_O2_density" name="rtUserRecord.R_O2_density" value="3" /> NA</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    內部電池蓄電功能正常
+                </td>
+                <td class="checkboxBlok">
+                    <label><input type="checkbox" class="checkbox-inline R_battery_normal" name="rtUserRecord.R_battery_normal" value="1" /> 是</label>
+                    <label><input type="checkbox" class="checkbox-inline R_battery_normal" name="rtUserRecord.R_battery_normal" value="2" /> 需送修</label>
+                    <label><input type="checkbox" class="checkbox-inline R_battery_normal" name="rtUserRecord.R_battery_normal" value="3" /> NA</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Blender警報功能正常
+                </td>
+                <td class="checkboxBlok">
+                    <label><input type="checkbox" class="checkbox-inline R_blender_alert_normal" name="rtUserRecord.R_blender_alert_normal" value="1" /> 是</label>
+                    <label><input type="checkbox" class="checkbox-inline R_blender_alert_normal" name="rtUserRecord.R_blender_alert_normal" value="2" /> 需送修</label>
+                    <label><input type="checkbox" class="checkbox-inline R_blender_alert_normal" name="rtUserRecord.R_blender_alert_normal" value="3" /> NA</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    更換呼吸器管路
+                </td>
+                <td class="checkboxBlok">
+                    <label><input type="checkbox" class="checkbox-inline R_switch_tube" name="rtUserRecord.R_switch_tube" value="1" /> 是</label>
+                    <label><input type="checkbox" class="checkbox-inline R_switch_tube" name="rtUserRecord.R_switch_tube" value="3" /> NA</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    管路檢查及測試正常
+                </td>
+                <td class="checkboxBlok">
+                    <label><input type="checkbox" class="checkbox-inline R_tube_check_normal" name="rtUserRecord.R_tube_check_normal" value="1" /> 是</label>
+                    <label><input type="checkbox" class="checkbox-inline R_tube_check_normal" name="rtUserRecord.R_tube_check_normal" value="3" /> NA</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    更換吐氣端細菌過濾器
+                </td>
+                <td class="checkboxBlok">
+                    <label><input type="checkbox" class="checkbox-inline R_germ_filter" name="rtUserRecord.R_germ_filter" value="1" /> 是</label>
+                    <label><input type="checkbox" class="checkbox-inline R_germ_filter" name="rtUserRecord.R_germ_filter" value="3" /> NA</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    空氣過濾棉清潔
+                </td>
+                <td class="checkboxBlok">
+                    <label><input type="checkbox" class="checkbox-inline R_sponge_clean" name="rtUserRecord.R_sponge_clean" value="1" /> 是</label>
+                    <label><input type="checkbox" class="checkbox-inline R_sponge_clean" name="rtUserRecord.R_sponge_clean" value="3" /> NA</label>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+}
+
+@helper NewgetShift_ISBARFrom()
+{
+    <table class="table table-bordered table-condensed table-striped ISBARtable" style="width:100%;">
+        <tr>
+            <th style="width:33%;">Introduction介紹(自我介紹與確認交班對象)</th>
+            <th style="width:33%;">Background背景(過去病史/入院經過)</th>
+            <th style="width:33%;">Background背景(病情處置追蹤)</th>
+        </tr>
+        <tr>
+            <td>
+                <div class="oldData">
+                    <div id="I"><textarea class="form-control" style="resize: none;" rows="5"></textarea></div>
+                </div>
+                <div class="oldData">
+                    @*<div class="panel-heading">Situation情境(病人現況)</div>*@
+                    <div id="S"><textarea class="form-control" style="resize: none;display:none;" rows="5"></textarea></div>
+                </div>
+                <div class="nowData">
+                    <div class="panel-body" onmouseover="symbol_sw(this,true);" onmouseout="symbol_sw(this,false);" style="">
+                        <div tg="i_value"></div>
+                        <textarea class="form-control" style="resize: none;" id="i_value" name="i_value" rows="5"></textarea>
+                    </div>
+                    @*<div class="panel-heading">Situation情境(病人現況)</div>*@
+                    <div class="panel-body" onmouseover="symbol_sw(this,true);" onmouseout="symbol_sw(this,false);">
+                        <div tg="s_value"></div>
+                        <input type="hidden" id="s_value" name="s_value" />
+                    </div>
+                </div>
+                    <table id="s_valueList" data-toggle="table" class="table table-bordered table-striped table-condensed">
+                        <thead style="background-color: #5BA198; color: #FFF;">
+                            <tr>
+                                <th data-field="name" style="width:30%;">名稱</th>
+                                <th data-field="data" style="width:70%;">資料</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+
+                <table id="s_valueList2" data-toggle="table" class="table table-bordered table-striped table-condensed">
+                    <thead style="background-color: #5BA198; color: #FFF;">
+                        <tr>
+                            <th>mode</th>
+                            <th>FiO2</th>
+                            <th>PS</th>
+                            <th>PC</th>
+                            <th>PEEP</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td id="mode"></td>
+                            <td id="FiO2"></td>
+                            <td id="PS"></td>
+                            <td id="PC"></td>
+                            <td id="PEEP"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+            <td>
+                <div class="oldData">
+                    <div id="B1"><textarea class="form-control" style="resize: none; height: 300px;" rows="5"></textarea></div>
+                </div>
+                <div class="nowData">
+                    <div class="panel-body" onmouseover="symbol_sw(this,true);" onmouseout="symbol_sw(this,false);">
+                        <div tg="b_value_1"></div>
+                        <textarea class="form-control" style="resize: none; height: 350px;" id="b_value_1" name="b_value_1" rows="5"></textarea>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="oldData">
+                    <div id="B2"><textarea class="form-control" style="resize: none; height: 300px;" rows="5"></textarea></div>
+                </div>
+                <div class="nowData">
+                    <div class="panel-body" onmouseover="symbol_sw(this,true);" onmouseout="symbol_sw(this,false);">
+                        <div tg="b_value_2"></div>
+                        <textarea class="form-control" style="resize: none; height: 350px;" id="b_value_2" name="b_value_2" rows="5"></textarea>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th>Background背景(特殊用藥及治療情形)</th>
+            <th>Assessment評估</th>
+            <th>Recommendation建議(後續處理措施)</th>
+        </tr>
+        <tr>
+            <td>
+                <div class="oldData">
+                    <div id="B">
+                        <table id="odlList" data-toggle="table" class="table table-bordered table-striped table-condensed">
+                            <thead style="background-color: #5BA198; color: #FFF;">
+                                <tr>
+                                    <th data-field="NAM">名稱</th>
+                                    <th data-field="action_datetime">執行時間</th>
+                                    <th data-field="action_loc">執行地點</th>
+                                    <th data-field="ITEM_COD">收費碼</th>
+                                    <th data-field="QTY">數量</th>
+                                    <th data-field="USAGE1">頻率</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="nowData">
+                    <table id="OrderList" data-toggle="table" class="table table-bordered table-striped table-condensed">
+                        <thead style="background-color: #5BA198; color: #FFF;">
+                            <tr>
+                                <th data-field="NAM">名稱</th>
+                                <th data-field="action_datetime">執行時間</th>
+                                <th data-field="action_loc">執行地點</th>
+                                <th data-field="ITEM_COD">收費碼</th>
+                                <th data-field="QTY">數量</th>
+                                <th data-field="USAGE1">頻率</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </td>
+            <td>
+                <div class="oldData">
+                    <div id="A"><textarea class="form-control" style="resize: none; display: none;" rows="10"></textarea></div>
+                </div>
+                <div class="nowData">
+                    <div class="panel-body" onmouseover="symbol_sw(this,true);" onmouseout="symbol_sw(this,false);" style="">
+                        <div tg="a_value"></div>
+                        <input type="hidden" id="a_value" name="a_value" />
+                    </div>
+                </div>
+                <div id="level1_nameA2">
+
+                </div>
+                    <table id="level1_nameA2Table" data-toggle="table" class="table table-bordered table-striped table-condensed">
+                        <thead style="background-color: #5BA198; color: #FFF;">
+                            <tr>
+                                <th data-field="type">項目</th>
+                                <th data-field="name">名稱</th>
+                                <th data-field="data">資料</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                <div id="level1_nameA1">
+
+                </div>
+                    <table id="level1_nameA1Table" data-toggle="table" class="table table-bordered table-striped table-condensed">
+                        <thead style="background-color: #5BA198; color: #FFF;">
+                            <tr>
+                                <th data-field="name">名稱</th>
+                                <th data-field="data">資料</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+            </td>
+            <td>
+                <div class="oldData">
+                    <div id="R"><textarea class="form-control" style="resize: none; display: none;" rows="5"></textarea></div>
+                </div>
+                <div class="nowData">
+                    <div class="panel-body" onmouseover="symbol_sw(this,true);" onmouseout="symbol_sw(this,false);" style="">
+                        <div tg="r_value"></div>
+                        <input type="hidden" id="r_value" name="r_value" />
+                    </div>
+                </div>
+                <div id="level1_nameR">
+
+                </div>
+                    <table id="RTable" data-toggle="table" class="table table-bordered table-striped table-condensed">
+                        <thead style="background-color: #5BA198; color: #FFF;">
+                            <tr>
+                                <th data-field="name">名稱</th>
+                                <th data-field="data">資料</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+            </td>
+        </tr>
+        <tr class="showRTUR">
+            <th colspan="3">呼吸器檢測記錄</th>
+        </tr>
+        <tr class="showRTUR">
+            <td colspan="3">
+                <table class="table table-bordered table-condensed table-striped" style="background-color:#FFF;" id="rtuserrecordTable">
+                    <tr>
+                        <td>記錄內容</td>
+                        <td>選項</td>
+                    </tr>
+                    <tr>
+                        <td>吸與吐氣容積相差10%內</td>
+                        <td class="checkboxBlok">
+                            <label><input type="checkbox" class="checkbox-inline R_volume" name="rtUserRecord.R_volume" value="1" /> 是</label>
+                            <label><input type="checkbox" class="checkbox-inline R_volume" name="rtUserRecord.R_volume" value="2" /> 需送修</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            依病人狀況設定換氣量警報上下限<br />
+                            上限: minute volume +3〜5 L/min<br />
+                            下限: minute volume - 2〜3 L/min<br />
+                        </td>
+                        <td class="checkboxBlok">
+                            <label><input type="checkbox" class="checkbox-inline R_V_alert_limit" name="rtUserRecord.R_V_alert_limit" value="1" /> 是</label>
+                            <label><input type="checkbox" class="checkbox-inline R_V_alert_limit" name="rtUserRecord.R_V_alert_limit" value="3" /> NA</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            壓力警報系統測試正常
+                        </td>
+                        <td class="checkboxBlok">
+                            <label><input type="checkbox" class="checkbox-inline R_warning_system_normal" name="rtUserRecord.R_warning_system_normal" value="1" /> 是</label>
+                            <label><input type="checkbox" class="checkbox-inline R_warning_system_normal" name="rtUserRecord.R_warning_system_normal" value="2" /> 需送修</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            依病人狀況設定壓力警報上下限<br />
+                            上限: Peak Pressure + 10〜15cmH2O<br />
+                            下限: Peak Pressure - 3〜5cmH2O<br />
+                        </td>
+                        <td class="checkboxBlok">
+                            <label><input type="checkbox" class="checkbox-inline R_P_warning_system_normal" name="rtUserRecord.R_P_warning_system_normal" value="1" /> 是</label>
+                            <label><input type="checkbox" class="checkbox-inline R_P_warning_system_normal" name="rtUserRecord.R_P_warning_system_normal" value="3" /> NA</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            氧氣濃度之確認(21%、100%)
+                        </td>
+                        <td class="checkboxBlok">
+                            <label><input type="checkbox" class="checkbox-inline R_O2_density" name="rtUserRecord.R_O2_density" value="1" /> 是</label>
+                            <label><input type="checkbox" class="checkbox-inline R_O2_density" name="rtUserRecord.R_O2_density" value="2" /> 需送修</label>
+                            <label><input type="checkbox" class="checkbox-inline R_O2_density" name="rtUserRecord.R_O2_density" value="3" /> NA</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            內部電池蓄電功能正常
+                        </td>
+                        <td class="checkboxBlok">
+                            <label><input type="checkbox" class="checkbox-inline R_battery_normal" name="rtUserRecord.R_battery_normal" value="1" /> 是</label>
+                            <label><input type="checkbox" class="checkbox-inline R_battery_normal" name="rtUserRecord.R_battery_normal" value="2" /> 需送修</label>
+                            <label><input type="checkbox" class="checkbox-inline R_battery_normal" name="rtUserRecord.R_battery_normal" value="3" /> NA</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Blender警報功能正常
+                        </td>
+                        <td class="checkboxBlok">
+                            <label><input type="checkbox" class="checkbox-inline R_blender_alert_normal" name="rtUserRecord.R_blender_alert_normal" value="1" /> 是</label>
+                            <label><input type="checkbox" class="checkbox-inline R_blender_alert_normal" name="rtUserRecord.R_blender_alert_normal" value="2" /> 需送修</label>
+                            <label><input type="checkbox" class="checkbox-inline R_blender_alert_normal" name="rtUserRecord.R_blender_alert_normal" value="3" /> NA</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            更換呼吸器管路
+                        </td>
+                        <td class="checkboxBlok">
+                            <label><input type="checkbox" class="checkbox-inline R_switch_tube" name="rtUserRecord.R_switch_tube" value="1" /> 是</label>
+                            <label><input type="checkbox" class="checkbox-inline R_switch_tube" name="rtUserRecord.R_switch_tube" value="3" /> NA</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            管路檢查及測試正常
+                        </td>
+                        <td class="checkboxBlok">
+                            <label><input type="checkbox" class="checkbox-inline R_tube_check_normal" name="rtUserRecord.R_tube_check_normal" value="1" /> 是</label>
+                            <label><input type="checkbox" class="checkbox-inline R_tube_check_normal" name="rtUserRecord.R_tube_check_normal" value="3" /> NA</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            更換吐氣端細菌過濾器
+                        </td>
+                        <td class="checkboxBlok">
+                            <label><input type="checkbox" class="checkbox-inline R_germ_filter" name="rtUserRecord.R_germ_filter" value="1" /> 是</label>
+                            <label><input type="checkbox" class="checkbox-inline R_germ_filter" name="rtUserRecord.R_germ_filter" value="3" /> NA</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            空氣過濾棉清潔
+                        </td>
+                        <td class="checkboxBlok">
+                            <label><input type="checkbox" class="checkbox-inline R_sponge_clean" name="rtUserRecord.R_sponge_clean" value="1" /> 是</label>
+                            <label><input type="checkbox" class="checkbox-inline R_sponge_clean" name="rtUserRecord.R_sponge_clean" value="3" /> NA</label>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+}
+
+@functions{
+    /// <summary>
+    /// 數值異常呈現
+    /// </summary>
+    /// <param name="input">輸入文字</param>
+    /// <param name="digit">小數點位數</param>
+    ///<param name="min_v">最小值</param>
+    ///<param name="max_v">最大值</param>
+    /// <returns>html string</returns>
+}
+@helper warning_show(string input, int digit, double min_v, double max_v) {
+    string insp_style = "";
+    double number = 0;
+
+    if (double.TryParse(input, out number)) {
+        if (digit < 0) {
+            Math.Floor(number);
+        }
+        double pow = Math.Pow(10, digit);
+        double sign = number >= 0 ? 1 : -1;
+        number = sign * Math.Floor(sign * number * pow) / pow;
+
+        insp_style = number > max_v ? "warning_color" : insp_style;
+    }
+    <span class="@insp_style">@number</span>
+}
+
+@functions{
+    /// <summary>
+    /// 文字值異常呈現
+    /// </summary>
+    /// <param name="input">輸入文字</param>
+    /// <param name="list_text">正常範圍清單文字</param>
+    /// <returns>html string</returns>
+}
+@helper warning_show_list(string input, List<string> list_text) {
+    string insp_style = "";
+    string return_v = "";
+    double number = 0;
+    string[] i_split = input.Split(':');
+    if (i_split.Count() == 2) {
+        if (double.TryParse(i_split[0].ToString(), out number)) {
+            double pow = Math.Pow(10, 1);
+            double sign = number >= 0 ? 1 : -1;
+            number = sign * Math.Floor(sign * number * pow) / pow;
+        }
+        return_v += number.ToString().Replace(".0", "");
+        return_v += ":" + i_split[1].ToString();
+    } else {
+        return_v = input;
+    }
+
+    if (!list_text.Contains(input)) {
+        insp_style = "warning_color";
+
+    }
+    <span class="@insp_style">@return_v</span>
+}
+
+@functions{
+    /// <summary>
+    /// 區域顯示列表陣列
+    /// </summary>
+}
+@helper area_list_js_arr(List<KeyValuePair<string, string>> area_list) {
+    @:assignment_area = Array();
+    foreach(var i in area_list){
+    @:assignment_area.push({ btn_value: "@i.Value", btn_name: "@i.Key" });
+    }
+}

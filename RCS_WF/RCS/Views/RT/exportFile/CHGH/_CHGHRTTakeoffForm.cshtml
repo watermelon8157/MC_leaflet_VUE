@@ -1,0 +1,643 @@
+﻿@using RCS.Models.DB;
+@using RCS_Data;
+@using RCSData.Models;
+@model List<RTTakeoffAssessViewModel>
+@{
+    var ViewModel = new RTTakeoffAssessViewModel();
+    if (Model != null && Model.Count>0)
+    {
+        ViewModel = Model[0];
+    }
+    Layout = null;
+}
+<!--設定width為100%以剛好符合PDF文件的寬度-->
+<!--如果width為固定寬度的話，C#那邊可能要改寫成Document doc = new Document(PageSize.A3)-->
+<!--此table已調整好高度剛好符合PDF A4一頁的高度了-->
+
+<table style='width:100%;'>
+    <tr>
+        <td>
+            <table style='width:100%;'>
+                <tr>
+                    <td width="20%" align="left"></td>
+                    <td width="60%" align="center"></td>
+                    <td width="20%" align="left">姓名：@ViewModel.DTL.patient_name</td>
+                </tr>
+                <tr>
+                    <td width="20%" align="left">病房別：</td>
+                    <td width="60%" align="center">衛生福利部雙和醫院</td>
+                    <td width="20%" align="left">病歷號：@ViewModel.DTL.chart_no</td>
+                </tr>
+                <tr>
+                    <td width="20%" align="left">________</td>
+                    <td width="60%" align="center">呼吸治療科呼吸器脫離評估計畫表(一)</td>
+                    <td width="20%" align="left">年齡： @ViewModel.DTL.age</td>
+                </tr>
+                <tr>
+                    <td width="20%" align="left"></td>
+                    <td width="60%" align="center"></td>
+                    <td width="20%" align="left">性別：@ViewModel.DTL.genderCHT</td>
+                </tr>
+            </table>
+
+            <table style='width:100%; border:1px solid black;'>
+                <tr>
+                    <td width="25%" align="left">床號：@ViewModel.DTL.bed_no</td>
+                    <td width="25%" align="left">姓名：@ViewModel.DTL.patient_name</td>
+                    <td width="25%" align="left">病歷號：@ViewModel.DTL.chart_no</td>
+                    <td width="25%" align="left">診斷：@ViewModel.DTL.diagnosis_code</td>
+                </tr>
+                <tr>
+                    <td width="25%" align="left">性別：@ViewModel.DTL.genderCHT</td>
+                    <td width="25%" align="left">出生：@ViewModel.DTL.birth_day</td>
+                    <td width="25%" align="left">身分證字號：</td>
+                    <td width="25%" align="left">轉入日期：@ViewModel.DTL.tran_date</td>
+                </tr>
+                <tr>
+                    <td width="100%" align="left" colspan="4">呼吸氣開始使用日期：@ViewModel.DTL.on_breath_date</td>
+                </tr>
+                <tr>
+                    <td width="100%" align="left" colspan="4">
+                        使用呼吸器原因：
+                        @ViewModel.showCheckBox(ViewModel.DTL.use_breath_reason.Contains("Oxy") ? "1" : "0") Oxy. Failure
+                        @ViewModel.showCheckBox(ViewModel.DTL.use_breath_reason.Contains("Vent") ? "1" : "0") Vent. Failure
+                        @ViewModel.showCheckBox(ViewModel.DTL.use_breath_reason.Contains("Operation") ? "1" : "0") Operation
+                        @ViewModel.showCheckBox(ViewModel.DTL.use_breath_reason.Contains("其它") ? "1" : "0") 其它
+
+                        @if (ViewModel.DTL.use_breath_reason_txt != "")
+                        {
+                            <u>( @ViewModel.DTL.use_breath_reason_txt )</u>
+                        }
+                    </td>
+                </tr>
+
+                <tr>
+                    <td width="100%" align="left" colspan="4">入院主訴：@ViewModel.DTL.in_hosp_complaint</td>
+                </tr>
+            </table>
+
+            <table style='width:100%; border:1px solid black;'>
+                <tr>
+                    <td width="5%" align="right">一、</td>
+                    <td width="95%" align="left">病患主要呼吸問題：</td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        @ViewModel.showCheckBox(ViewModel.DTL.breathingQuestion.Exists(x => (x.id == "bq_1" && x.chkd == true)) ? "1" : "0")呼吸停止
+                        @ViewModel.showCheckBox(ViewModel.DTL.breathingQuestion.Exists(x => (x.id == "bq_2" && x.chkd == true)) ? "1" : "0")呼吸衰竭
+                        @ViewModel.showCheckBox(ViewModel.DTL.breathingQuestion.Exists(x => (x.id == "bq_3" && x.chkd == true)) ? "1" : "0")低血氧
+                        @ViewModel.showCheckBox(ViewModel.DTL.breathingQuestion.Exists(x => (x.id == "bq_4" && x.chkd == true)) ? "1" : "0")氣道阻塞
+                        @ViewModel.showCheckBox(ViewModel.DTL.breathingQuestion.Exists(x => (x.id == "bq_5" && x.chkd == true)) ? "1" : "0")肺部塌陷
+                        @ViewModel.showCheckBox(ViewModel.DTL.breathingQuestion.Exists(x => (x.id == "bq_6" && x.chkd == true)) ? "1" : "0")感染
+                        @ViewModel.showCheckBox(ViewModel.DTL.breathingQuestion.Exists(x => (x.id == "bq_7" && x.chkd == true)) ? "1" : "0")痰液滯留
+                        @ViewModel.showCheckBox(ViewModel.DTL.breathingQuestion.Exists(x => (x.id == "bq_8" && x.chkd == true)) ? "1" : "0")肺部病變
+                        @ViewModel.showCheckBox(ViewModel.DTL.breathingQuestion.Exists(x => (x.id == "bq_9" && x.chkd == true)) ? "1" : "0")嚴重外傷
+                        @ViewModel.showCheckBox(ViewModel.DTL.breathingQuestion.Exists(x => (x.id == "bq_10" && x.chkd == true)) ? "1" : "0")術後肺合併症
+                        @ViewModel.showCheckBox(ViewModel.DTL.breathingQuestion.Exists(x => (x.id == "bq_11" && x.chkd == true)) ? "1" : "0")其它
+
+                        @if (ViewModel.DTL.breathingQuestion.Find(x => x.id == "bq_12").val != "")
+                        {
+                            <u>( @ViewModel.DTL.breathingQuestion.Find(x => x.id == "bq_12").val )</u>
+                        }
+                    </td>
+                </tr>
+            </table>
+
+            <table style='width:100%; border:1px solid black;'>
+                <tr>
+                    <td width="5%" align="right">二、</td>
+                    <td width="95%" align="left">病患評估：</td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        1.胸腔病史：
+                        @ViewModel.showCheckBox(ViewModel.DTL.chest_history.Exists(x => (x.id == "ch_1" && x.chkd == true)) ? "1" : "0")無
+                        @ViewModel.showCheckBox(ViewModel.DTL.chest_history.Exists(x => (x.id == "ch_2" && x.chkd == true)) ? "1" : "0")COPD慢性阻塞性肺病
+                        @ViewModel.showCheckBox(ViewModel.DTL.chest_history.Exists(x => (x.id == "ch_3" && x.chkd == true)) ? "1" : "0")Asthma哮喘
+                        @ViewModel.showCheckBox(ViewModel.DTL.chest_history.Exists(x => (x.id == "ch_4" && x.chkd == true)) ? "1" : "0")Bronchiectasis支氣管擴張
+                        @ViewModel.showCheckBox(ViewModel.DTL.chest_history.Exists(x => (x.id == "chs_5" && x.chkd == true)) ? "1" : "0")TB结核病
+                        @ViewModel.showCheckBox(ViewModel.DTL.chest_history.Exists(x => (x.id == "ch_6" && x.chkd == true)) ? "1" : "0")其它
+
+                        @if (ViewModel.DTL.chest_history.Find(x => x.id == "ch_7").val != "")
+                        {
+                            <u>( @ViewModel.DTL.chest_history.Find(x => x.id == "ch_7").val )</u>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        2.意識：
+                        @ViewModel.showCheckBox(ViewModel.DTL.conscious.Exists(x => (x.id == "c_1" && x.chkd == true)) ? "1" : "0")Clear
+                        @ViewModel.showCheckBox(ViewModel.DTL.conscious.Exists(x => (x.id == "c_2" && x.chkd == true)) ? "1" : "0")Stupor
+                        @ViewModel.showCheckBox(ViewModel.DTL.conscious.Exists(x => (x.id == "c_3" && x.chkd == true)) ? "1" : "0")Confuse
+                        @ViewModel.showCheckBox(ViewModel.DTL.conscious.Exists(x => (x.id == "c_4" && x.chkd == true)) ? "1" : "0")To pain
+                        @ViewModel.showCheckBox(ViewModel.DTL.conscious.Exists(x => (x.id == "c_5" && x.chkd == true)) ? "1" : "0")Semi-coma
+                        @ViewModel.showCheckBox(ViewModel.DTL.conscious.Exists(x => (x.id == "c_6" && x.chkd == true)) ? "1" : "0")Coma
+                        (GCS=
+                        E_@ViewModel.DTL.conscious.Find(x => x.id == "c_7").val
+                        V_@ViewModel.DTL.conscious.Find(x => x.id == "c_8").val
+                        M_@ViewModel.DTL.conscious.Find(x => x.id == "c_9").val
+                        )
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        3.皮膚：
+                        @ViewModel.showCheckBox(ViewModel.DTL.skin.Exists(x => (x.id == "sk_1" && x.chkd == true)) ? "1" : "0")正常
+                        @ViewModel.showCheckBox(ViewModel.DTL.skin.Exists(x => (x.id == "sk_2" && x.chkd == true)) ? "1" : "0")發紺
+                        @ViewModel.showCheckBox(ViewModel.DTL.skin.Exists(x => (x.id == "sk_3" && x.chkd == true)) ? "1" : "0")蒼白
+                        @ViewModel.showCheckBox(ViewModel.DTL.skin.Exists(x => (x.id == "sk_4" && x.chkd == true)) ? "1" : "0")盜汗
+                        @ViewModel.showCheckBox(ViewModel.DTL.skin.Exists(x => (x.id == "sk_5" && x.chkd == true)) ? "1" : "0")其它
+
+                        @if (ViewModel.DTL.skin.Find(x => x.id == "sk_6").val != "")
+                        {
+                            <u>( @ViewModel.DTL.skin.Find(x => x.id == "sk_6").val )</u>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        4.呼吸型態(病患自然呼吸狀態)：
+                        @ViewModel.showCheckBox(ViewModel.DTL.breathing_patterns.Exists(x => (x.id == "bp_1" && x.chkd == true)) ? "1" : "0")Apnea睡眠呼吸中止
+                        @ViewModel.showCheckBox(ViewModel.DTL.breathing_patterns.Exists(x => (x.id == "bp_2" && x.chkd == true)) ? "1" : "0")Use Accessory Muscle使用輔助肌
+                        @ViewModel.showCheckBox(ViewModel.DTL.breathing_patterns.Exists(x => (x.id == "bp_3" && x.chkd == true)) ? "1" : "0")Tachypnea呼吸急促
+                        @ViewModel.showCheckBox(ViewModel.DTL.breathing_patterns.Exists(x => (x.id == "bp_4" && x.chkd == true)) ? "1" : "0")Paradoxical Movement胸腹不協調運動
+                        @ViewModel.showCheckBox(ViewModel.DTL.breathing_patterns.Exists(x => (x.id == "bp_5" && x.chkd == true)) ? "1" : "0")其它
+
+                        @if (ViewModel.DTL.breathing_patterns.Find(x => x.id == "bp_6").val != "")
+                        {
+                            <u>( @ViewModel.DTL.breathing_patterns.Find(x => x.id == "bp_6").val )</u>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        5.呼吸音：
+                        @ViewModel.showCheckBox(ViewModel.DTL.breath_sounds.Exists(x => (x.id == "bs_1" && x.chkd == true)) ? "1" : "0")Clear正常
+                        @ViewModel.showCheckBox(ViewModel.DTL.breath_sounds.Exists(x => (x.id == "bs_2" && x.chkd == true)) ? "1" : "0")Rhonchi鼾音
+                        @ViewModel.showCheckBox(ViewModel.DTL.breath_sounds.Exists(x => (x.id == "bs_3" && x.chkd == true)) ? "1" : "0")Crackles囉音
+                        @ViewModel.showCheckBox(ViewModel.DTL.breath_sounds.Exists(x => (x.id == "bs_4" && x.chkd == true)) ? "1" : "0")Wheeze喘鳴
+                        @ViewModel.showCheckBox(ViewModel.DTL.breath_sounds.Exists(x => (x.id == "bs_5" && x.chkd == true)) ? "1" : "0")Stridor哮鳴
+                        @ViewModel.showCheckBox(ViewModel.DTL.breath_sounds.Exists(x => (x.id == "bs_6" && x.chkd == true)) ? "1" : "0")Decreased減少
+                        @ViewModel.showCheckBox(ViewModel.DTL.breath_sounds.Exists(x => (x.id == "bs_7" && x.chkd == true)) ? "1" : "0")Absent缺乏
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        6.咳嗽能力：
+                        @ViewModel.showCheckBox(ViewModel.DTL.cough.Exists(x => (x.id == "cg_1" && x.chkd == true)) ? "1" : "0")Functional正常
+                        @ViewModel.showCheckBox(ViewModel.DTL.cough.Exists(x => (x.id == "cg_2" && x.chkd == true)) ? "1" : "0")Weakly Functional虛弱
+                        @ViewModel.showCheckBox(ViewModel.DTL.cough.Exists(x => (x.id == "cg_3" && x.chkd == true)) ? "1" : "0")Non-Functional無功能
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        7.痰液：顏色：
+                        @ViewModel.showCheckBox(ViewModel.DTL.sputum.Exists(x => (x.id == "sp_1" && x.chkd == true)) ? "1" : "0")透明
+                        @ViewModel.showCheckBox(ViewModel.DTL.sputum.Exists(x => (x.id == "sp_2" && x.chkd == true)) ? "1" : "0")黃或綠
+                        @ViewModel.showCheckBox(ViewModel.DTL.sputum.Exists(x => (x.id == "sp_3" && x.chkd == true)) ? "1" : "0")灰
+                        @ViewModel.showCheckBox(ViewModel.DTL.sputum.Exists(x => (x.id == "sp_4" && x.chkd == true)) ? "1" : "0")血絲
+                        @ViewModel.showCheckBox(ViewModel.DTL.sputum.Exists(x => (x.id == "sp_5" && x.chkd == true)) ? "1" : "0")血塊
+                        @ViewModel.showCheckBox(ViewModel.DTL.sputum.Exists(x => (x.id == "sp_6" && x.chkd == true)) ? "1" : "0")棕褐
+                        @ViewModel.showCheckBox(ViewModel.DTL.sputum.Exists(x => (x.id == "sp_7" && x.chkd == true)) ? "1" : "0")粉紅色泡沫痰
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        &emsp;&emsp;&emsp;性質：
+                        @ViewModel.showCheckBox(ViewModel.DTL.sputum.Exists(x => (x.id == "sp_8" && x.chkd == true)) ? "1" : "0")稀
+                        @ViewModel.showCheckBox(ViewModel.DTL.sputum.Exists(x => (x.id == "sp_9" && x.chkd == true)) ? "1" : "0")微稠
+                        @ViewModel.showCheckBox(ViewModel.DTL.sputum.Exists(x => (x.id == "sp_10" && x.chkd == true)) ? "1" : "0")非常黏稠
+                        &emsp;&emsp;&emsp;量：
+                        @ViewModel.showCheckBox(ViewModel.DTL.sputum.Exists(x => (x.id == "sp_11" && x.chkd == true)) ? "1" : "0")少
+                        @ViewModel.showCheckBox(ViewModel.DTL.sputum.Exists(x => (x.id == "sp_12" && x.chkd == true)) ? "1" : "0")中
+                        @ViewModel.showCheckBox(ViewModel.DTL.sputum.Exists(x => (x.id == "sp_13" && x.chkd == true)) ? "1" : "0")多
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">8.Weaning profile：</td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        <table id="weaningTable" style='width:100%; text-align:center;  border:1px solid;'>
+                            <tr>
+                                <th style='border:1px solid;'>年/月/日</th>
+                                <th style='border:1px solid;'>Pimax</th>
+                                <th style='border:1px solid;'>VE</th>
+                                <th style='border:1px solid;'>VT</th>
+                                <th style='border:1px solid;'>SRR</th>
+                                <th style='border:1px solid;'>RSI</th>
+                            </tr>
+                            @*@foreach (var item in ViewModel.DTL.weaningTable)
+                                {
+                                    <tr>
+                                        <td style='border:1px solid;'>@Html.DisplayFor(modelItem => item.date)</td>
+                                        <td style='border:1px solid;'>@Html.DisplayFor(modelItem => item.pi_max)</td>
+                                        <td style='border:1px solid;'>@Html.DisplayFor(modelItem => item.mv_value)</td>
+                                        <td style='border:1px solid;'>@Html.DisplayFor(modelItem => item.vt_value)</td>
+                                        <td style='border:1px solid;'>@Html.DisplayFor(modelItem => item.srr)</td>
+                                        <td style='border:1px solid;'>@Html.DisplayFor(modelItem => item.rsbi)</td>
+                                    </tr>
+                                }*@
+
+                            @if (ViewModel.DTL.weaningTable.Count < 3)
+                            {
+                                for (int i = 0; i < ViewModel.DTL.weaningTable.Count; i++)
+                                {
+                                    <tr>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.weaningTable[i].date</td>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.weaningTable[i].pi_max</td>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.weaningTable[i].mv_value</td>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.weaningTable[i].vt_value</td>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.weaningTable[i].srr</td>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.weaningTable[i].rsbi</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    <tr>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.weaningTable[i].date</td>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.weaningTable[i].pi_max</td>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.weaningTable[i].mv_value</td>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.weaningTable[i].vt_value</td>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.weaningTable[i].srr</td>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.weaningTable[i].rsbi</td>
+                                    </tr>
+                                }
+                            }
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        9.Lab data：(血液)
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        <table id="labdata_select_tb" style='width:100%; text-align:center; border:1px solid black;'>
+                            <tr>
+                                <th style='border:1px solid;'>年/月/日</th>
+                                <th style='border:1px solid;'>Hb</th>
+                                <th style='border:1px solid;'>Hct</th>
+                                <th style='border:1px solid;'>WBC</th>
+                                <th style='border:1px solid;'>PLT</th>
+                                <th style='border:1px solid;'>Na</th>
+                                <th style='border:1px solid;'>K</th>
+                                <th style='border:1px solid;'>BUN</th>
+                                <th style='border:1px solid;'>Cr.</th>
+                                <th style='border:1px solid;'>Alb</th>
+                            </tr>
+                            @*@foreach (var item in ViewModel.DTL.labDataTable)
+                                {
+                                    <tr>
+                                        <td style='border:1px solid;'>@item.date</td>
+                                        <td style='border:1px solid;'>@item.hb</td>
+                                        <td style='border:1px solid;'>@item.ht</td>
+                                        <td style='border:1px solid;'>@item.wbc</td>
+                                        <td style='border:1px solid;'>@item.Platelet</td>
+                                        <td style='border:1px solid;'>@item.na</td>
+                                        <td style='border:1px solid;'>@item.k</td>
+                                        <td style='border:1px solid;'>@item.bun</td>
+                                        <td style='border:1px solid;'>@item.cr</td>
+                                        <td style='border:1px solid;'>@item.albumin</td>
+                                    </tr>
+                                }*@
+                            @if (ViewModel.DTL.labDataTable.Count <= 3)
+                            {
+                                for (int i = 0; i < ViewModel.DTL.weaningTable.Count; i++)
+                                {
+                                    <tr>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.labDataTable[i].date</td>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.labDataTable[i].hb</td>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.labDataTable[i].ht</td>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.labDataTable[i].wbc</td>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.labDataTable[i].Platelet</td>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.labDataTable[i].na</td>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.labDataTable[i].k</td>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.labDataTable[i].bun</td>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.labDataTable[i].cr</td>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.labDataTable[i].albumin</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    <tr>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.labDataTable[i].date</td>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.labDataTable[i].hb</td>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.labDataTable[i].ht</td>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.labDataTable[i].wbc</td>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.labDataTable[i].Platelet</td>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.labDataTable[i].na</td>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.labDataTable[i].k</td>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.labDataTable[i].bun</td>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.labDataTable[i].cr</td>
+                                        <td style='border:1px solid;'>@ViewModel.DTL.labDataTable[i].albumin</td>
+                                    </tr>
+                                }
+                            }
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        10.其他藥物使用：
+                        @ViewModel.showCheckBox(ViewModel.DTL.other_drugs.Exists(x => (x.id == "od_1" && x.chkd == true)) ? "1" : "0")肌肉鬆弛劑
+                        @ViewModel.showCheckBox(ViewModel.DTL.other_drugs.Exists(x => (x.id == "od_2" && x.chkd == true)) ? "1" : "0")鎮靜安眠藥
+                        @ViewModel.showCheckBox(ViewModel.DTL.other_drugs.Exists(x => (x.id == "od_3" && x.chkd == true)) ? "1" : "0")升壓劑
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<div>我是分頁</div>
+
+<table style='width:100%;'>
+    <tr>
+        <td>
+            <table style='width:100%; border:1px solid black;'>
+                <tr>
+                    <td width="5%" align="right">三、</td>
+                    <td width="95%" align="left">呼吸治療項目：</td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        1.噴霧治療：
+                        @ViewModel.showCheckBox(ViewModel.DTL.spray_treatment.Exists(x => (x.id == "st_1" && x.chkd == true)) ? "1" : "0")SVN
+                        @ViewModel.showCheckBox(ViewModel.DTL.spray_treatment.Exists(x => (x.id == "st_2" && x.chkd == true)) ? "1" : "0")MDI
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        &emsp;&emsp;&emsp;藥物：
+                        @ViewModel.showCheckBox(ViewModel.DTL.drug.Exists(x => (x.id == "dr_1" && x.chkd == true)) ? "1" : "0") Ventolin
+                        @ViewModel.showCheckBox(ViewModel.DTL.drug.Exists(x => (x.id == "dr_2" && x.chkd == true)) ? "1" : "0") Berotec
+                        @ViewModel.showCheckBox(ViewModel.DTL.drug.Exists(x => (x.id == "dr_3" && x.chkd == true)) ? "1" : "0") Atrovent (Ipratran)
+                        @ViewModel.showCheckBox(ViewModel.DTL.drug.Exists(x => (x.id == "dr_4" && x.chkd == true)) ? "1" : "0") Bricanyl
+                        @ViewModel.showCheckBox(ViewModel.DTL.drug.Exists(x => (x.id == "dr_5" && x.chkd == true)) ? "1" : "0") Combivent
+                        @ViewModel.showCheckBox(ViewModel.DTL.drug.Exists(x => (x.id == "dr_6" && x.chkd == true)) ? "1" : "0") Bisolven
+                        @ViewModel.showCheckBox(ViewModel.DTL.drug.Exists(x => (x.id == "dr_7" && x.chkd == true)) ? "1" : "0") Mesna (Siruta)
+                        @ViewModel.showCheckBox(ViewModel.DTL.drug.Exists(x => (x.id == "dr_8" && x.chkd == true)) ? "1" : "0") 其它
+
+                        @if (ViewModel.DTL.drug.Find(x => x.id == "dr_9").val != "")
+                        {
+                            <u>( @ViewModel.DTL.drug.Find(x => x.id == "dr_9").val )</u>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">2.目前呼吸器使用情形：</td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        @ViewModel.showCheckBox(ViewModel.DTL.now_breathing_patterns.Exists(x => (x.id == "nbp_1" && x.chkd == true)) ? "1" : "0")
+                        Mode：       @ViewModel.DTL.now_breathing_patterns.Find(x => x.id == "nbp_2").val
+                        FiO2：       @ViewModel.DTL.now_breathing_patterns.Find(x => x.id == "nbp_3").val
+                        VT/IP (PH)： @ViewModel.DTL.now_breathing_patterns.Find(x => x.id == "nbp_4").val
+                        VR：         @ViewModel.DTL.now_breathing_patterns.Find(x => x.id == "nbp_5").val
+                        PS (ASB)：   @ViewModel.DTL.now_breathing_patterns.Find(x => x.id == "nbp_6").val
+                        PEEP (PL)：  @ViewModel.DTL.now_breathing_patterns.Find(x => x.id == "nbp_8").val
+                        @ViewModel.showCheckBox(ViewModel.DTL.now_breathing_patterns.Exists(x => (x.id == "nbp_9" && x.chkd == true)) ? "1" : "0") 其它
+
+                        @if (ViewModel.DTL.now_breathing_patterns.Find(x => x.id == "nbp_10").val != "")
+                        {
+                            <u>( @ViewModel.DTL.now_breathing_patterns.Find(x => x.id == "nbp_10").val )</u>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        3.胸腔復健治療：
+                        @ViewModel.showCheckBox(ViewModel.DTL.cpt_treatment.Exists(x => (x.id == "cp_1" && x.chkd == true)) ? "1" : "0") CPT
+                        @ViewModel.showCheckBox(ViewModel.DTL.cpt_treatment.Exists(x => (x.id == "cp_2" && x.chkd == true)) ? "1" : "0") 運動訓練
+                        (
+                        @ViewModel.showCheckBox(ViewModel.DTL.cpt_treatment.Exists(x => (x.id == "cp_3" && x.chkd == true)) ? "1" : "0") 上肢______
+                        @ViewModel.showCheckBox(ViewModel.DTL.cpt_treatment.Exists(x => (x.id == "cp_4" && x.chkd == true)) ? "1" : "0") 下肢______
+                        @ViewModel.showCheckBox(ViewModel.DTL.cpt_treatment.Exists(x => (x.id == "cp_5" && x.chkd == true)) ? "1" : "0") 其它
+
+                        @if (ViewModel.DTL.cpt_treatment.Find(x => x.id == "cp_6").val != "")
+                        {
+                            <u>( @ViewModel.DTL.cpt_treatment.Find(x => x.id == "cp_6").val )</u>
+                        }
+                        )
+                    </td>
+                </tr>
+            </table>
+
+
+            <table style='width:100%; border:1px solid black;'>
+                <tr>
+                    <td width="5%" align="right">四、</td>
+                    <td width="95%" align="left">呼吸器脫離困難原因：</td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        1.
+                        @ViewModel.showCheckBox(ViewModel.DTL.Unstable_vital_signs.Exists(x => (x.id == "uvs_1" && x.chkd == true)) ? "1" : "0")
+                        Unstable vital signs
+                        @ViewModel.DTL.Unstable_vital_signs.Find(x => x.id == "uvs_2").val
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        2.
+                        @ViewModel.showCheckBox(ViewModel.DTL.gas_exchange.Exists(x => (x.id == "ge_1" && x.chkd == true)) ? "1" : "0") Gas exchange：
+                        @ViewModel.showCheckBox(ViewModel.DTL.gas_exchange.Exists(x => (x.id == "ge_2" && x.chkd == true)) ? "1" : "0") PaO2/FiO2＜200
+                        @ViewModel.showCheckBox(ViewModel.DTL.gas_exchange.Exists(x => (x.id == "ge_3" && x.chkd == true)) ? "1" : "0") PEEP≧8cmH2O
+                        @ViewModel.showCheckBox(ViewModel.DTL.gas_exchange.Exists(x => (x.id == "ge_4" && x.chkd == true)) ? "1" : "0") FiO2≧50%
+                        @ViewModel.showCheckBox(ViewModel.DTL.gas_exchange.Exists(x => (x.id == "ge_5" && x.chkd == true)) ? "1" : "0") PH≦7.3 or PH≧7.5
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        3.
+                        @ViewModel.showCheckBox(ViewModel.DTL.underlying_disease.Exists(x => (x.id == "ud_1" && x.chkd == true)) ? "1" : "0") Underlying disease：
+                        @ViewModel.showCheckBox(ViewModel.DTL.underlying_disease.Exists(x => (x.id == "ud_2" && x.chkd == true)) ? "1" : "0") 慢性肺部疾病
+                        @ViewModel.showCheckBox(ViewModel.DTL.underlying_disease.Exists(x => (x.id == "ud_3" && x.chkd == true)) ? "1" : "0") 心臟血管疾病
+                        @ViewModel.showCheckBox(ViewModel.DTL.underlying_disease.Exists(x => (x.id == "ud_4" && x.chkd == true)) ? "1" : "0") 敗血症
+                        @ViewModel.showCheckBox(ViewModel.DTL.underlying_disease.Exists(x => (x.id == "ud_5" && x.chkd == true)) ? "1" : "0") 中樞神經病變
+                        @ViewModel.showCheckBox(ViewModel.DTL.underlying_disease.Exists(x => (x.id == "ud_6" && x.chkd == true)) ? "1" : "0") 肌肉神經元病變
+                        @ViewModel.showCheckBox(ViewModel.DTL.underlying_disease.Exists(x => (x.id == "ud_7" && x.chkd == true)) ? "1" : "0") 其它
+
+                        @if (ViewModel.DTL.underlying_disease.Find(x => x.id == "ud_8").val != "")
+                        {
+                            <u>( @ViewModel.DTL.underlying_disease.Find(x => x.id == "ud_8").val )</u>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        4.
+                        @ViewModel.showCheckBox(ViewModel.DTL.weaning_drug.Exists(x => (x.id == "wd_1" && x.chkd == true)) ? "1" : "0") Drug：
+                        @ViewModel.showCheckBox(ViewModel.DTL.weaning_drug.Exists(x => (x.id == "wd_2" && x.chkd == true)) ? "1" : "0") Muscle relax
+                        @ViewModel.showCheckBox(ViewModel.DTL.weaning_drug.Exists(x => (x.id == "wd_3" && x.chkd == true)) ? "1" : "0") Sedation
+                        @ViewModel.showCheckBox(ViewModel.DTL.weaning_drug.Exists(x => (x.id == "wd_4" && x.chkd == true)) ? "1" : "0") 其它
+
+                        @if (ViewModel.DTL.weaning_drug.Find(x => x.id == "wd_5").val != "")
+                        {
+                            <u>( @ViewModel.DTL.weaning_drug.Find(x => x.id == "wd_5").val )</u>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        5.
+                        @ViewModel.showCheckBox(ViewModel.DTL.poor_respiratory_drive.Exists(x => (x.id == "prd_1" && x.chkd == true)) ? "1" : "0") Poor respiratory drive：
+                        @ViewModel.showCheckBox(ViewModel.DTL.poor_respiratory_drive.Exists(x => (x.id == "prd_2" && x.chkd == true)) ? "1" : "0") Disease induce
+                        @ViewModel.DTL.poor_respiratory_drive.Find(x => x.id == "prd_3").val
+                        @ViewModel.showCheckBox(ViewModel.DTL.poor_respiratory_drive.Exists(x => (x.id == "prd_4" && x.chkd == true)) ? "1" : "0") Acid-base abnormalities
+                        @ViewModel.showCheckBox(ViewModel.DTL.poor_respiratory_drive.Exists(x => (x.id == "prd_5" && x.chkd == true)) ? "1" : "0") Drugs induce
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        6.
+                        @ViewModel.showCheckBox(ViewModel.DTL.poor_respirator_muscle.Exists(x => (x.id == "prm_1" && x.chkd == true)) ? "1" : "0") poor respiratory muscle：
+                        @ViewModel.showCheckBox(ViewModel.DTL.poor_respirator_muscle.Exists(x => (x.id == "prm_2" && x.chkd == true)) ? "1" : "0") Disease induce
+                        @ViewModel.DTL.poor_respirator_muscle.Find(x => x.id == "prm_3").val
+                        @ViewModel.showCheckBox(ViewModel.DTL.poor_respirator_muscle.Exists(x => (x.id == "prm_4" && x.chkd == true)) ? "1" : "0") N-M fatigue
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        7.
+                        @ViewModel.showCheckBox(ViewModel.DTL.poor_cough_fuction.Exists(x => (x.id == "pcf_1" && x.chkd == true)) ? "1" : "0") Poor cough function
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        8.
+                        @ViewModel.showCheckBox(ViewModel.DTL.malnutrition.Exists(x => (x.id == "m_1" && x.chkd == true)) ? "1" : "0")
+                        Malnutrition (Albumin
+                        @ViewModel.DTL.malnutrition.Find(x => x.id == "m_2").val
+                        )
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        9.
+                        @ViewModel.showCheckBox(ViewModel.DTL.weaning_other.Exists(x => (x.id == "wo_1" && x.chkd == true)) ? "1" : "0") 其它：
+                    </td>
+                </tr>
+            </table>
+
+
+            <table style='width:100%; border:1px solid black;'>
+                <tr>
+                    <td width="5%" align="right">五、</td>
+                    <td width="95%" align="left">呼吸器脫離計劃：</td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_weaning_mode.Exists(x => (x.id == "twm_1" && x.chkd == true)) ? "1" : "0") Try weaning mode：
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_weaning_mode.Exists(x => (x.id == "twm_2" && x.chkd == true)) ? "1" : "0") SIMV rate：
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_weaning_mode.Exists(x => (x.id == "twm_6" && x.chkd == true)) ? "1" : "0")10
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_weaning_mode.Exists(x => (x.id == "twm_7" && x.chkd == true)) ? "1" : "0")8
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_weaning_mode.Exists(x => (x.id == "twm_8" && x.chkd == true)) ? "1" : "0")6
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_weaning_mode.Exists(x => (x.id == "twm_9" && x.chkd == true)) ? "1" : "0")4
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_weaning_mode.Exists(x => (x.id == "twm_3" && x.chkd == true)) ? "1" : "0") PS (ASB)：
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_weaning_mode.Exists(x => (x.id == "twm_10" && x.chkd == true)) ? "1" : "0")20
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_weaning_mode.Exists(x => (x.id == "twm_11" && x.chkd == true)) ? "1" : "0")18
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_weaning_mode.Exists(x => (x.id == "twm_12" && x.chkd == true)) ? "1" : "0")16
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_weaning_mode.Exists(x => (x.id == "twm_13" && x.chkd == true)) ? "1" : "0")14
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_weaning_mode.Exists(x => (x.id == "twm_14" && x.chkd == true)) ? "1" : "0")12
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_weaning_mode.Exists(x => (x.id == "twm_15" && x.chkd == true)) ? "1" : "0")10
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_weaning_mode.Exists(x => (x.id == "twm_16" && x.chkd == true)) ? "1" : "0")8
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_weaning_mode.Exists(x => (x.id == "twm_4" && x.chkd == true)) ? "1" : "0") 其它 weaning mode：
+
+                        @if (ViewModel.DTL.try_weaning_mode.Find(x => x.id == "twm_5").val != "")
+                        {
+                            <u>( @ViewModel.DTL.try_weaning_mode.Find(x => x.id == "twm_5").val )</u>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_t_piece.Exists(x => (x.id == "ttp_1" && x.chkd == true)) ? "1" : "0")
+                        Try T-piece (or Collar) 與機器交替使用 
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_weaning_mode.Exists(x => (x.id == "ttp_2" && x.chkd == true)) ? "1" : "0")1hr.
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_weaning_mode.Exists(x => (x.id == "ttp_3" && x.chkd == true)) ? "1" : "0")2hrs
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_weaning_mode.Exists(x => (x.id == "ttp_4" && x.chkd == true)) ? "1" : "0")4
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_weaning_mode.Exists(x => (x.id == "ttp_5" && x.chkd == true)) ? "1" : "0")6
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_weaning_mode.Exists(x => (x.id == "ttp_6" && x.chkd == true)) ? "1" : "0")8
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_weaning_mode.Exists(x => (x.id == "ttp_7" && x.chkd == true)) ? "1" : "0")10
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_weaning_mode.Exists(x => (x.id == "ttp_8" && x.chkd == true)) ? "1" : "0")12
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_weaning_mode.Exists(x => (x.id == "ttp_9" && x.chkd == true)) ? "1" : "0")14
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_weaning_mode.Exists(x => (x.id == "ttp_10" && x.chkd == true)) ? "1" : "0")16
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_weaning_mode.Exists(x => (x.id == "ttp_11" && x.chkd == true)) ? "1" : "0")18
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_weaning_mode.Exists(x => (x.id == "ttp_12" && x.chkd == true)) ? "1" : "0")20
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_weaning_mode.Exists(x => (x.id == "ttp_13" && x.chkd == true)) ? "1" : "0")24
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        @ViewModel.showCheckBox(ViewModel.DTL.try_t_piece_over_night.Exists(x => (x.id == "ttpon_1" && x.chkd == true)) ? "1" : "0")
+                        Try T-piece over night
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%" align="right"></td>
+                    <td width="95%" align="left">
+                        @ViewModel.showCheckBox(ViewModel.DTL.weaning_plan_other.Exists(x => (x.id == "wpo_1" && x.chkd == true)) ? "1" : "0")
+                        其它：
+                    </td>
+                </tr>
+            </table>
+
+            <br />
+
+            <table style='width:100%;'>
+                <tr>
+                    <td width="40%" align="left">呼吸治療師：@ViewModel.create_name</td>
+                    <td width="20%" align="center">第_____頁</td>
+                    <td width="40%" align="right">醫師：____________</td>
+                </tr>
+                <tr>
+                    <td width="40%" align="left">M140918-1</td>
+                    <td width="20%" align="center"></td>
+                    <td width="40%" align="right">2010.05.03 病委會通過</td>
+                </tr>
+            </table>
+
+        </td>
+    </tr>
+</table>

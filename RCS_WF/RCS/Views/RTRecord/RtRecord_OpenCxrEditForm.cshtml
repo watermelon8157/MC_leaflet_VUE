@@ -1,0 +1,600 @@
+﻿@{
+    // 1.若初現錯誤訊息: VM5259:452 Uncaught ReferenceError: RtRecord_CxrVue is not defined
+    // 2.需先預載入 [Views\RT\RT_Index2.cshtml] 頁面
+    // 3.加入 $('#RtRecord_CxrVue_DivTagID').load('@Url.Content("~/RTRecord/CxrVue_Load")');
+    // 4.加入 <div id="RtRecord_CxrVue_DivTagID"></div><!-- /.modal -->
+
+    // ~/RTRecord/getCxrResultNode_byIdRecordDetail [控制器]
+    ViewBag.Title = "RtRecord_OpenCxrEditForm";
+    /*
+    主畫面 [開啟] 一定要先清空 [vueCxrFinalSave 現有資料]
+        第一步：開啟編輯視窗，讀取 [vueCxrFinalSave 現有資料]，現有資料 [有] 就繼續編輯，[沒有] 就 [下一步]
+        第二步：有 [RECORD_ID 流水號]，網路 [Server] 來源讀取 [vueCxrFinalSave 現有資料] 繼續編輯，沒有就 [下一步]
+        第三步：若沒有 [RECORD_ID 流水號]，設定 [vueCxrFinalSave 上傳] 空值 [新一筆]
+    主畫面 [關閉] 可以清空 [vueCxrFinalSave 上傳]
+    //
+    1.若有 [RECORD_ID 流水號]，又開啟編輯過的 [Cxr] ，應該要讀取 [vueCxrFinalSave 上傳] ，不應該讀取 [Server 網路]
+    2.有無 [RECORD_ID 流水號] 會決定，何時該讀取 1.[vueCxrFinalSave 現有資料] or 2.[Server 網路]
+    3.主畫面開啟，便會決定 [vueCxrFinalSave 現有資料] 資料來源
+    4.編輯畫面，只需統一讀取 [vueCxrFinalSave 現有資料] 資料
+    5.關閉or儲存，只決定 [vueCxrFinalSave 現有資料] 是否要 [覆蓋/覆寫]
+    */
+}
+
+<style>
+    #RtRecord_CxrEdit_DivID .input-group { /*右欄位1~4標題*/
+        margin: 0.5em 0;
+    }
+    .todayDateText:before  {
+        content: "現在時刻";
+    }
+    .clearDateText:before {
+        content: "欄位清空";
+    }
+    .closeDateText:before {
+        content: "關閉取消";
+    }
+    .rtRecordColorOptions_cls { /*2018.08.26 線繪圖*/
+        float: left;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #cccccc;
+        margin-left: 5px;
+        margin-top: 0px;
+        text-align: center;
+        vertical-align: middle;
+    }
+    .rtRecordcssBlackBorder {  
+        border: 2px solid black;
+    }
+    /*canvas { //勿開啟，影響舊版功能 [治療評估單]
+        background: var(--color-white);
+        cursor: none;
+    }*/
+    /* ================== Canvas Cursor ================== */
+
+    .RtRecordCanvasCls:hover + .myCanvasCursorCls {
+        opacity: 1;
+    }
+    .RtRecordCanvasCls:active + .myCanvasCursorCls {
+        border-color: transparent;
+    }
+    .myCanvasCursorCls {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 1px;
+        height: 1px;
+        border-radius: 50%;
+        border: 3px solid var(--color-cursor);
+        padding: 2px;
+        pointer-events: none;
+        user-select: none;
+        opacity: 0;
+        transition: opacity 100ms;
+    }
+    .v-select.single .selected-tag + input[type="search"] {
+        /*--- v-select height 換行，自身Bug內建錯誤修正 h-ttps://github.com/sagalbot/vue-select/pull/512---*/
+        padding: 0;
+        width: 0px !important;
+    }
+</style>
+
+<div id="RtRecord_CxrEdit_DivID" class="modal fade setScrollbar" role="dialog" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content" style="width: 500px;">
+
+            @* ----------------- Header 標題 [下] -----------------*@
+            <div class="modal-header">
+                <h4 class="modal-title" style="display:inline-block; margin:0 1em;">CXR檢查</h4>
+                <div class="btn-group pull-right">
+                    <button class="btn btn-success" v-on:click="fn_SaveClick" title="確認儲存">
+                        <span class="glyphicon glyphicon-ok"></span>
+                        &nbsp;儲存
+                    </button>
+                    <button class="btn btn-danger" v-on:click="fn_ResetClick" title="清空視窗">
+                        <span class="glyphicon glyphicon-trash"></span>
+                        &nbsp;清空
+                    </button>
+                    <button class="btn btn-warning" v-on:click="fn_CancelClick" title="回到上一頁">
+                        <span class="glyphicon glyphicon-remove"></span>
+                        &nbsp;關閉
+                    </button>
+                </div>
+            </div>
+            @* ----------------- [上] Header 標題 + Body 內容 [下] -----------------*@
+            <div class="modal-body" id="modifyCxrDetail_divID">
+                <div class="row">
+                    <div class="col-md-4">
+                        @* === 左4 === *@
+                        <canvas class="RtRecordCanvasCls"
+                                style="background: var(--color-white); cursor: none; border: 1px solid black;"
+                                id="OpenDrawingCanvas_canvasID"
+                                v-on:mousedown="fn_MouseDown"
+                                v-on:mousemove="fn_MouseMove"
+                                v-on:mouseup="fn_MouseUp"
+                                v-on:mouseout="fn_MouseOut"
+                                width="120" height="120">
+                        </canvas>
+                        <div ref="cursor" class="myCanvasCursorCls" :style="cursorStyle"></div>
+                    </div>
+                    <div class="col-md-8">
+                        @* === 右8 === *@
+                        <div class="input-group hidden">
+                            <span class="input-group-addon">
+                                ID隱藏
+                            </span>
+                            <input stype="text"
+                                   tyle="width:181px; height:32px; border:1px solid #ccc; display:inline-block;"
+                                   v-model="vueCxrTempEdit.Cxr_CJID" />
+                            <span class="input-group-addon hidden">
+                                {{ vueCxrTempEdit.Cxr_CJID }}
+                            </span>
+                        </div>
+                        @*1.檢查日期*@
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                檢查日期
+                            </span>
+                            <date-picker class="input-group-addon" style="width:149px; height:32px; border:1px solid #ccc; display:inline-block;"
+                                         v-model="vueCxrTempEdit.Result_Date"
+                                         :config="myVueBootstrap4DatetimePicker_RtRecordOptions"
+                                         readonly>
+                            </date-picker>
+                            <span class="input-group-addon hidden">
+                                {{ vueCxrTempEdit.Result_Date }}
+                            </span>
+                        </div>
+                        @*2.大小*@
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                大小
+                            </span>
+                            <span class="input-group-addon" style="width:148px; height:32px; border:1px solid #ccc; display:inline-block;">
+                                <input type="range" class="slider" min="1" max="9" v-model="selectedLineWidth">
+                            </span>
+                            <span class="input-group-addon" style="width:32px; height:32px; border:1px solid #ccc; display:inline-block;">
+                                {{ selectedLineWidth }}
+                            </span>
+                        </div>
+                        @*3.顏色*@
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                顏色
+                            </span>
+                            <div class="input-group-addon" style="width:181px; height:32px; border:1px solid #ccc; display:inline-block;text-align:center; vertical-align: middle;">
+                                <ul class="palette">
+                                    <li v-for="myClr in penColorOptionGroup_array">
+                                        <div :class="myClr._class"
+                                             :style="{background: myClr._color}"
+                                             v-on:click="selectColor(myClr)">
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        @*4.結果*@
+                        @*<span class="input-group hidden">vueCxrTempEdit.Result_Str }}</span>*@
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                結果
+                            </span>
+                            <v-select taggable :filterable="false" @* [開啟可輸入編輯功能] *@
+                                      placeholder="空白"
+                                      v-model="vueCxrTempEdit.Result_Str"
+                                      :options="vueCxrTempEdit.ResultStr_Dropdownlist"
+                                      v-bind:style="{width : '180px'}">
+                            </v-select>
+                        </div>
+                    </div>@* === 右8 === *@
+                </div>
+                @* ----------------- [上] Body 內容 -----------------*@
+            </div>
+        </div>
+    </div>
+</div><!-- Modal -->
+
+<script>
+    var RtRecord_CxrVue = new Vue({
+        el: '#RtRecord_CxrEdit_DivID', // [element] 掛載元素
+        //data: Object.assign(CxrEdit_Mdl), // [data] 數據資料
+        data: {
+            /*--------- 後端 [Server] 接收資料 [下] ---------*/
+            vueCxrFinalSave: {
+                SqlTableName: ''
+                , SqlMasterDetail_ID: ''
+                , Cxr_CJID: ''
+                , image_file_key: ''
+                , Result_Date: ''
+                , Result_Str: ''
+                , CxrXuwmc_List: []
+                , ResultStr_Dropdownlist: []
+            }
+            , vueCxrTempEdit: {
+                SqlTableName: ''
+                , SqlMasterDetail_ID: ''
+                , Cxr_CJID: ''
+                , image_file_key: ''
+                , Result_Date: ''
+                , Result_Str: ''
+                , CxrXuwmc_List: []
+                , ResultStr_Dropdownlist: []
+            }
+            , vueCXR_XYwmc: {
+                x: ''
+                , y: ''
+                , width: ''
+                , mouse: ''
+                , color: ''
+            }
+            /*--------- [上] 後端 [Server] 接收資料 + 前端 [Html] 物件 [下] ---------*/
+            , isDrawing_bool: false //是否要不要 畫圖
+            , newNodeAddOldList_bool: false //是否 加入 新一筆XYwmc
+            , previous_X: 0
+            , previous_Y: 0
+            , selectedColor: 'red'
+            , selectedLineWidth: 1
+            , penColorOptionGroup_array: [{ _color: 'red', _class: 'rtRecordColorOptions_cls rtRecordcssBlackBorder' },
+                { _color: 'yellow', _class: 'rtRecordColorOptions_cls' },
+                { _color: 'green', _class: 'rtRecordColorOptions_cls' },
+                { _color: 'blue', _class: 'rtRecordColorOptions_cls' },
+                //{ _color: 'white', _class: 'rtRecordColorOptions_cls' },
+                 { _color: 'black', _class: 'rtRecordColorOptions_cls' }
+                
+            ]
+            , myVueBootstrap4DatetimePicker_RtRecordOptions: {
+                //Vue Bootstrap 4 DatetimePicker
+                //網址 h-ttps://www.npmjs.com/package/vue-bootstrap-datetimepicker
+                locale: moment.locale('zh-tw') //台灣時間(中文顯示)
+                , dayViewHeaderFormat: 'YYYY - MMMM' //標題(中文顯示)
+                , format: 'YYYY-MM-DD HH:mm' //自定 [顯示] 格式
+                , ignoreReadonly: true //忽略唯讀(勿關閉功能)
+                , toolbarPlacement: 'bottom' //功能 [sideBySide] 會隱藏 [按鍵] (勿關閉功能)
+                , sideBySide: true //顯示時間 [欄位] 但會隱藏 [按鍵]
+                , showTodayButton: true //現在時刻
+                , showClear: true //欄位清空
+                , showClose: true //關閉取消
+                //, icons: {
+                //    today: 'todayDateText' //現在時刻
+                //    , clear: 'clearDateText' //欄位清空
+                //    , close: 'closeDateText' //關閉取消
+                //}
+            }
+            /*--------- [上] 前端 [Html] 物件 ---------*/
+        },// [data] 數據資料
+        mounted: function () {
+            //this.set_model = JSON.parse(JSON.stringify(this.vueCxrFinalSave));
+        },
+        computed: {
+            cursorStyle: function() { //滑鼠樣式轉換
+                return {
+                    width: this.selectedLineWidth + 'px',
+                    height: this.selectedLineWidth + 'px',
+                    background: this.selectedColor
+                };
+            }//cursorStyle
+        },
+        methods: {
+            /*----------------- 開啟 "編輯視窗" [下] -----------------*/
+            //Views\RTRecord\RtRecord_OpenCxrEditForm.cshtml
+            //註解：this.vueCxrFinalSave = this.vueCxrTempEdit; //(會雙向綁定，有錯誤)
+            openCxrEditForm: function(RECORD_ID, modal_ShowHide) {
+
+                // 功能 [Reset] 清空資料 (應寫在 [Views\RTRecord\RTRecordForm2.cshtml] 主頁面，勿開啟)
+                // this.fn_VueCxrSetDefault(this.vueCxrFinalSave); //主頁面，勿開啟
+                this.vueCxrTempEdit = this.fn_VueCxrSetDefault();
+
+                // 1.1 開啟 [編輯視窗]
+                $("#RtRecord_CxrEdit_DivID").modal(modal_ShowHide);
+
+                // 1.2 載入"小肺圖" ImagesDeviantEmptyPng 來源 MainLayout.cshtml
+                //this.fn_ResetClick(); //需加入取代下4行code??待解決
+                var canvasID = document.getElementById('OpenDrawingCanvas_canvasID');
+                var ctx2d = canvasID.getContext('2d');
+                ctx2d.clearRect(0, 0, canvasID.width, canvasID.height); //清空canvas視窗
+                ctx2d.drawImage(ImagesDeviantEmptyPng, 0, 0); //載入"小肺圖"
+                this.isDrawing_bool = false; //Cxr不要繪圖
+
+                // 讀取 [vueCxrFinalSave] 現有資料，若 [已經有值] 則繼續編輯 (不進行動作)
+                // 若是 [沒值] 則要 [1.網路來源] 或是 [2.新創建一筆]
+                if (this.vueCxrFinalSave == undefined
+                    || this.vueCxrFinalSave.Result_Date == undefined
+                    || this.vueCxrFinalSave.Result_Date.toString().trim() == "" // [等於] 代表 [沒值]
+                ){
+                        //重製 [Reset] 清空資料
+                        this.vueCxrFinalSave = this.fn_VueCxrSetDefault();
+                        this.vueCxrTempEdit = this.fn_VueCxrSetDefault();
+
+                        // 1.3 Http 網路請求 [下]
+                        this.$http.post( // Request 網路 Server 請求
+                            '@Url.Content("~/RTRecord/getCxrResultNode_byIdRecordDetail")'
+                            , {
+                                // 細項 SQL 資料庫名稱 [RCS_CPT_ASS_DETAIL] [RCS_RECORD_DETAIL]
+                                // 2.細項 ID 流水號 [RECORD_ID] [CPT_ID] != [Cxr_CJID] 3.Cxr流水號
+                                input_RecordDetail_ID: RECORD_ID
+                            }
+                        ).then( function(ResponseSuccess) { // http 網路 Server 回傳成功
+
+                            // 1.Http 接收資料-全部所有
+                            // this.vueCxrFinalSave = this.fn_SetEqualValueDoNotBind(ResponseSuccess.data);
+                            this.vueCxrFinalSave = ResponseSuccess.data;
+
+                            // 2.若接收已有 Http 資料-進行編輯
+                            // [RCS_CPT_ASS_DETAIL] [RCS_RECORD_DETAIL]
+                            if (this.vueCxrFinalSave != undefined
+                                && this.vueCxrFinalSave.SqlTableName != undefined // 1.細項 SQL 資料庫名稱 [RCS_CPT_ASS_DETAIL] [RCS_RECORD_DETAIL]
+                                && this.vueCxrFinalSave.SqlTableName.toString().trim() == "RCS_RECORD_DETAIL"
+                                && this.vueCxrFinalSave.SqlMasterDetail_ID != undefined // 2.細項 ID 流水號
+                                && this.vueCxrFinalSave.SqlMasterDetail_ID.toString().trim() == RECORD_ID.toString().trim() //RECORD_ID.toString().trim() 
+                                && this.vueCxrFinalSave.Cxr_CJID != undefined // 3.Cxr流水號
+                                && this.vueCxrFinalSave.Cxr_CJID.toString().trim() != ""
+                            ){
+                                //3.Vue資料綁定，須將 [Save_VueData] 暫存於 [EditTemp_VueData] 暫存編輯資料
+                                //只針對 [EditTemp_VueData] 暫存編輯資料，進行編輯，最終 [Save_VueData] 為確認上傳SQL資料
+                                this.vueCxrFinalSave = this.fn_SetEqualValueDoNotBind(this.vueCxrFinalSave);
+                                this.vueCxrTempEdit = this.fn_SetEqualValueDoNotBind(this.vueCxrFinalSave);
+
+                                // 4.[Cxr繪圖畫線]
+                                this.fn_CanvasDrawLine(this.vueCxrTempEdit, "OpenDrawingCanvas_canvasID");
+                                //showAlert('讀取流水號: ' + this.vueCxrFinalSave.Cxr_CJID.toString(), msg_stat.Success);
+                            }//if [已有舊資料]
+
+                            //2.若 SQL 沒有舊資料-[新創建一筆]
+                            else {
+                                //重製 [Reset] 清空資料
+                                this.vueCxrFinalSave = this.fn_VueCxrSetDefault();
+                                this.vueCxrTempEdit = this.fn_VueCxrSetDefault();
+                                //showAlert('新增Cxr資料', msg_stat.Info);
+                            }//-[新創建一筆]
+                            //CXR下拉清單
+                            this.vueCxrFinalSave.ResultStr_Dropdownlist = ResponseSuccess.data.ResultStr_Dropdownlist;
+                            this.vueCxrTempEdit.ResultStr_Dropdownlist = ResponseSuccess.data.ResultStr_Dropdownlist;
+                        },
+                        function (ResponseError) { // 1.3.3 Response 網路回傳失敗
+                            showAlert('程式發生錯誤，請洽資訊人員!' + ResponseError, msg_stat.Danger, 3000);
+                            });
+                }//if-1.3 Request 網路請求 [上]
+
+                // 讀取 [vueCxrFinalSave] 現有資料，若 [已經有值] 則繼續編輯 (不進行動作)
+                // 若是 [沒值] 則要 [1.網路來源] 或是 [2.新創建一筆]
+                else if (this.vueCxrFinalSave != undefined
+                    && this.vueCxrFinalSave.Result_Date != undefined
+                    && this.vueCxrFinalSave.Result_Date.toString().trim() != "" // [不等於] 代表 [有值] 繼續編輯
+                ){
+                    //不進行動作，讀取 [FinalSave] 繼續編輯 [TempEdit]
+                    this.vueCxrTempEdit = this.fn_SetEqualValueDoNotBind(this.vueCxrFinalSave);
+                    // [Cxr繪圖畫線]
+                    this.fn_CanvasDrawLine(this.vueCxrTempEdit, "OpenDrawingCanvas_canvasID");
+                    //showAlert('繼續編輯，欄位 [檢查日期]: ' + this.vueCxrFinalSave.Result_Date.toString(), msg_stat.Success);
+                }//讀取 [vueCxrFinalSave] 現有資料
+            }
+            /*----------------- [上] 開啟 "編輯視窗" + Header 標題按鍵 [下] -----------------*/
+            //1.儲存 [SQL資料庫]
+            , fn_SaveClick: function () {
+                // 統一由主表單 [Views\RTRecord\RTRecordForm2.cshtml] 一併 [setRecordFormData] 儲存
+                // 須將 [EditTemp_VueData] 暫存編輯資料，放入 [Save_VueData] 最終資料
+                if (this.vueCxrTempEdit.Result_Date != undefined
+                    && this.vueCxrTempEdit.Result_Date.toString().trim() != ""
+                ) {
+                    // 使用者 [5.檢查日期] 一定要填寫，否則 [vueCxrFinalSave] 編輯Cxr不會儲存 (保護機制)
+                    this.vueCxrFinalSave = this.fn_VueCxrSetDefault(); //(勿刪除，若先 [取消] 會保留舊圖繼續畫，則錯誤)
+                    this.vueCxrFinalSave = this.fn_SetEqualValueDoNotBind(this.vueCxrTempEdit);
+                    this.vueCxrTempEdit = this.fn_VueCxrSetDefault();
+                    $("#RtRecord_CxrEdit_DivID").modal("hide");
+                }
+                else
+                {
+                    showAlert('欄位 [檢查日期] 不得為空值!!', msg_stat.Danger, 2000);
+                }
+            }
+            //2.清空 [編輯視窗]
+            , fn_ResetClick: function (eEvent) {
+                eEvent.preventDefault();
+                this.vueCxrTempEdit.Result_Date = ""; //3.檢查日期
+                this.vueCxrTempEdit.Result_Str = ""; //4.檢查結果
+                //5.清空 Canvas 繪圖視窗
+                var canvasID = document.getElementById("OpenDrawingCanvas_canvasID");
+                var ctx2d = canvasID.getContext("2d");
+                ctx2d.clearRect(0, 0, canvasID.width, canvasID.height);
+                //6.載入"小肺圖" ImagesDeviantEmptyPng 來源 MainLayout.cshtml
+                ctx2d.drawImage(ImagesDeviantEmptyPng, 0, 0);
+                this.isDrawing_bool = false; //Cxr不要繪圖
+                //清空暫存資料
+                this.vueCxrTempEdit = this.fn_VueCxrSetDefault();
+            }
+            //3.取消 [編輯視窗]
+            , fn_CancelClick: function (eEvent) {
+                this.vueCxrTempEdit = this.fn_VueCxrSetDefault();
+                $("#RtRecord_CxrEdit_DivID").modal("hide");
+            }
+            /*----------------- [上] Header 標題按鍵 + CXR 畫線函式 [下] -----------------*/
+            , fn_CanvasDrawLine(inputA_vueCxrTempEdit, inputB_CanvasID) {
+                this.vueCxrTempEdit = this.fn_SetEqualValueDoNotBind(inputA_vueCxrTempEdit);
+                if (this.vueCxrTempEdit != undefined
+                    && this.vueCxrTempEdit.CxrXuwmc_List != undefined
+                    && this.vueCxrTempEdit.CxrXuwmc_List.length > 0
+                ){
+                    //初步判斷 CxrXuwmc_List 資料格式
+                    var listFirst = this.vueCxrTempEdit.CxrXuwmc_List[0];
+                    if (listFirst["x"] != undefined && listFirst["y"] != undefined) {
+                        //取第1點-起始點
+                        [this.previous_X, this.previous_Y] =
+                            [
+                                parseInt(listFirst["x"])
+                                , parseInt(listFirst["y"])
+                            ];
+                        //取每一點-畫線
+                        this.isDrawing_bool = true; //Cxr可以繪圖
+                        this.newNodeAddOldList_bool = false; //不要加入新一筆XYwmc
+                        for (var keyNum in this.vueCxrTempEdit.CxrXuwmc_List) {
+                            //Vue資料轉換
+                            this.vueCXR_XYwmc = this.vueCxrTempEdit.CxrXuwmc_List[keyNum];
+                            //Cxr開始畫線
+                            this.fn_CanvasDrawPoint(
+                                inputB_CanvasID
+                                , parseInt(this.vueCXR_XYwmc.x)
+                                , parseInt(this.vueCXR_XYwmc.y)
+                                , this.vueCXR_XYwmc.width
+                                , this.vueCXR_XYwmc.mouse
+                                , this.vueCXR_XYwmc.color
+                            );
+                        }
+                        this.isDrawing_bool = false; //Cxr不要繪圖
+                    }//if[!undefined]
+                }//if[length>0]
+            }
+            , fn_CanvasDrawPoint: function(input_CanvasID, input_X, input_Y, input_Width, input_Mouse, input_Color) {
+                if (this.isDrawing_bool) {
+                    //var canvasID = document.getElementById("OpenDrawingCanvas_canvasID");
+                    var canvasID = document.getElementById(input_CanvasID);
+                    var ctx2d = canvasID.getContext("2d");
+                    ctx2d.beginPath(); //開始繪圖
+                    ctx2d.lineCap = 'round'; //圓筆
+                    ctx2d.lineJoin = 'round'; //當2條線相遇時創建一個圓角
+                    ctx2d.strokeStyle = input_Color; //顏色 = 'blue'
+                    ctx2d.lineWidth = input_Width; //筆寬度 = 2
+                    switch (input_Mouse) {
+                        default:
+                        case 'down': {
+                            break; //不做繪圖，但需要break
+                        }
+                        case 'move':
+                        case 'up':
+                        case 'out': {
+                            ctx2d.moveTo(this.previous_X, this.previous_Y);
+                            ctx2d.lineTo(input_X, input_Y);
+                            ctx2d.stroke();
+                            break;
+                        }
+                    }//switch
+                    [this.previous_X, this.previous_Y] = [input_X, input_Y];
+                    /*--------------------------- 是否要加入新一點XYwmc ---------------------------*/
+                    if (this.newNodeAddOldList_bool == true) {
+                        //加入一筆 vueCXR_XYwmc 到現有的 CxrXuwmc_List 暫存
+                        //this.vueCXR_XYwmc.x = input_X; //會有錯誤??待解決
+                        this.vueCxrTempEdit.CxrXuwmc_List.push({
+                            x: input_X
+                            , y: input_Y
+                            , width: input_Width
+                            , mouse: input_Mouse
+                            , color: input_Color
+                        });
+                    }//if
+                }//if-是否要不要 畫圖
+            }
+            //清空資料模板，勿修改內容值
+            , fn_VueCxrSetDefault: function() {
+                var VueCxrDefault =
+                    {
+                        SqlTableName: ''        // 1.細項 SQL 資料庫名稱 (主資料庫)
+                        , SqlMasterDetail_ID: ''// 2.細項 ID 流水號 (主資料庫)
+                        , Cxr_CJID: ''          // 3.Cxr流水號 [資料表名稱] + [主表ID流水號]
+                        , image_file_key: ''    // 4.CXR圖片檔名 (Cxr資料庫)
+                        , Result_Date: ''       // 5.檢查日期 (Cxr資料庫)
+                        , Result_Str: ''        // 6.檢查結果 (Cxr資料庫)
+                        , CxrXuwmc_List: []     // 7.座標 (Cxr資料庫)
+                        , ResultStr_Dropdownlist: []     // 8.[檢查結果] 下拉選單
+                    };
+                return VueCxrDefault;
+            }
+            //獲得內容值，且Data不雙向綁定
+            , fn_SetEqualValueDoNotBind: function(inputVueCxr) {
+                var SetVueCxr = this.fn_VueCxrSetDefault();
+                    SetVueCxr.SqlTableName          = inputVueCxr.SqlTableName == null ? "" : inputVueCxr.SqlTableName.toString().trim(); // 1.細項 SQL 資料庫名稱
+                    SetVueCxr.SqlMasterDetail_ID    = inputVueCxr.SqlMasterDetail_ID == null ? "" : inputVueCxr.SqlMasterDetail_ID.toString().trim(); // 2.細項 ID 流水號
+                    SetVueCxr.Cxr_CJID              = inputVueCxr.Cxr_CJID == null ? "" : inputVueCxr.Cxr_CJID.toString().trim(); // 3.Cxr流水號
+                    SetVueCxr.image_file_key        = inputVueCxr.image_file_key == null ? "" : inputVueCxr.image_file_key.toString().trim(); // 4.CXR圖片檔名
+                    SetVueCxr.Result_Date           = inputVueCxr.Result_Date == null ? "" : inputVueCxr.Result_Date.toString().trim(); // 5.檢查日期
+                    SetVueCxr.Result_Str            = inputVueCxr.Result_Str == null ? "" : inputVueCxr.Result_Str.toString().trim(); // 6.檢查結果
+                    SetVueCxr.CxrXuwmc_List         = SetVueCxr.CxrXuwmc_List.concat(inputVueCxr.CxrXuwmc_List); // 7.座標
+                    SetVueCxr.ResultStr_Dropdownlist    = SetVueCxr.ResultStr_Dropdownlist.concat(inputVueCxr.ResultStr_Dropdownlist); //7.下拉選單
+                return SetVueCxr;
+            }
+            /*------------- [上] CXR 畫線函式 + CXR 滑鼠動作 [下] -------------*/
+            , fn_MouseDown: function (eEvent) {
+                this.newNodeAddOldList_bool = true; //加入新一筆XYwmc
+                this.isDrawing_bool = true; //允許畫圖
+                [this.previous_X, this.previous_Y] = [eEvent.layerX, eEvent.layerY];
+                this.fn_CanvasDrawPoint("OpenDrawingCanvas_canvasID", eEvent.layerX, eEvent.layerY, this.selectedLineWidth, "down", this.selectedColor);
+            }
+            , fn_MouseMove: function (eEvent) {
+                //改變滑鼠圖案
+                const transCursor = this.$refs.cursor;
+                transCursor.style.transform = `translate(${eEvent.layerX + 14}px, ${eEvent.layerY + 71}px)`; //[X+14, Y+71]
+                //加入新一筆XYwmc
+                this.newNodeAddOldList_bool = true;
+                this.fn_CanvasDrawPoint("OpenDrawingCanvas_canvasID", eEvent.layerX, eEvent.layerY, this.selectedLineWidth, "move", this.selectedColor);
+                [this.previous_X, this.previous_Y] = [eEvent.layerX, eEvent.layerY];
+            }
+            , fn_MouseUp: function (eEvent) {
+                this.newNodeAddOldList_bool = true; //加入新一筆XYwmc
+                this.fn_CanvasDrawPoint("OpenDrawingCanvas_canvasID", eEvent.layerX, eEvent.layerY, this.selectedLineWidth, "up", this.selectedColor);
+                this.isDrawing_bool = false; //不要畫圖
+            }
+            , fn_MouseOut: function (eEvent) {
+                this.newNodeAddOldList_bool = true; //加入新一點XYwmc
+                this.fn_CanvasDrawPoint("OpenDrawingCanvas_canvasID", eEvent.layerX, eEvent.layerY, this.selectedLineWidth, "out", this.selectedColor);
+                this.isDrawing_bool = false; //不要畫圖
+            }
+            /*----------------- [上] CXR 滑鼠動作 + 畫筆選擇 [下] -----------------*/
+            , selectColor: function(pickColor_str) {
+                this.selectedColor = pickColor_str._color;
+                for (var i = 0; i < this.penColorOptionGroup_array.length; i++) {
+                    this.penColorOptionGroup_array[i]._class = 'rtRecordColorOptions_cls';
+                }
+                pickColor_str._class = 'rtRecordColorOptions_cls rtRecordcssBlackBorder';
+            }
+            /*----------------- [上] 畫筆選擇 + [Http網路請求 + Cxr繪圖畫線] [下] -----------------*/
+            , fn_getCxrResultNode_byRecordId: function(input_RecordId) {
+
+                // [Http網路請求 + Cxr繪圖畫線]
+                this.$http.post( // Request 網路 Server 請求
+                    '@Url.Content("~/RTRecord/getCxrResultNode_byIdRecordDetail")'
+                    , {
+                        // 細項 SQL 資料庫名稱 [RCS_CPT_ASS_DETAIL] [RCS_RECORD_DETAIL]
+                        // 2.細項 ID 流水號 [RECORD_ID] [CPT_ID] != [Cxr_CJID] 3.Cxr流水號
+                        input_RecordDetail_ID: input_RecordId
+                    }
+                ).then(function(responseSuccess)  { // Http 網路 Server 回傳成功
+
+                    // 1.Http 接收資料-全部所有
+                    // this.vueCxrFinalSave = this.fn_SetEqualValueDoNotBind(responseSuccess.data);
+                    this.vueCxrFinalSave = this.fn_VueCxrSetDefault();
+                    this.vueCxrFinalSave = responseSuccess.data;
+
+                    // 2.若接收已有 Http 資料-進行編輯
+                    // [RCS_CPT_ASS_DETAIL] [RCS_RECORD_DETAIL]
+                    if (this.vueCxrFinalSave != undefined
+                        && this.vueCxrFinalSave.SqlTableName != undefined // 1.細項 SQL 資料庫名稱 [RCS_CPT_ASS_DETAIL] [RCS_RECORD_DETAIL]
+                        && this.vueCxrFinalSave.SqlTableName.toString().trim() == "RCS_RECORD_DETAIL"
+                        && this.vueCxrFinalSave.SqlMasterDetail_ID != undefined // 2.細項 ID 流水號
+                        && this.vueCxrFinalSave.SqlMasterDetail_ID.toString().trim() == input_RecordId.toString().trim() //input_RecordId.toString().trim() 
+                        && this.vueCxrFinalSave.Cxr_CJID != undefined // 3.Cxr流水號
+                        && this.vueCxrFinalSave.Cxr_CJID.toString().trim() != ""
+                    ) {
+                        // 1.2 載入"小肺圖" ImagesDeviantEmptyPng 來源 MainLayout.cshtml
+                        //this.fn_ResetClick(); //需加入取代下4行code??待解決
+                        var canvasID = document.getElementById(this.vueCxrFinalSave.SqlMasterDetail_ID.toString().trim());
+                        var ctx2d = canvasID.getContext('2d');
+                        ctx2d.clearRect(0, 0, canvasID.width, canvasID.height); //清空canvas視窗
+                        ctx2d.drawImage(ImagesDeviantEmptyPng, 0, 0); //載入"小肺圖"
+                        // 4.[Cxr繪圖畫線]
+                        this.fn_CanvasDrawLine(this.vueCxrFinalSave, input_RecordId.toString().trim());
+                        //showAlert('讀取流水號: ' + this.vueCxrFinalSave.Cxr_CJID.toString(), msg_stat.Success);
+                    }//if [已有舊資料]
+
+                    //2.若 SQL 沒有舊資料
+                    else {
+                        //重製 [Reset] 清空資料
+                        this.vueCxrFinalSave = this.fn_VueCxrSetDefault();
+                    }//
+                }
+                , function(responseError)  { // 1.3.3 Http 網路回傳失敗
+                    showAlert('程式發生錯誤，請洽資訊人員!' + responseError, msg_stat.Danger, 3000);
+                });
+            }//fn_getCxrResultNode_byRecordId
+            /*----------------- [上] [Http網路請求 + Cxr繪圖畫線] -----------------*/
+        }//methods 方法
+    });//new RtRecord_CxrVue
+
+</script>

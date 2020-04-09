@@ -1,0 +1,707 @@
+﻿@model RCS_Data.DeviceModel
+@using RCS_Data
+@{
+    UserInfo user_info = (UserInfo)Session["user_info"];
+}
+
+<script type="text/javascript">
+    var urlContent = '@Url.Content("~/SystemManage/")';
+    $(document).ready(function () {
+        $('#btnNewDevice').on('click', function () { showDeviceModal(''); });
+        
+        $('#btnShowCheck, #btnShowMaintain').on('click', showDeviceDetail);
+
+        $('#btnNewMaintain').on('click', function () {
+            var selectNo = getSelectDevice();
+            if (selectNo == null) {
+                showAlert('取得資料失敗', msg_stat.Danger);
+                return false;
+            }
+            showMaintainModal(selectNo[0], '', 'new');
+        });
+        $('#btnDeleteMaintain').on('click', deleteMaintain);
+        $('#checklist_pre_page, #checklist_next_page, #maintain_pre_page, #maintain_next_page')
+            .on('click', switch_page);
+
+        $('#btnSaveDevice, #btnDeleteDevice, #btnRestoreDevice').on('click', saveDevice);
+        $('#cbxShowDelete').on('click', function () {
+            $('#btnRestoreDevice').css('display', (this.checked ? '' : 'none'));
+            refreshDevice();
+        });
+        refreshDevice();
+    });
+
+    function refreshDevice() {
+        var $mdiv = $('#div_device');
+        var $mtbl = $mdiv.find('table');
+        var ischked = document.getElementById('cbxShowDelete').checked;
+
+        $.ajax({
+            type: 'post',
+            url: urlContent + 'getDeviceList',
+            timeout: 5000,
+            data: { 'pShowDel': ischked },
+            success: function (listdata) {
+                if ($('#device_loaded').val() == '1') {
+                    $mtbl.bootstrapTable('load', listdata.attachment);
+                } else {
+                    var open = '@ViewBag.OpenRights';
+                    //console.log(open);
+                    $mtbl.bootstrapTable({
+                        data: listdata.attachment,
+                        undefinedText: '',
+                        maintainSelected: true,
+                        singleSelect: true,
+                        pagination: true,
+                        toolbar: '#device_func',
+                        pageSize: 10,
+                        pageList: [10, 25],
+                        flat: true,
+                        onPostBody: function () {
+                            if (open && open == 'True') {
+                                $mtbl.find('td.edit-column').tooltip({
+                                    placement: 'bottom',
+                                    title: 'click to edit',
+                                    container: 'body'
+                                });
+                            }
+                        },
+                        onClickRow: function (row, e) {
+                            if (e.context.cellIndex == 1 && open && open == 'True') {
+                                showDeviceModal(row.DEVICE_NO);
+                            } else {
+                                var chk = $mdiv.data('open-check');
+                                if (chk == undefined || chk == 0) {
+                                    e.find('input[type="checkbox"]').trigger('click');
+                                }
+                            }
+                        }
+                    }).on('pre-body.bs.table', function (data) {
+                        $('#div_device').find('table').find('input[type="checkbox"]:checked').trigger('click');
+                    });
+                    $('#device_loaded').val('1');
+                }
+                if (listdata.message != '') {
+                    showAlert(listdata.message, msg_stat.Info);
+                }
+            },
+            error: function (xhr, status, error) {
+                alert('系統發生錯誤');
+            }
+        });
+    }
+    function saveDevice() {
+        var $model = $('#DeviceModal');
+        var device_no = $model.data('now-device-no');
+        var now_device_no = [];
+        now_device_no.push($('#TbxDeviceNo').val());
+        var savetype = $(this).data('device-savetype');
+
+        if (savetype == 'delete') {
+            var selectNo = getSelectDevice(savetype);
+            if (selectNo == null || !confirm('您確定要停用所選儀器?')) {
+                return false;
+            } else {
+                now_device_no = selectNo;
+            }
+        } else if (savetype == 'restore') {
+            var selectNo = getSelectDevice(savetype);
+            now_device_no = selectNo;
+        } else {
+            savetype = device_no == undefined || device_no == '' ? 'new' : 'modify';
+        }
+
+        $.ajax({
+            type: 'post',
+            url: urlContent + 'DeviceSave',
+            timeout: 5000,
+            traditional: true,
+            data: {
+                'pOriDeviceNo': device_no,
+                'pDeviceNo': now_device_no,
+                'pModel': $('#DdlDeviceModel').val(),
+                'pBuyDate': $('#TbxPDate').val(),
+                'pType': savetype
+            },
+            success: function (data) {
+                if (data.status == '0') {
+                    setDefaultView();
+                    refreshDevice();
+                }
+                if (data.message != '') {
+                    showAlert(data.message, msg_stat.Info);
+                }
+            },
+            error: function (xhr, status, error) {
+                alert('系統發生錯誤');
+            }
+        });
+    }
+    function showDeviceModal(device_no) {
+        var ischked = document.getElementById('cbxShowDelete').checked;
+        if (device_no == '') {
+            clearDeviceForm();
+            $('#DeviceModal').data('now-device-no', '').modal('show');
+        } else {
+            $.ajax({
+                type: 'post',
+                url: urlContent + 'getDevice',
+                timeout: 5000,
+                data: { 'pDeviceNo': device_no, 'pShowDel' : ischked },
+                success: function (data) {
+                    if (data.status == '0') {
+                        $('#DeviceModal').data('now-device-no', device_no).modal('show');
+                        $('#TbxDeviceNo').val(device_no);
+                        $('#DdlDeviceModel').val(data.attachment.DEVICE_MODEL);
+                        $('#TbxPDate').val(data.attachment.PURCHASE_DATE);
+                    }
+                    if (data.message != '') {
+                        showAlert(data.message, msg_stat.Info);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert('系統發生錯誤');
+                }
+            });
+        }
+    }
+    function getSelectDevice(savetype) {
+        var $mtbl = $('#div_device').find('table');
+        var selectItem = $mtbl.bootstrapTable('getSelections');
+        if (savetype == 'delete' && selectItem.length == 0) {
+            showAlert('請選擇至少一筆資料', msg_stat.Warning);
+            return null;
+        }
+        if (selectItem.length == 0 || selectItem.length > 1) {
+            showAlert('請選擇一筆資料', msg_stat.Warning);
+            return null;
+        }
+        var device_no = $.map(selectItem, function (item) {
+            return item.DEVICE_NO;
+        });
+        return device_no;
+    }
+
+    function setDefaultView() {
+        $('#div_device').find('table').find('tr').show();
+        $('#checklist_area, #maintain_area').hide();
+        clearDeviceForm();
+        $('#DeviceModal').data('now-device-no', '').modal('hide');
+    }
+    function clearDeviceForm() {
+        $('#TbxDeviceNo').val('');
+        $('#DdlDeviceModel').selecFirst();
+        $('#TbxPDate').val('');
+    }
+    function switch_page() {
+        var $btn = $(this);
+        var $listtbl = $('#' + $btn.data('swtich-area'));
+        var func = $btn.data('func-name');
+        var dir_from = func == 'prevPage' ? 'right' : 'left';
+        var dir_to = func == 'prevPage' ? 'left' : 'right';;
+        $listtbl.hide('slide', { direction: dir_from, easing: "easeOutQuint" }, 300, function () {
+            $listtbl.bootstrapTable(func);
+            $listtbl.show('slide', { direction: dir_to, easing: "easeOutQuint" }, 300);
+        });
+    }
+
+    function showDeviceDetail() {
+        var $mdiv = $('#div_device');
+        var $mtbl = $mdiv.find('table');
+        var $this = $(this);
+        var selectNo = getSelectDevice();
+        var delbtn = document.getElementById('btnDeleteDevice');
+        var resbtn = document.getElementById('btnRestoreDevice');
+
+        if (selectNo !== null) {
+            var chk = $mdiv.data('open-check');
+            var opentype = $this.data('open-type');
+            var $showarea = $('#' + opentype + '_area');
+
+            if ($showarea.is(':visible')) {
+                $this.text($this.data('show-text')).removeClass('btn-info').addClass('btn-default');
+                $showarea.hide();
+                if (chk == 1) {
+                    $mdiv.data('open-check', 0)
+                        .find('.fixed-table-pagination').show();
+                    $mtbl.find('tr').show().find('input[type="checkbox"]').show();
+                    if (delbtn) delbtn.disabled = false;
+                    if (resbtn) resbtn.disabled = false;
+                } else {
+                    $mdiv.data('open-check', 1);
+                }
+
+            } else {
+                $this.text('關閉' + $this.data('show-text')).removeClass('btn-default').addClass('btn-info');
+                $mdiv.find('.fixed-table-pagination').hide();
+                var $chked = $mtbl.find('input[type="checkbox"]').hide().end().find(':checked');
+                $mtbl.find('td').parent().not($chked.parent().parent()).hide();
+                if (delbtn) delbtn.disabled = true;
+                if (resbtn) resbtn.disabled = true;
+                $showarea.show();
+                refreshDetail(opentype, selectNo);
+                if (chk == undefined || chk == 0) {
+                    $mdiv.data('open-check', 1);
+                } else {
+                    $mdiv.data('open-check', 2);
+                }
+            }
+        }
+    }
+    function refreshDetail(type, device_no) {
+        var $listtbl = $('#device_' + type);
+        var $chk = $('#' + type + '_loaded');
+        if (device_no == undefined || device_no == '')
+            device_no = $listtbl.data('now-device-no');
+
+        $.ajax({
+            type: 'post',
+            url: urlContent + 'getDetailList',
+            timeout: 5000,
+            traditional: true,
+            data: {
+                'pDeviceNo': device_no,
+                'pSdate': $('#' + type + '_sdate').val(),
+                'pEdate': $('#' + type + '_edate').val(),
+                'pType': type
+            },
+            success: function (listdata) {
+                if ($chk.val() == '1') {
+                    $listtbl.data('now-device-no', device_no)
+                        .bootstrapTable('load', listdata.attachment);
+                } else {
+                    $chk.val('1');
+                    $listtbl.bootstrapTable({
+                        data: listdata.attachment,
+                        undefinedText: '',
+                        pagination: true,
+                        toolbar: '#' + type + '_func',
+                        pageSize: 6,
+                        flat: true,
+                        onPostBody: function () {
+                            $listtbl.find('td.edit-column').tooltip({
+                                placement: 'bottom',
+                                title: 'click to edit',
+                                container: 'body'
+                            });
+                        },
+                        onClickRow: function (row, e) {
+                            if (type == 'maintain') {
+                                if (e.context.cellIndex == 1) {
+                                    var selectNo = getSelectDevice();
+                                    if (selectNo == null) {
+                                        showAlert('取得資料失敗', msg_stat.Danger);
+                                        return false;
+                                    }
+                                    showMaintainModal(row.DEVICE_NO, row.CREATE_DATE, 'modify');
+                                } else {
+                                    e.find('input[type="checkbox"]').trigger('click');
+                                }
+                            }
+                        }
+                    }).data('now-device-no', device_no);
+                }
+                if (listdata.message != '') {
+                    showAlert(listdata.message, msg_stat.Info);
+                }
+            },
+            complete: function () {
+                if (type == 'checklist') {
+                    $listtbl.find('th:eq(3), th:eq(5), td:nth-child(4), td:nth-child(6)')
+                        .css('height', '86px');
+                }
+            },
+            error: function (xhr, status, error) {
+                alert('系統發生錯誤');
+            }
+        });
+    }
+    function clearMaintainForm() {
+        $('#LblDeviceNo').text('');
+        $('#TbxRunningHr').val('');
+        $('#DdlMaintainStatus').selecFirst();
+        $('#TbxMaintainSDate').val('');
+        $('#TbxMaintainEDate').val('');
+        $('#DdlSystemTest').selecFirst();
+        $('#DdlCleanStatus').selecFirst();
+        $('#TbxEditMemo').val('');
+        $('#HidDeviceNo').val('');
+        $('#HidCreateDate').val('');
+    }
+    function showMaintainModal(device_no, create_date, savetype) {
+        clearMaintainForm();
+        $('#LblDeviceNo').text(device_no);
+        $('#HidDeviceNo').val(device_no);
+        if (savetype == 'new') {
+            $('#MaintainModal').data('edit-mode', false).modal('show');
+        } else {
+            $.ajax({
+                type: 'post',
+                url: urlContent + 'getMaintain',
+                timeout: 5000,
+                data: { 'pDeviceNo': device_no, 'pCreateDate': create_date },
+                success: function (data) {
+                    if (data.status == '0') {
+                        $('#MaintainModal')
+                            .data('now-device-no', device_no)
+                            .data('now-create_date', create_date)
+                            .data('edit-mode', true)
+                            .modal('show');
+
+                        $('#TbxRunningHr').val(data.attachment.RUNNING_HR);
+                        $('#DdlMaintainStatus').val(data.attachment.STATUS);
+                        $('#TbxMaintainSDate').val(data.attachment.START_DATE);
+                        $('#TbxMaintainEDate').val(data.attachment.END_DATE);
+                        $('#DdlSystemTest').val(data.attachment.SYSTEM_TEST);
+                        $('#DdlCleanStatus').val(data.attachment.CLEAN_STATUS);
+                        $('#TbxEditMemo').val(data.attachment.REMARK);
+                        $('#HidCreateDate').val(data.attachment.CREATE_DATE);
+                    }
+                    if (data.message != '') {
+                        showAlert(data.message, msg_stat.Info);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert('系統發生錯誤');
+                }
+            });
+        }
+    }
+    function saveMaintain() {
+        var saveObj = getJsonObject('MaintainModal');
+        var $modal = $('#MaintainModal');
+        var is_new = $('#HidCreateDate').val() == '';
+        $.ajax({
+            type: 'post',
+            url: urlContent + 'MaintainSave',
+            timeout: 5000,
+            data: { 'pMaintainData': JSON.stringify(saveObj), 'pIsNew': is_new },
+            success: function (data) {
+                //console.log(data.status);
+                if (data.status == '0') {
+                    $modal.modal('hide');
+                    refreshDetail('maintain', $('#LblDeviceNo').text());
+                }
+                if (data.message != '') {
+                    showAlert(data.message, msg_stat.Info);
+                }
+            },
+            error: function (xhr, status, error) {
+                alert('系統發生錯誤');
+            }
+        });
+    }
+    function deleteMaintain() {
+        var $mtbl = $('#maintain_area').find('table');
+        var selectItem = $mtbl.bootstrapTable('getSelections');
+        if (selectItem.length == 0) {
+            showAlert('請選擇至少一筆資料', msg_stat.Warning);
+            return null;
+        }
+        if (confirm('您確定要刪除所選資料?')) {
+            var date_list = $.map(selectItem, function (item) {
+                return item.CREATE_DATE;
+            });
+            //console.log(date_list);
+            var selectNo = getSelectDevice();
+            $.ajax({
+                type: 'post',
+                url: urlContent + 'MaintainDelete',
+                timeout: 5000,
+                traditional: true,
+                data: { 'pDeviceNo': selectNo, 'pCreateDate': date_list },
+                success: function (data) {
+                    if (data.status == '0') {
+                        refreshDetail('maintain', $('#LblDeviceNo').text());
+                    }
+                    if (data.message != '') {
+                        showAlert(data.message, msg_stat.Info);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert('系統發生錯誤');
+                }
+            });
+        }
+    }
+
+    function statistics_print() {
+        //console.log($('#ddlStatisticsMonth').val());
+        $('#pYearMonth').val($('#ddlStatisticsMonth').val());
+        $('#pEndYearMonth').val($('#ddlEndMonth').val());
+        $('#DeviceSettingsForm')[0].submit();
+        return false;
+    }
+    
+    function mergeDeviceText(value, row, index) {
+        var device = row['DEVICE_SEQ'];
+        var isuse = row['USE_STATUS'];
+        return isuse == 'N' ? '<span class="text-danger">' + device + '(已停用)</span>' : device;
+    }
+</script>
+<form id="DeviceSettingsForm" action="@Url.Content("~/SystemManage/ExportMonthlyStatisticsExcel")" method="post">
+    <input type="hidden" name="pYearMonth" id="pYearMonth" />
+    <input type="hidden" name="pEndYearMonth" id="pEndYearMonth" />
+    <input type="submit" id="BtnDownloadStatistics" style="display:none;" />
+</form>
+<table id="device_list" class="table table-hover table-bordered table-striped table-condensed" style="width:100%;">
+    <tr>
+        <td>
+            <div id="div_device">
+                <div class="extra_function" id="device_func">
+                    
+                        <button class="btn btn-default new-device" id="btnNewDevice">新增</button>
+                        <button class="btn btn-default" id="btnDeleteDevice" data-device-savetype="delete">停用</button>
+                        <button class="btn btn-success" id="btnRestoreDevice" data-device-savetype="restore" style="display: none;">恢復</button> 
+                    <button class="btn btn-default" id="btnShowCheck" data-open-type="checklist" data-show-text="檢核清單">檢核清單</button>
+                    <button class="btn btn-default" id="btnShowMaintain" data-open-type="maintain" data-show-text="保養紀錄">保養紀錄</button>
+                    <input type="checkbox" id="cbxShowDelete" /><label for="cbxShowDelete" style="margin: 0; font-size: 1em;">顯示停用呼吸機</label>
+                    @if (RCS.Controllers.BaseController.funSetting.showMonthlyReport)
+                    {
+                        <select id="ddlStatisticsMonth">
+                            @for (int i = 0; i < 5; i++)
+                            {
+                                string year = (DateTime.Now.Year - i).ToString();
+                                for (int m = 12; m >= 1; m--)
+                                {
+                                    if ((i == 0 && m <= DateTime.Now.Month) || i > 0)
+                                    {
+                                        <option value="@(year + m.ToString().PadLeft(2, '0'))">@(year + "年" + m.ToString().PadLeft(2, '0') + "月")</option>
+                                    }
+                                }
+                            }
+                        </select>
+                        @:至
+                        <select id="ddlEndMonth">
+                            @for (int i = 0; i < 5; i++)
+                            {
+                                string year = (DateTime.Now.Year - i).ToString();
+                                for (int m = 12; m >= 1; m--)
+                                {
+                                    if ((i == 0 && m <= DateTime.Now.Month) || i > 0)
+                                    {
+                                        <option value="@(year + m.ToString().PadLeft(2, '0'))">@(year + "年" + m.ToString().PadLeft(2, '0') + "月")</option>
+                                    }
+                                }
+                            }
+                        </select>
+                        <button class="btn btn-info" id="btnMonthlyStatistics" onclick="statistics_print();">月報表</button>
+                    }
+                </div>
+                <table id="device_maintable" class="table table-hover table-bordered table-striped table-condensed maya-table" data-search="true">
+                    <thead>
+                        <tr>
+                            <th data-checkbox="true"></th>
+                            <th data-field="DEVICE_SEQ" data-formatter="mergeDeviceText" class="edit-column">財產編號</th>
+                            <th data-field="PURCHASE_DATE">採購日期</th>
+                            <th data-field="ON_POSITION">使用中位置</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </td>
+    </tr>
+</table>
+<fieldset id="checklist_area" class="flip-scroll fieldset-style">
+    <legend class="legend-title">檢核清單</legend>
+    <div id="date_time_dom" style="position:relative;"></div>
+    <div class="extra_function" id="checklist_func">
+        <button class="btn btn-default" id="checklist_pre_page" data-swtich-area="device_checklist" data-func-name="prevPage" title="上一頁">
+            <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;上一頁
+        </button>
+        <button class="btn btn-default" id="checklist_next_page" data-swtich-area="device_checklist" data-func-name="nextPage" title="下一頁">
+            <span class="glyphicon glyphicon-arrow-right"></span>&nbsp;下一頁
+        </button>
+        紀錄日期：&nbsp;
+        <input type="text" class="form-control dt-picker dt-picker-device" dt-format="d" dt-sidebyside="true" dt-widgetparent="date_time_dom" id="checklist_sdate" name="checklist_sdate" value="@DateTime.Now.Date.AddDays(-6).ToString("yyyy-MM-dd")" />
+        ~
+        <input type="text" class="form-control dt-picker dt-picker-device" dt-format="d" dt-sidebyside="true" dt-widgetparent="date_time_dom" id="checklist_edate" name="checklist_edate" value="@DateTime.Now.Date.ToString("yyyy-MM-dd")" />
+        <input type="button" id="btnQueryChecklist" class="btn btn-default" value="搜尋" data-loading-text="搜尋中..." onclick="refreshDetail('checklist');" />
+    </div>
+    <table id="device_checklist" class="table table-hover table-bordered table-striped table-condensed">
+        <thead>
+            <tr>
+                <th data-field="DEVICE_SEQ" data-click-to-select="false">呼吸器編號</th>
+                <th data-field="CHART_NO" data-click-to-select="false">病歷號</th>
+                <th data-field="DETAIL.0" data-click-to-select="false">
+                    吸與吐氣容積相差10%內
+                </th>
+                <th data-field="DETAIL.1" style="height: 86px;" data-click-to-select="false">
+                    依病人狀況設定換氣量警報上下限<br />
+                    上限: minute volume +3〜5 L/min<br />
+                    下限: minute volume - 2〜3 L/min<br />
+                </th>
+                <th data-field="DETAIL.2" data-click-to-select="false">
+                    壓力警報系統測試正常
+                </th>
+                <th data-field="DETAIL.3" style="height: 86px;" data-click-to-select="false">
+                    依病人狀況設定壓力警報上下限<br />
+                    上限: Peak Pressure + 10〜15cmH2O<br />
+                    下限: Peak Pressure - 3〜5cmH2O<br />
+                </th>
+                <th data-field="DETAIL.4" data-click-to-select="false">
+                    氧氣濃度之確認(21%、100%)
+                </th>
+                <th data-field="DETAIL.5" data-click-to-select="false">
+                    內部電池蓄電功能正常
+                </th>
+                <th data-field="DETAIL.6" data-click-to-select="false">
+                    Blender警報功能正常
+                </th>
+                <th data-field="DETAIL.7" data-click-to-select="false">
+                    更換呼吸器管路
+                </th>
+                <th data-field="DETAIL.8" data-click-to-select="false">
+                    管路檢查及測試正常
+                </th>
+                <th data-field="DETAIL.9" data-click-to-select="false">
+                    更換吐氣端細菌過濾器
+                </th>
+                <th data-field="DETAIL.10" data-click-to-select="false">
+                    空氣過濾棉清潔
+                </th>
+                <th data-field="CREATE_NAME" data-click-to-select="false">記錄人員</th>
+                <th data-field="CREATE_DATE" data-click-to-select="false">呼吸器檢測記錄時間</th>
+            </tr>
+        </thead>
+    </table>
+</fieldset>
+<fieldset id="maintain_area" class="fieldset-style" style="position: relative;">
+    <legend class="legend-title">保養紀錄</legend>
+    <div class="extra_function" id="maintain_func">
+        <button class="btn btn-default new-maintain" id="btnNewMaintain">新增</button>
+        <button class="btn btn-default" id="btnDeleteMaintain">刪除</button>
+        <button class="btn btn-default" id="maintain_pre_page" data-swtich-area="device_maintain" data-func-name="prevPage" title="上一頁">
+            <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;上一頁
+        </button>
+        <button class="btn btn-default" id="maintain_next_page" data-swtich-area="device_maintain" data-func-name="nextPage" title="下一頁">
+            <span class="glyphicon glyphicon-arrow-right"></span>&nbsp;下一頁
+        </button>
+        紀錄日期：&nbsp;
+        <input type="text" class="form-control dt-picker dt-picker-device" dt-format="d" dt-sidebyside="true" dt-widgetparent="maintain_area" id="maintain_sdate" name="maintain_sdate" value="@DateTime.Now.Date.AddDays(-6).ToString("yyyy-MM-dd")" />
+        ~
+        <input type="text" class="form-control dt-picker dt-picker-device" dt-format="d" dt-sidebyside="true" dt-widgetparent="maintain_area" id="maintain_edate" name="maintain_edate" value="@DateTime.Now.Date.ToString("yyyy-MM-dd")" />
+        <input type="button" id="btnQueryMaintain" class="btn btn-default" value="搜尋" data-loading-text="搜尋中..." onclick="refreshDetail('maintain');" />
+    </div>
+    <table id="device_maintain" class="table table-hover table-bordered table-striped table-condensed maya-table" data-search="true">
+        <thead>
+            <tr>
+                <th data-checkbox="true" data-click-to-select="false"></th>
+                <th data-field="DEVICE_SEQ" class="edit-column">財產編號</th>
+                <th data-field="CREATE_NAME">人員</th>
+                <th data-field="RUNNING_HR">運轉時數</th>
+                <th data-field="STATUS">狀態</th>
+                <th data-field="SYSTEM_TEST">機器系統</th>
+                <th data-field="CLEAN_STATUS">保養清潔</th>
+                <th data-field="START_DATE">起始日</th>
+                <th data-field="REMARK">備註</th>
+            </tr>
+        </thead>
+    </table>
+</fieldset>
+<div class="modal fade modal_assess" tabindex="-1" data-backdrop="static" data-keyboard="false" role="dialog" id="DeviceModal">
+    <div class="modal-dialog modal-slg">
+        <div class="modal-content">
+            <div class="modal-header col-*-12">
+                <div class="btn-group col-*-6">
+                    <h4 class="modal-title">呼吸器維護</h4>
+                </div>
+                <div class="btn-group pull-right">
+                    <button class="btn btn-success" id="btnSaveDevice" data-loading-text="儲存中...">儲存</button>
+                    <button class="btn btn-warning" data-dismiss="modal">關閉</button>
+                </div>
+            </div>
+            <div class="modal-body" id="device_body">
+                <table class="table table-bordered table-condensed">
+                    <tr>
+                        <td class="col-lg-4">
+                            <label style="display: block;">財產編號：</label>
+                            @if (Model.hospdevicelist.Count > 0)
+                            {
+                                @Html.DropDownList("TbxDeviceNo", Model.hospdevicelist, new { @style = "width: 160px;", @maxlength = "20", @class = "form-control input-sm editable_select" })
+                            }
+                            else
+                            {
+                                <input type="text" class="form-control input-sm" id="TbxDeviceNo" maxlength="20" style="width: 160px;" />
+                            }
+                        </td>
+                        <td class="col-sm-4">
+                            <label style="display: block;">呼吸器類別：</label>
+                            @Html.DropDownList("DdlDeviceModel", Model.modeltypelist, new { @class = "form-control input-sm" })
+                        </td>
+                        <td class="col-sm-4">
+                            <label style="display: block;">採購日期：</label>
+                            <input type="text" class="form-control dt-picker dt-picker-device" dt-format="d" id="TbxPDate" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade modal_assess" tabindex="-1" data-backdrop="static" data-keyboard="false" role="dialog" id="MaintainModal">
+    <div class="modal-dialog modal-slg">
+        <div class="modal-content">
+            <div class="modal-header col-*-12">
+                <div class="btn-group col-*-6">
+                    <h4 class="modal-title">保養紀錄維護</h4>
+                </div>
+                <div class="btn-group pull-right">
+                    <button class="btn btn-success" id="BtnSaveMaintain" data-loading-text="儲存中..." onclick="saveMaintain()">儲存</button>
+                    <button class="btn btn-warning" data-dismiss="modal">關閉</button>
+                </div>
+            </div>
+            <div class="modal-body" id="device_body">
+                <table class="table table-bordered table-condensed">
+                    <tr>
+                        <td colspan="2">
+                            財產編號：<label id="LblDeviceNo"></label>
+                            <input type="hidden" class="form-control" data-rcs-cate="create_date" id="HidCreateDate">
+                            <input type="hidden" class="form-control" data-rcs-cate="device_no" id="HidDeviceNo">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-lg-6">
+                            運轉時數：
+                            <input type="text" class="form-control input-sm" data-rcs-cate="running_hr" dt-format="d" id="TbxRunningHr" style="width: 90px; display: inline-block;" maxlength="7" />
+                            小時
+                        </td>
+                        <td class="col-lg-6">
+                            狀態：
+                            @Html.DropDownList("DdlMaintainStatus", Model.statuslist, new { @style = "width: 160px; display: inline-block;", @class = "form-control input-sm", @data_rcs_cate = "status" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-lg-6">
+                            起始日期：
+                            <input type="text" class="form-control dt-picker dt-picker-device" data-rcs-cate="start_date" dt-format="d" id="TbxMaintainSDate" maxlength="10" />
+                        </td>
+                        <td class="col-lg-6">
+                            結束日期：
+                            <input type="text" class="form-control dt-picker dt-picker-device" data-rcs-cate="end_date" dt-format="d" id="TbxMaintainEDate" maxlength="10" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-lg-6">
+                            機器系統檢測：
+                            @Html.DropDownList("DdlSystemTest", Model.systemtestlist, new { @style = "width: 160px; display: inline-block;", @class = "form-control input-sm", @data_rcs_cate = "system_test" })
+                        </td>
+                        <td class="col-lg-6">
+                            保養清潔：
+                            @Html.DropDownList("DdlCleanStatus", Model.cleanstatuslist, new { @style = "width: 160px; display: inline-block;", @class = "form-control input-sm", @data_rcs_cate = "clean_status" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <label style="display: block;">備註：</label>
+                            <input type="text" class="form-control" name="edit_memo" data-rcs-cate="remark" id="TbxEditMemo" style="width:100%" maxlength="100" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="device_loaded" value="0" />
+<input type="hidden" id="checklist_loaded" value="0" />
+<input type="hidden" id="maintain_loaded" value="0" />

@@ -1,0 +1,96 @@
+﻿
+body {
+    background: url(../Images/login-bg.jpg);
+    background-size: cover;
+    font-family: "微軟正黑體",Arial,sans-serif;
+    font-size: 16px;
+}
+
+.container-fluid {
+    min-width: 800px;
+}
+
+/*LOGIN*/
+.loginbody {
+    background: url(../Images/login-bg.jpg);
+    background-size: cover;
+}
+
+.form-signin {
+    max-width: 400px;
+    padding: 10px 42px;
+    margin: 0 auto;
+    border-radius: 0 0 5px 5px;
+    background: rgba(255,255,255,0.78);
+    background-size: contain;
+    box-shadow: 0 10px 15px -2px rgba(22,35,25,0.8);
+
+}
+.form-signin{
+  
+
+}
+.form-signin .btn{
+    background:#B1B1B1;
+    color:#FFF;
+    background:rgba(255, 156, 0, 0.80);
+}
+
+.login-role {
+    margin: 10px 0px 15px 0px;
+    width: 100%;
+    text-align: center;
+}
+
+    .login-role label {
+        
+    }
+
+.form-signin-heading {
+    background: url(../Images/login-LOGO.png) no-repeat bottom;
+    max-width: 487px;
+    height: 280px;
+    /*text-indent:-999999px;*/
+    margin: 30px auto 50px auto;
+    text-align: center;
+    padding-top: 290px;
+    box-sizing: border-box;
+}
+.form-signin-heading h2{
+    text-shadow: 1px 1px 3px #000;
+    color:#FFF;
+    background:rgba(255, 156, 0, 0.80);
+    padding:9px 0;
+    border-radius:20px 20px 0 0;
+    margin:0 43px;
+    
+ 
+    
+    
+
+}
+
+.form-signin input[type="text"] {
+    margin-bottom: 20px;
+}
+
+.form-signin input[type="password"] {
+    margin-bottom: 10px;
+}
+
+.form-signin .form-control {
+    position: relative;
+    height: auto;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.form-signin .checkbox label {
+    color: #808080;
+    font-family:Arial;
+    font-weight:bold;
+
+}

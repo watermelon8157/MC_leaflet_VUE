@@ -1,0 +1,58 @@
+﻿
+
+@*@using RCS.Areas.CARE_LIST.Models;
+@model List<CARE_LIST>*@
+
+@{
+    //var ViewModelCareList = new CARE_LIST();
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+@*<table border="1" style='width:100%;'>
+    <thead>
+        <tr>
+            @foreach (var item in ViewModelCareList.patInfo)
+            {
+                <td style='border:1px solid;'>@item.bed_no</td>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            @foreach (var item in ViewModelCareList.patInfo)
+            {
+                <td style='border:1px solid;'>@item.patient_name</td>
+            }
+        </tr>
+        <tr>
+            @foreach (var item in ViewModelCareList.patInfo)
+            {
+                <td style='border:1px solid;'>@item.chart_no</td>
+            }
+        </tr>
+    </tbody>
+</table>*@
+
+<table border="1" cellpadding="5">
+    <thead>
+        <tr>
+            @foreach (System.Data.DataColumn col in Model.Columns)
+            {
+                <th>@col.Caption</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (System.Data.DataRow row in Model.Rows)
+        {
+            <tr>
+                @foreach (var cell in row.ItemArray)
+                {
+                    <td>@cell.ToString()</td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>

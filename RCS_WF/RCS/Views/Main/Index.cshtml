@@ -1,0 +1,154 @@
+﻿@using RCS.Controllers;
+@{
+    Layout = Url.Content("~/Views/Layout/MainLayout.cshtml");
+    string ver = "20180205"; 
+}
+
+<link rel="stylesheet" type="text/css" href="@Url.Content("~/StyleSheet/login-theme.css")" />
+<script src="@Url.Content("~/Plugin/jquery-scrollbox-master/jquery.scrollbox.min.js")"></script>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        @if (TempData["message"] != null) {
+            <text>
+               showAlert('@((string)TempData["message"])', msg_stat.Warning);
+            </Text>
+        }
+        //當網址參數帶入hide_logo=1隱藏
+        //if (getParameterByName("hide_logo")) {
+        //    $(".form-signin-heading").addClass("hide_logo");
+        //}
+
+        //當網址為demo.mayaminer.com.tw隱藏logo
+        //if (window.location.hostname == "demo.mayaminer.com.tw") {
+        //    $(".form-signin-heading").addClass("hide_logo");
+        //}
+
+        //設定使用者ID(Remember me)
+        if ($.cookie("user_id") != "" && $.cookie("user_id") != undefined) {
+            $("#user_id").val($.cookie("user_id"));
+            $("#remember_me").prop("checked", true);
+        }
+
+        //Remember me event
+        $("#remember_me").unbind("click").click(function () {
+            if ($("#user_id").val() != "") {
+                if ($(this).prop("checked")) {
+                    $.cookie("user_id", $("#user_id").val());
+                } else {
+                    $.cookie("user_id", "");
+                }
+            }
+        }); 
+        $("#login").click(function () {
+            if ($(".module:checked").length == 0 && false) {
+                showAlert('請選擇要登入之模組', msg_stat.Warning);
+            } else {
+                $.ajax({
+                    url: "@Url.Content("~/Main/LogCheck")", type: "post", timeout: 10000,
+                    dataType: "json",
+                    data: "user_id=" + $("#user_id").val() + "&user_pwd=" + $("#user_pwd").val(),
+                    success: function (data) {
+                        if (data.status == 0) {
+                            if (!!data.message) {
+                                $('#logform #loginMsg').val(data.message);
+                            }
+                            //成功
+                            $("#logform")[0].submit();
+                        } else {
+                            showAlert(data.message, msg_stat.Danger);
+                        }
+                    },
+                    error: function (jqXHR) {
+                        console.log(jqXHR)
+                        if (typeof jqXHR.message === "undefined") {
+                            showAlert('系統錯誤，登入失敗(HIS系統連線發生異常，連線逾時)', msg_stat.Danger);
+                        } else {
+                            showAlert("系統錯誤(" + jqXHR.message + ")", msg_stat.Danger);
+                        } 
+                    }
+                });
+            }
+            return false;
+        });
+
+        //Enter event
+        $("#user_pwd").keyup(function (event) {
+            if (event.keyCode == 13) {
+                $("#login").click();
+            }
+        });
+        $('#showUpdateList #showUpdateListBody').html($('#login_msg').html());
+        //更新訊息跑馬燈20171101
+        $('#web_msg').hide();
+        $('#login_msg').hide();
+        //$('#login_msg').scrollbox({
+        //    linear: true,
+        //    step: 1,
+        //    delay: 0,
+        //    speed: 100
+        //});
+    });
+
+    //取得網址參數
+    function getParameterByName(name, url) {
+        if (!url) url = window.location.href;
+        name = name.replace(/[\[\]]/g, "\\$&");
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
+
+
+</script>
+<style>
+    input:-webkit-autofill {
+        -webkit-box-shadow: 0 0 0px 1000px white inset;
+    }
+
+    /*隱藏LOGO*/
+    .hide_logo {
+        background: initial !important;
+    }
+
+    .scroll-text {
+        /*border: 1px solid red;*/
+        width: 315px;
+        height: 3.5em;
+        overflow: hidden;
+    }
+</style>
+
+<div class="container">
+    <div class="form-signin-heading">
+        <h2>呼吸治療資訊管理系統</h2>
+        @if (RCS.Controllers.BaseController.isTestWeb)
+        {
+            <p style="color:#FF6161;">測試版</p>
+        }
+    </div>
+    <div class="form-signin">
+        <label for="inputId" class="sr-only">ID</label>
+        <input type="text" id="user_id" class="form-control" placeholder="請輸入帳號" required="" autofocus>
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input type="password" id="user_pwd" class="form-control" placeholder="請輸入密碼" required=""> 
+    </div>
+</div>
+<!-- 更新內容 Modal -->
+<div class="modal fade bs-example-modal-slg" tabindex="-1" role="dialog" id="showUpdateList">
+    <div class="modal-dialog modal-lg" style="width:600px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="btn-group">
+                    <h4 class="modal-title">更新內容</h4>
+                </div>
+                <div class="btn-group pull-right">
+                    <button class="btn btn-warning" data-dismiss="modal">關閉</button>
+                </div>
+                <div class="modal-body" id="showUpdateListBody"></div>
+            </div>
+        </div>
+    </div>
+</div>

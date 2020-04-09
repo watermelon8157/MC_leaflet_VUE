@@ -1,0 +1,935 @@
+﻿@using Com.Mayaminer;
+@using RCS.Controllers;
+@{
+    string ver = DateTime.Now.ToString("yyyyMMddHHmmss");
+}
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+    <!-- icon -->
+    <link href="~/Images/Icon/favicon.ico" type="image/x-icon" rel="shortcut icon" />
+    <!-- title -->
+    <title>呼吸治療資訊管理系統</title>
+    <!-- meta -->
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="keywords" content="呼吸治療,管理系統" />
+    <meta name="author" content="Mayaminer co.,ltd." />
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta http-equiv="expires" content="-1" />
+    @*font-awesome*@
+    <link href="@Url.Content("~/Plugin/fontawesome-free-5.0.10/web-fonts-with-css/css/fontawesome-all.min.css")?ver=@(ver)" rel="stylesheet" />
+    <link href="@Url.Content("~/Plugin/fontawesome-free/css/all.min.css")?ver=@(ver)" rel="stylesheet" />
+    <link href="@Url.Content("~/Plugin/font-awesome-4.7.0/css/font-awesome.min.css")?ver=@(ver)" rel="stylesheet" />
+    <!-- css reset -->
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/StyleSheet/css_reset.css")?ver=@(ver)" />
+
+    <!-- jQuery & define js -->
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-1.11.3.min.js")?ver=@(ver)"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.cookie.js")?ver=@(ver)"></script>
+
+    <!-- jlinq http://hugoware.net/Projects/jlinq -->
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jlinq.js")?ver=@(ver)"></script>
+
+    <!-- jQuery UI & UI plus-in -->
+    <link rel="Stylesheet" type="text/css" href="@Url.Content("~/StyleSheet/jquery-ui.min.css")?ver=@(ver)" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/StyleSheet/jquery-ui.structure.min.css")?ver=@(ver)" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/StyleSheet/jquery-ui.theme.min.css")?ver=1@(ver)" />
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-ui.min.js")?ver=@(ver)"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-ui-sliderAccess.js")?ver=@(ver)"></script>
+
+    <!-- Json Model Objects -->
+    <script type="text/javascript" src="@Url.Content("~/Scripts/rcs_model_processor.js")?ver=@(ver)"></script>
+
+    <!-- jQuery flatJSON-->
+    <script type="text/javascript" src="@Url.Content("~/Scripts/flatJSON.js")?ver=@(ver)"></script>
+
+    <!-- Moment http://momentjs.com/ -->
+    <script type="text/javascript" src="@Url.Content("~/Scripts/moment.js")?ver=@(ver)"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/moment-with-locales.js")?ver=@(ver)"></script>
+
+    <!-- Bootstrap 3 http://getbootstrap.com/ -->
+    <script type="text/javascript" src="@Url.Content("~/Scripts/bootstrap.min.js")?ver=@(ver)"></script>
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/StyleSheet/bootstrap.css")?ver=@(ver)" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/StyleSheet/bootstrap-theme.css")?ver=@(ver)" />
+
+    <!-- Bootstrap Table -->
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Plugin/bootstrapTable/bootstrap-table.css")?ver=@(ver)" />
+    <script type="text/javascript" src="@Url.Content("~/Plugin/bootstrapTable/bootstrap-table.js")?ver=@(ver)"></script>
+    <script type="text/javascript" src="@Url.Content("~/Plugin/bootstrapTable/extensions/flat-json/bootstrap-table-flat-json.js")?ver=@(ver)"></script>
+    <script type="text/javascript" src="@Url.Content("~/Plugin/bootstrapTable/locale/bootstrap-table-zh-TW.js")?ver=@(ver)" charset="UTF-8"></script>
+
+    <!-- Bootstrap datetimepicker http://eonasdan.github.io/bootstrap-datetimepicker/ -->
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/StyleSheet/bootstrap-datetimepicker.css")?ver=@(ver)" />
+    <script type="text/javascript" src="@Url.Content("~/Scripts/bootstrap-datetimepicker.js")?ver=@(ver)" charset="UTF-8"></script>
+
+    <!-- Jasny Bootstrap http://www.jasny.net/bootstrap/ -->
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/StyleSheet/jasny-bootstrap.css")?ver=@(ver)" />
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jasny-bootstrap.min.js")?ver=@(ver)"></script>
+
+    <!-- flot chart https://github.com/flot/flot/ -->
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.flot.min.js")?ver=@(ver)"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.flot.time.min.js")?ver=@(ver)"></script>
+
+    <!-- Scheduling Table -->
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/StyleSheet/schedulingTable.css")?ver=@(ver)" />
+    <script type="text/javascript" src="@Url.Content("~/Scripts/schedulingTable.js")?ver=@(ver)"></script>
+
+    <!-- Setting -->
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/StyleSheet/jquery-ui.maya-plusin.css")?ver=@(ver)" />
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-maya-plusin.js")?ver=@(ver)"></script>
+
+    <!-- 台灣地址js https://code.essoduke.org/twzipcode/ -->
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.twzipcode.min.js")?ver=@(ver)"></script>
+
+    <!--jQuery Editable Select Plugin http://www.jqueryscript.net/form/jQuery-Plugin-For-Custom-Filterable-Select-Box-Editable-Select.html -->
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Scripts/jquery-editable-select-plugin/jquery.editable-select.css")?ver=@(ver)" />
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-editable-select-plugin/jquery.editable-select.js")?ver=@(ver)"></script>
+
+    <!-- CKEditor http://ckeditor.com/ -->
+    @*<link rel="stylesheet" type="text/css" href="@Url.Content("~/Plugin/ckeditor/contents.css")?ver=@(ver)" />*@
+    <script type="text/javascript" src="@Url.Content("~/Scripts/ckeditor/ckeditor.js")?ver=@(ver)"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/ckeditor/config.js")?ver=@(ver)"></script>
+
+    <!-- jQuery BlockUI Plugin http://malsup.com/jquery/block/ -->
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.blockUI.js")?ver=@(ver)"></script>
+
+    <!-- checkBox使用js檔 -->
+    <script type="text/javascript" src="@Url.Content("~/Scripts/PageScript.js")?ver=@(ver)"></script>    <!-- style -->
+    <link rel="Stylesheet" type="text/css" href="@Url.Content("~/StyleSheet/style.css")?ver=@(ver)" />
+
+    <!--Snackbar-->
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Plugin/snackbar/snackbar.css")" />
+    <script type="text/javascript" src="@Url.Content("~/Plugin/snackbar/snackbar.js")"></script>
+
+    <!-- bootstrap select -->
+    <link rel="Stylesheet" type="text/css" href="@Url.Content("~/Plugin/bootstrap-select/bootstrap-select.min.css")?ver=@(ver)" />
+    <script type="text/javascript" src="@Url.Content("~/Plugin/bootstrap-select/bootstrap-select.min.js")?ver=@(ver)"></script>
+    <script type="text/javascript" src="@Url.Content("~/Plugin/bootstrap-select/i18n/defaults-zh_TW.min.js")?ver=@(ver)"></script>    <!-- style -->
+    <!-- bootstrap-switch  https://github.com/Bttstrp/bootstrap-switch-->
+    <link href="@Url.Content("~/Plugin/bootstrap-switch-master/dist/css/bootstrap3/bootstrap-switch.min.css")?ver=@(ver)" rel="stylesheet" />
+    <script src="@Url.Content("~/Plugin/bootstrap-switch-master/dist/js/bootstrap-switch.min.js")?ver=@(ver)"></script>
+    <!-- signature_pad  https://github.com/szimek/signature_pad //20181122  fromData方法 有修改 fromData拿掉clear 改為手動clear，底圖才不會消失 -->
+    <script src="@Url.Content("~/Plugin/signature_pad.min.js")?ver=@(ver)"></script>
+    <!-- Vue -->
+    <script src="@Url.Content("~/Plugin/Vue/vue.min.js")?ver=@(ver)"></script>
+    <script src="@Url.Content("~/Plugin/Vue/vue-resource.min.js")?ver=@(ver)"></script>
+    <script src="@Url.Content("~/Plugin/Vue/vue-bootstrap-datetimepicker.min.js")?ver=@(ver)"></script>
+    <script src="@Url.Content("~/Plugin/Vue/vue-select.js")?ver=@(ver)"></script>
+    <script src="@Url.Content("~/Plugin/Vue/Sortable.min.js")?ver=@(ver)"></script> @* 拖曳 2018.10.17 *@
+    <script src="@Url.Content("~/Plugin/Vue/vuedraggable.js")?ver=@(ver)"></script> @* 拖曳 2018.10.17 *@
+    <!--Vue.component cxr-paint -->
+    <script type="text/javascript">
+    // Initialize as global component
+    //畫cxr
+    Vue.component('cxr-paint',function (resolve, reject) {
+        // 可以请求一个html文件
+        $.get("@Url.Content("~/RTRecord/cxr_paint")").then(function (res) {
+            resolve({
+                props: {
+                    config: {
+                        type: Object,
+                        default: function () {
+                            return {
+                                keyId: ''
+                                ,tableName: ''
+                                ,pClick:false
+                                ,saveDataSelect:''
+                                ,tempData:'' }
+                        }
+                    }
+                },
+                data: function () {
+                    return {
+                        saveDataSelect:'',
+                        isDisable:false,
+                        previous_X:0,
+                        previous_Y:0,
+                        isNotOld:false,
+                        signaturePad: null,
+                        selectedColor: 'red',
+                        ResultDropdownlist:[],
+                        penColorAarray: [
+                            { _color: 'red', _class: 'ColorOptions BlackBorder' },
+                            { _color: 'yellow', _class: 'ColorOptions' },
+                            { _color: 'green', _class: 'ColorOptions' },
+                            { _color: 'blue', _class: 'ColorOptions' },
+                            { _color: 'black', _class: 'ColorOptions' }
+                        ],
+                        datepickerConfig: {
+                            locale: moment.locale('zh-tw') //台灣時間(中文顯示)
+                            , dayViewHeaderFormat: 'YYYY - MMMM' //標題(中文顯示)
+                            , format: 'YYYY-MM-DD HH:mm' //自定 [顯示] 格式
+                            , ignoreReadonly: true //忽略唯讀(勿關閉功能)
+                            , toolbarPlacement: 'bottom' //功能 [sideBySide] 會隱藏 [按鍵] (勿關閉功能)
+                            , sideBySide: true //顯示時間 [欄位] 但會隱藏 [按鍵]
+                            , showTodayButton: true //現在時刻
+                            , showClear: true //欄位清空
+                            , showClose: true //關閉取消
+                        },
+                        selectedLineWidth: 1,
+                        model: {
+                            SqlTableName: ''        // 1.細項 SQL 資料庫名稱 (主資料庫)
+                            , SqlMasterDetail_ID: ''// 2.細項 ID 流水號 (主資料庫)
+                            , Cxr_CJID: ''          // 3.Cxr流水號 [資料表名稱] + [主表ID流水號]
+                            , Result_Date: ''       // 5.檢查日期 (Cxr資料庫)
+                            , Result_Str: ''        // 6.檢查結果 (Cxr資料庫)
+                            , CxrXuwmc_List: []     // 7.座標 (Cxr資料庫)
+                            , singJson: []           //singJson
+                            , singJsonImageBase64: '' //singJsonImage
+                        }
+                    }
+                },
+                template: res,
+                mounted: function () {
+                    $('#index_loading').modal('show');
+                    //元素已掛載，el被建立
+                    this.$http.post( // Request 網路 Server 請求
+                         '@Url.Content("~/RTRecord/getResultDropdownlist")'
+                     ).then(function (responseSuccess) { // Http 網路 Server 回傳成功
+                         this.ResultDropdownlist = responseSuccess.data;
+                     }
+                     , function (responseError) { // 1.3.3 Http 網路回傳失敗
+                         //showAlert('程式發生錯誤，請洽資訊人員!' + responseError, msg_stat.Danger, 3000);
+                     });
+                    this.model.SqlMasterDetail_ID = this.config.keyId;
+                    this.model.SqlTableName = this.config.tableName;
+                    this.saveDataSelect = this.config.saveDataSelect;
+                    this.signaturePad = new SignaturePad(document.getElementById('DrawingCanvas'), {
+                        minWidth: 1,
+                        maxWidth: 1,
+                        penColor: "red"
+                    });
+                    this.signaturePad._ctx.drawImage(ImagesDeviantEmptyPng, 0, 0); //載入"小肺圖"
+                    if (!!this.model.SqlMasterDetail_ID) {
+                        this.loadData(this.model.SqlMasterDetail_ID);
+                    }else {
+                        this.isNotOld = true;
+                    }
+                     $('#index_loading').modal('hide');
+                },
+                methods: {
+                    //Vue Instance 在初始化時可設定選項物件，其中可設定 method，執行一些動作。
+                    save: function () {
+                        //console.log(JSON.stringify(this.signaturePad.toData()));
+                        
+                        // 20190723 必要欄位檢查移除
+                        this.loadCXRDataToForm();
+                        //if (!!this.model.Result_Date) {
+                        //    this.loadCXRDataToForm();
+                        //}
+                        //else {
+                        //    showAlert('欄位 [檢查日期] 不得為空值!!', msg_stat.Danger, 2000);
+                        //}
+                    },
+                    loadCXRDataToForm: function () {
+                       
+                        // 20190723 必要欄位檢查移除
+                        $('#cxr_modal').modal('hide');
+                        //if (!!this.model.Result_Date) {
+                        //    if (this.setData()) {
+                        //        if (!!this.saveDataSelect && this.setDataToForm()) {
+                        //            $('#cxr_modal').modal('hide');
+                        //        } else {
+                        //            showAlert('沒有設定ID，儲存失敗!，請洽資訊人員', msg_stat.Danger, 2000);
+                        //        }
+                        //    }
+                        //}
+                    },
+                    setDataToForm: function(){
+                        if (!!this.saveDataSelect) {
+                            var _temp = this.signaturePad.toData();
+                            this.model.singJsonImageBase64 = this.signaturePad.toDataURL();
+                            //console.log(this.model.singJsonImageBase64);
+                            var newCxrArr = new Array();
+                            newCxrArr.push(this.model);
+                            $(this.saveDataSelect).val(JSON.stringify(newCxrArr));
+                            return true;
+                        }else {
+                            showAlert('沒有設定ID，儲存失敗!，請洽資訊人員', msg_stat.Danger, 2000);
+                            return false;
+                        }
+                        return false;
+                    },
+                    setData:function(){
+                        var pList = [];
+                        this.model.singJson = this.signaturePad.toData();
+                        var _signatureCxr = this.model.singJson;
+                        if (!!_signatureCxr) {
+                            for (var i = 0; i < _signatureCxr.length; i++) {
+                                if (_signatureCxr[i].length == 1) {
+                                    var _obj = _signatureCxr[i][0];
+                                    pList.push({ x: _obj.x, y: _obj.y, width: "2", mouse: "down", color: _obj.color });
+                                    pList.push({ x: _obj.x, y: _obj.y, width: "2", mouse: "up", color: _obj.color });
+                                } else {
+                                    if (_signatureCxr[i].length > 1) {
+                                        var _obj = _signatureCxr[i][0];
+                                        pList.push({ x: _obj.x, y: _obj.y, width: "2", mouse: "down", color: _obj.color });
+                                        pList.push({ x: _obj.x, y: _obj.y, width: "2", mouse: "move", color: _obj.color });
+                                        for (var j = 1; j < _signatureCxr[i].length -1; j++) {
+                                            _obj = _signatureCxr[i][j];
+                                            pList.push({ x: _obj.x, y: _obj.y, width: "2", mouse: "move", color: _obj.color });
+                                        }
+                                        _obj = _signatureCxr[i][_signatureCxr[i].length-1];
+                                        pList.push({ x: _obj.x, y: _obj.y, width: "2", mouse: "move", color: _obj.color });
+                                        pList.push({ x: _obj.x, y: _obj.y, width: "2", mouse: "up", color: _obj.color });
+                                    }
+                                }
+                            }
+                        }
+                        //console.log(JSON.stringify(pList));
+                        if (pList.length > 0) {
+                            this.model.CxrXuwmc_List =pList;
+                        }
+                        return true;
+                    },
+                    loadData:function(pId){
+                        // [Http網路請求 + Cxr繪圖畫線]
+                        this.$http.post( // Request 網路 Server 請求
+                            '@Url.Content("~/RTRecord/getCxrResultNode_byIdRecordDetail")'
+                            , { input_RecordDetail_ID: pId  }
+                        ).then(function (responseSuccess) { // Http 網路 Server 回傳成功
+
+                            this.model = responseSuccess.data;
+                            this.isNotOld = !!this.model.hasSingJson;
+                            this.CanvasDrawLine(this.model);
+                            this.setDataToForm();
+                        }
+                        , function (responseError) { // 1.3.3 Http 網路回傳失敗
+                            showAlert('程式發生錯誤，請洽資訊人員!' + responseError, msg_stat.Danger, 3000);
+                        });
+                    },
+                    CanvasDrawOldToNew: function(pModel){
+                        var pList = [];
+                        var d = new Date();
+                        if (!!pModel.CxrXuwmc_List) {
+                            var _mouse = '';
+                            for (var i = 0; i < pModel.CxrXuwmc_List.length; i++) {
+                                if (_mouse != pModel.CxrXuwmc_List[i].mouse) {
+                                    pList.push([{
+                                        color: pModel.CxrXuwmc_List[i].color,
+                                        time: d.getTime()+ i*100,
+                                        x: pModel.CxrXuwmc_List[i].x,
+                                        y: pModel.CxrXuwmc_List[i].y,
+                                    }]);
+                                } else {
+                                    pList[pList.length-1].push({
+                                        color: pModel.CxrXuwmc_List[i].color,
+                                        time: d.getTime()+ i*100,
+                                        x: pModel.CxrXuwmc_List[i].x,
+                                        y: pModel.CxrXuwmc_List[i].y,
+                                    });
+                                }
+                                _mouse = pModel.CxrXuwmc_List[i].mouse;
+                            }
+                        }
+                        //console.log(JSON.stringify(pList));
+                    },
+                    CanvasDrawLine: function (pModel) {
+                        //console.log(pModel);
+                        //判斷沒有資料，開放CXR功能
+                        if (((!!pModel.singJson && pModel.singJson.length == 0) || !pModel.singJson)) {
+                            this.isNotOld = true;
+                        }
+                        if (this.isNotOld) {
+                            if (!pModel.singJson) {
+                                pModel.singJson = [];
+                            }
+                            this.isDisable = false;
+                            for (var j = 0; j < pModel.singJson.length; j++) {
+                                for (var i = 0; i < pModel.singJson[j].length; i++) {
+                                    pModel.singJson[j][i].x = parseInt(pModel.singJson[j][i].x);
+                                    pModel.singJson[j][i].y = parseInt(pModel.singJson[j][i].y);
+                                    pModel.singJson[j][i].time = parseInt(pModel.singJson[j][i].time);
+                                }
+
+                            }
+                            //console.log(JSON.stringify(pModel.singJson));
+                            this.reset();
+                            this.signaturePad.fromData(pModel.singJson); //20181122  fromData原生code 有修改 fromData拿掉clear 改為手動clear，底圖才不會消失
+                            for (var i = 0; i < this.penColorAarray.length; i++) {
+                                if (this.signaturePad.penColor == this.penColorAarray[i]._color) {
+                                    this.selectColor(this.penColorAarray[i]);
+                                }
+                            }
+                            this.setDataToForm();
+
+                        }else {
+                            this.isDisable = true;
+                            this.CanvasDrawView(pModel.CxrXuwmc_List);
+                        }
+                    },
+                    CanvasDrawView:function(pList){
+                        var CanvasDrawPoint = function (pCanvasID, input_X, input_Y, input_Width, input_Mouse, input_Color){
+                            var canvasID = document.getElementById(pCanvasID);
+                            var ctx2d = canvasID.getContext("2d");
+                            ctx2d.beginPath(); //開始繪圖
+                            ctx2d.lineCap = 'round'; //圓筆
+                            ctx2d.lineJoin = 'round'; //當2條線相遇時創建一個圓角
+                            ctx2d.strokeStyle = input_Color; //顏色 = 'blue'
+                            ctx2d.lineWidth = input_Width; //筆寬度 = 2
+                            switch (input_Mouse) {
+                                default:
+                                case 'down': {
+                                    break; //不做繪圖，但需要break
+                                }
+                                case 'move':
+                                case 'up':
+                                case 'out': {
+                                    ctx2d.moveTo(this.previous_X, this.previous_Y);
+                                    ctx2d.lineTo(input_X, input_Y);
+                                    ctx2d.stroke();
+                                    break;
+                                }
+                            }//switch
+                            [this.previous_X, this.previous_Y] = [input_X, input_Y];
+                        };
+                        if (!!pList && pList.length > 0) {
+                            //初步判斷 CxrXuwmc_List 資料格式
+                            var listFirst = pList[0];
+                            if (listFirst["x"] != undefined && listFirst["y"] != undefined) {
+                                //取第1點-起始點
+                                [this.previous_X, this.previous_Y] =[parseInt(listFirst["x"]), parseInt(listFirst["y"])];
+                            }
+                            var _canvas_id = 'Canvas_canvasView';
+                            var _canvasID = document.getElementById(_canvas_id);
+                            var _ctx2d = _canvasID.getContext("2d");
+                            _ctx2d.clearRect(0, 0, _canvasID.width, _canvasID.height); //清空canvas視窗
+                            _ctx2d.drawImage(ImagesDeviantEmptyPng, 0, 0); //載入"小肺圖"
+                            for (var i = 0; i < pList.length; i++) {
+                                //Vue資料轉換
+                                var vueCXR_XYwmc = pList[i];
+                                //Cxr開始畫線
+                                CanvasDrawPoint(
+                                    _canvas_id
+                                    , parseInt(vueCXR_XYwmc.x)
+                                    , parseInt(vueCXR_XYwmc.y)
+                                    , vueCXR_XYwmc.width
+                                    , vueCXR_XYwmc.mouse
+                                    , vueCXR_XYwmc.color
+                                );
+                            }
+                        }
+                    },
+                    reset: function () {
+                        this.signaturePad.clear();
+                        this.signaturePad._ctx.drawImage(ImagesDeviantEmptyPng, 0, 0); //載入"小肺圖"
+                    },
+                    undo:function(){
+                        var _data = this.signaturePad.toData();
+                        if (!!_data) {
+                            _data.pop(); // remove the last dot or line
+                            this.reset();
+                            this.signaturePad.fromData(_data);
+                        }
+                    },
+                    selectColor: function (pColor) {
+                        this.selectedColor = pColor._color;
+                        this.signaturePad.penColor = this.selectedColor;
+                        for (var i = 0; i < this.penColorAarray.length; i++) {
+                            this.penColorAarray[i]._class = 'ColorOptions';
+                        }
+                        pColor._class = 'ColorOptions BlackBorder';
+                    }
+                }
+                ,computed: {
+                    tempData: function() {
+                        return this.config.tempData;
+                    }
+
+                }
+                ,watch: {
+                    tempData: function(value) {
+                        //console.log(JSON.stringify(this.signaturePad.toData()));
+                        if (!!value) {
+                            this.reset();
+                            this.signaturePad.fromData(JSON.parse(value));
+                        }
+                    }
+
+                }
+
+            })
+        });}
+    );
+    </script>
+    <script type="text/javascript">
+        // Initialize as global component
+        Vue.component('date-picker', VueBootstrapDatetimePicker);
+        Vue.component('v-select', VueSelect.VueSelect);
+        // Using font-awesome 5 icons
+        $.extend(true, $.fn.datetimepicker.defaults, {
+            icons: {
+                time: 'far fa-clock',
+                date: 'far fa-calendar',
+                up: 'fas fa-arrow-up',
+                down: 'fas fa-arrow-down',
+                previous: 'fas fa-chevron-left',
+                next: 'fas fa-chevron-right',
+                today: 'fas fa-calendar-check',
+                clear: 'far fa-trash-alt',
+                close: 'far fa-times-circle'
+            }
+        });
+
+
+        var ImagesDeviantEmptyPng = new Image();
+        ImagesDeviantEmptyPng.src = "@Url.Content("~/Images/deviant_empty.png")";
+
+        function showAlertOption(status, msg, stat, def_wait, position, functionEval) {
+            var hasEval = false;
+            switch (status) {
+                case 0:
+                    stat = msg_stat.Success;
+                    eval(functionEval);
+                    break;
+                case 4:
+                    stat = msg_stat.Warning;
+                    eval(functionEval);
+                    break;
+                case 1:
+                case 2:
+                    stat = msg_stat.Danger;
+                    break;
+                case 3:
+
+                    break;
+                default:
+                    break;
+            }
+            showAlert(msg, stat, def_wait, position);
+        }
+
+        // 新版唯讀鎖定
+        // 只要給modal的ID，bottom的按鈕必須加上 chktype 屬性的就會被關閉
+        // pHasPowerEdit  是否有權利修改此表單(新增，自己的資料傳入true)
+        //type_mode H:歷史資料 C:照護資料
+        function set_readonly(selector, pHasPowerEdit, AuthorityName, typeMode) {
+            //notLock 排除不用disabled的物件
+            var control_target = $(selector).find("input, select, textarea").not('input[notLock], select[notLock], textarea[notLock]');
+            var btn_target = $(selector).find("button[chktype]");
+            var btn_new = $(selector).find("button[newBtn]");
+            var btn_del = $(selector).find("button[delType]");
+            var userAuthority = $('#userData').data('userAuthority');
+            var size = 0, key;
+            for (key in userAuthority) {
+                if (userAuthority.hasOwnProperty(key)) size++;
+            }
+            if (size > 0) {
+                var hasPowerEdit = false, authorityData;
+                if (IsNotNullOrWhiteSpace(AuthorityName)) {
+                    eval('authorityData = userAuthority.' + AuthorityName + ';');
+                    if (IsNotNullOrWhiteSpace(authorityData)) {
+                        hasPowerEdit = true;
+                    }
+                    control_target.prop("disabled", true);
+                    btn_target.hide();
+                    if (hasPowerEdit && typeMode != 'H') {
+                        //debugger;
+                        //new List<string>() { "瀏覽", "寫", "改", "刪", "停" };
+                        if (authorityData.canRead) {
+                            //瀏覽
+                            control_target.prop("disabled", true);
+                            btn_target.hide();
+                        }
+                        if (authorityData.canWrite) {
+                            //寫
+                            control_target.prop("disabled", false);
+                            btn_new.show();
+                        }
+                        if (authorityData.canEdit) {
+                            //改
+                            if (pHasPowerEdit) {
+                                control_target.prop("disabled", false);
+                                btn_target.show();
+                                btn_del.hide();
+                            }
+                        }
+                        if (authorityData.canDelete) {
+                            //刪
+                            if (pHasPowerEdit) {
+                                control_target.prop("disabled", false);
+                                btn_del.show();
+                            }
+                        }
+                        if (authorityData.canStopFunction) {
+                            //停
+                            if (pHasPowerEdit) {
+                                control_target.prop("disabled", false);
+                                btn_target.show();
+                            }
+                        }
+                    }
+                }
+            } else {
+                control_target.prop("disabled", true);
+                btn_target.hide();
+            }
+        }
+
+        function setRecodRule(selector, pHasPowerEdit, typeMode, isAdd) {
+            //notLock 排除不用disabled的物件
+            var control_target = $(selector).find("input, select, textarea").not('input[notLock], select[notLock], textarea[notLock]');
+            var btn_target = $(selector).find("button[chktype]");
+            var btn_new = $(selector).find("button[newBtn]");
+            var btn_del = $(selector).find("button[delType]");
+            control_target.prop("disabled", true);
+            btn_del.hide();
+            btn_target.hide();
+            if (typeMode != 'H') {
+                if (pHasPowerEdit) {
+                    control_target.prop("disabled", false);
+                    if (!isAdd) {
+                        btn_del.show();
+                    }
+                    btn_target.show();
+                }
+
+                btn_new.show();
+            } else {
+                btn_del.hide();
+                btn_new.hide();
+            }
+        }
+
+
+        //檢查字串是否為空字串或空值
+        function IsNotNullOrWhiteSpace(str) {
+            try {
+                if (str != null && str != undefined && str != '') {
+                    return true;
+                }
+            } catch (e) {
+
+            }
+            return false;
+        }
+
+        // bootstrapTable basic option for extend
+        var bootstrap_table_option = {
+            method: "post",
+            pagination: true,
+            buttonsClass: "raised",
+            clickToSelect: true,
+            pageList: [10, 15, 25, 50, 100],
+            pageSize: 15,
+            showRefresh: true,
+            search: true,
+            locale: "zh-TW"
+        };
+
+        // ajax 基本選項
+        var ajax_option = {
+            type: "post",
+            dataType: "json",
+            timeout: 10000,
+            statusCode: {
+                0: function () { msgbox("服務不存在"); },
+                503: function () { msgbox("網頁逾時"); },
+                500: function () { msgbox("伺服器內部錯誤."); },
+                404: function () { msgbox("找不到網頁"); }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR);
+                setTimeout(function () { $.unblockUI(); }, 3000);
+            }
+        };
+
+        //RCS新開啟視窗方式
+        var rcsWin = null;
+        function rcsWinOpen(url,TargetId) {
+            if (rcsWin != undefined || rcsWin != null) {
+                rcsWin.close();
+            }
+            rcsWin = window.open(url, TargetId);
+            return false;
+        }
+
+        //systemDetection 系統檢測視窗，另外開啟視窗
+        var winSystemDetection = null;
+        function winOpenSystemDetection() {
+            if (winSystemDetection != undefined || winSystemDetection != null) {
+                winSystemDetection.close();
+            }
+            winSystemDetection = window.open('@Url.Content("~/External/systemDetection")', 'winSystemDetection');
+            return false;
+        }
+
+        // setting ajax cache
+        $.ajaxSetup({
+            cache: false
+        });
+
+        //Main Global
+        $(document).ready(function () {
+
+        });
+
+        // 秀出文字訊息框 (snackbar)
+        function msgbox(msg) {
+            $.snackbar({
+                content: msg,
+                style: 'snackbar',
+                timeout: 3000,
+                htmlAllowed: true
+            });
+        }
+
+        //20150410  顯示提示訊息
+        function set_highlight(status, pId, msg, type) {
+            if (status == true) {
+                if ($('#' + pId + '_msg').length == 0) {
+                    //$('#' + pId).css('border', '1px solid red').after('<span id = "' + pId + '_msg" style="padding-left:6px;color:red">' + msg + '</span>');
+                    if (type == 'border') {
+                        $('#' + pId).css('border', '1px solid red');
+                    } else if (type == 'background') {
+                        $('#' + pId).css('background', '#F7D0D0');
+                    }
+                }
+            } else {
+                //$('#' + pId + '_msg').remove();
+                if (type == 'border') {
+                    if (($('#' + pId).prop('type') == 'text') || ($('#' + pId).prop('type') == 'div')) {
+                        $('#' + pId).css('border', '1px solid #ccc')
+                    } else {
+                        $('#' + pId).css('border', 'rgba(0, 0, 0, 0)')
+                    }
+                } else if (type == 'background') {
+                    //$('#' + pId).removeAttr('style');
+                    $('#' + pId).css('background', '');
+                }
+            }
+        }
+
+        //登出
+        function logout() {
+            try {
+                logout_click = true;
+                window.clearInterval(start_check_session);
+            } catch (ex) { };
+            $.ajax({
+                url: "@Url.Content("~/Main/LogOut")",
+                type: "POST",
+                //async:false,
+                complete: function (response_obj) {
+                    window.location.replace("./");
+                }
+            });
+        }
+        //檢查資料是否為正整數
+        function isPositiveNumber(pVal) {
+            if (pVal != '') {
+                if (!(/^(\+|-)?\d+$/.test(pVal)) || pVal < 0) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        }
+
+        //GitHub\MMH_ARS\Views\view_record\Index.cshtml(165):
+        //單選複選設定規則
+        //20160801 修改此方法
+        function setcheckboxRules(pId) {
+            $('#' + pId).each(function () {
+                var $result = $(this);
+                var $check = $result.find('.set_check'); //勾選預設第一項，其他項目全部清空
+                var $check_other = $result.find('.other'); //其他,輸入文字,checkbox打勾,checkbox不勾,清空文字
+                var $single_check = $result.find('.single_check'); //單選
+                var doCheck = function ($line, chkfst) {
+                    var sel = $line.find('select');
+                    var txt = $line.find('input:text');
+                    var chks = $line.find('input:checkbox');
+                    var fst = chks.first();
+                    var oth = chks.not(fst).not('.no_check');
+                    var checkHasData = function (d, atClosest) {
+                        var thisTag = d;
+                        if (!atClosest)
+                            thisTag = d.closest('.other');
+                        var tempHasData = false;
+                        thisTag.find('select').each(function () {
+                            if ($(this).val() != "") tempHasData = true;
+                        });
+                        thisTag.find('input:text').each(function () {
+                            if ($(this).val() != "") tempHasData = true;
+                        });
+                        return tempHasData;
+                    };
+                    var check_fst = function (c) {
+                        if (c) {
+                            fst.chkAllBox(chkfst);
+                        } else {
+                            var ischeck = false;
+                            oth.each(function () {
+                                if (this.checked)
+                                    ischeck = true;
+                            });
+                            if (!ischeck)
+                                fst.chkAllBox(false);
+                            fst.closest('.other').each(function () {
+                                var tempHasData = checkHasData($(this), true);
+                                $(this).find('input:checkbox').each(function () {
+                                    if (this.checked) tempHasData = true;
+                                });
+                                if (!tempHasData) {
+                                    $(this).find('input:checkbox').first().prop('checked', false);
+                                }
+                            });
+                        }
+                    };
+                    sel.change(function () {
+                        var hasTxt = checkHasData($(this), false);
+                        check_fst(hasTxt);
+                    });
+
+                    txt.keyup(function () {
+                        var hasTxt = checkHasData($(this), false);
+                        if (!hasTxt) {
+                            $(this).closest('.other').find('input:checkbox').chkAllBox(false);
+                        }
+                        check_fst(hasTxt);
+                        if ($line.hasClass('single_check')) {
+                            $line.find('input:checkbox').not('.other input:checkbox').each(function () {
+                                if (this.checked) this.checked = false;
+                            });
+                        }
+
+                    });
+                    fst.click(function () {
+                        if ((!chkfst && this.checked) || (chkfst && !this.checked)) {
+                            oth.chkAllBox(false);
+                            txt.val('');
+                            sel.selecFirst();
+                        }
+                    });
+                    //oth.click(function () {
+                    //    check_fst(this.checked);
+                    //});
+                    oth.change(function () {
+                        check_fst(this.checked);
+                    });
+                };
+                $single_check.each(function () {
+                    var $l = $(this);
+                    var chks = $l.find('input:checkbox');
+                    var oth = chks.not('.no_check');
+                    var $single_other = $l.find('.other'); //其他,輸入文字,checkbox打勾,checkbox不勾,清空文字
+                    oth.click(function () {
+                        if (this.checked) {
+                            oth.not(this).chkAllBox(false);
+                        }
+                        if ($single_other.find('input:text') == '') {
+                            $single_other.find('input:checkbox').each(function () {
+                                this.checked = false;
+                            });
+                        } else {
+                            $single_other.find('input:checkbox').each(function () {
+                                if (!this.checked) {
+                                    $single_other.find('input:text').each(function () {
+                                        $(this).val('');
+                                    });
+                                }
+                            });
+                        }
+                    });
+                });
+                $check.each(function () {
+                    doCheck($(this), false);
+                });
+                if ($check_other.length > 0) {
+                    $check_other = $($check_other.get().reverse())
+                }
+                $check_other.each(function () {
+                    doCheck($(this), true);
+                });
+            });
+        }
+
+        //檢查Session是否存在
+        function check_session(session_name) {
+            session_name = typeof session_name !== 'undefined' ? session_name : "";
+            $.ajax({
+                url: "@Url.Content("~/Base/CheckSessionExist")",
+                data: { "session_name": session_name },
+                type: "POST", async: false,
+                complete: function (response_obj) {
+                    if (response_obj.responseText != "True") {
+                        logout();
+                    }
+                }
+            });
+        }
+
+        /*------------ Scroll Back To Top Button 滾動返回頂部按鈕 [下] ------------*/
+        // onscroll="fn_ShowQuickTopBtn(this)"
+        var paraThisQuickTop_obj = null;
+        function fn_ShowQuickTopBtn(paraThis) {
+            paraThisQuickTop_obj = paraThis; //暫存目前物件為 "全域變數"
+            var myArray =
+                [
+                    "tab_rt_cpt_assess" //呼吸治療評估單 主表單
+                    , "ass_editor_panel" //胸腔物理治療紀錄單 編輯介面
+                    , "tk_Form_panel" //呼吸器脫離計畫 編輯介面
+                    , "Shit_List"//交班總覽
+                ]; 
+            if (myArray.includes(paraThis.children["0"].id)  //主表單
+                || myArray.includes(paraThis.id) //編輯介面
+                ){ //避免 [其它頁面] 顯示按鈕
+                if (paraThis.scrollTop > 2) { //下滑-顯示
+                    document.getElementById("myQuickTop_BtnID").style.display = "block";
+                }
+                else { //置頂-隱藏
+                    document.getElementById("myQuickTop_BtnID").style.display = "none";
+                }
+            }//if 避免 [其它頁面] 顯示按鈕
+        }//fn_ShowQuickTopBtn
+        function fn_QuickTopClick() { //點擊Btn按鈕
+            paraThisQuickTop_obj.scrollTop = 0; //立即返回頂部
+        }//fn_QuickTopClick
+        /*------------ Scroll Back To Top Button 滾動返回頂部按鈕 [上] ------------*/
+
+    </script>
+    <style>
+        #myQuickTop_BtnID { /*滾動返回頂部按鈕*/
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 30px;
+            z-index: 99;
+            font-size: 18px;
+            border: none;
+            outline: none;
+            background-color: red;
+            color: white;
+            cursor: pointer;
+            padding: 15px;
+            border-radius: 4px;
+            z-index: 9999; /*保證控件總是顯示在最前端*/
+        }
+            #myQuickTop_BtnID:hover { /*滾動返回頂部按鈕*/
+                background-color: #555;
+            }
+    </style>
+</head>
+<body id="mybody">
+    <!-- 使用者資料(權限) -->
+    <div id="userData" class="hidden"></div>
+    <div class="alert alert-warning fade_in" id="msgbox" onclick="closeAlert();">
+        <strong>系統提示!</strong><label>系統訊息</label>
+        <div id="msgbox_text"></div>
+    </div>
+    <!-- 背景遮罩 -->
+    <div id="index_cover"></div>
+    <!-- 讀取條 -->
+    <div id="index_loading" class="progress">
+        <div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 400px;">
+            <span style="color: #ffffff;">讀取中....</span>
+        </div>
+    </div>
+    <!-- 滾動返回頂部按鈕 -->
+    <button onclick="fn_QuickTopClick()" id="myQuickTop_BtnID" title="Go Top">Top</button>
+    @RenderBody()
+</body>
+</html>

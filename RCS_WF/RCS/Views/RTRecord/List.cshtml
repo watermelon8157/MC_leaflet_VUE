@@ -1,0 +1,437 @@
+﻿@using RCS_Data;
+@{ 
+    UserInfo user_info = (UserInfo)Session["user_info"];
+    List<SelectListItem> ipdnoList = (List<SelectListItem>)ViewData["getPatientHistoryList"];
+    string sDate = DateTime.Now.Date.AddDays(-6).ToString("yyyy-MM-dd HH:mm");
+    string eDate = DateTime.Now.Date.ToString("yyyy-MM-dd 23:59");
+    if (ViewData["sDate"] != null && !string.IsNullOrWhiteSpace((string)ViewData["sDate"]))
+    {
+        sDate = (string)ViewData["sDate"];
+    }
+    if (ViewData["eDate"] != null && !string.IsNullOrWhiteSpace((string)ViewData["eDate"]))
+    {
+        eDate = (string)ViewData["eDate"];
+    }
+}
+<style type="text/css">
+
+    #record_form .row {
+        padding: 3px 0px;
+    }
+
+    .altRow {
+        background-color: #ddddff;
+    }
+
+    #rtrecord_table > tbody > tr {
+        cursor: pointer;
+    }
+
+    .onmode_1 {
+        background-color: #ff6a00;
+    }
+
+    .onmode_2 {
+        background-color: #84d135;
+    }
+
+    .onmode_3 {
+        background-color: #7589e2;
+    }
+
+    .onmode {
+        height: 5px;
+        width: 100%;
+        margin-bottom: 4px;
+    }
+
+    .stickers {
+        background-color: white;
+        padding: 1px 4px 3px 3px;
+        border-radius: 6px;
+    }
+
+    /*Change the tooltip size*/
+    div.tooltip-inner {
+        max-width: none;
+        white-space: nowrap;
+    }
+
+    #rtrecord_table .memo {
+        height: 60px;
+    }
+
+     #rtrecord_table .onmodeTd {
+        height: 60px;
+    }
+
+    #rtrecord_table > tbody > tr > td, #rtrecord_table > thead > tr > th {
+        padding: 2px;
+    }
+
+    #rtrecord_table thead th .th-inner {
+        padding-top: 3px;
+    }
+
+    #rtrecord_table .CXR_result_json { /*--- Cxr繪圖 2018.09.07 ---*/
+        height: 120px;
+    }
+</style>
+<script type="text/javascript">
+
+    var win;
+    var rtrecord_table;
+    var lastabgdate = "";
+
+    //搜尋
+    function record_list_search() {
+        $("#record_list_search").button('loading');
+        getLastData = new Object();
+        $("#rtrecord_table").bootstrapTable('refresh', {
+            query: { "StartDate": $('#SearchTitle #StartDate').val(), "EndDate": $('#SearchTitle #EndDate').val(), "setIpdno": $('#SearchTitle #setIpdno').val() },
+            silent: true
+        });
+        $("#rtrecord_table").bootstrapTable('showLoading');
+    }
+
+    function makeRecord(pMakeDate, this_btn) {
+        //重新取得最新呼吸照護記錄單資料
+        var makeRECORD = new Object();
+        makeRECORD.RECORDDATE = pMakeDate;
+        openRecordView('rt_record_form_div', '@Url.Content("~/RTRecord/openRTRecordFormView")', makeRECORD, this_btn);
+    }
+
+    $(document).ready(function () {
+        $("#index_loading").modal('show');
+        //授權後重新設定
+        $("#rt_record_panel button[data-func=delete]").attr("disabled", false);
+        $("#rt_record_panel button.exec-func").button('reset');
+        $("#rt_record_panel button[data-func=save]").html('<span class="glyphicon glyphicon-save"></span>&nbsp;確定</button>').removeClass('btn-danger');
+        // 自動調整編輯介面的高度
+        $(window).resize(function () {
+            var height = $(this).outerHeight();
+            if (height <= 300)
+                height = 450;
+            $("#DetailContent").outerHeight(height - 150);
+        }).trigger("resize");
+        var start_date = "";
+        //限制照護不可往回查詢
+        if (type_mode == "C") {
+            start_date = $("#now_patient #now_pat_diag_date").html();
+        }
+
+        /*----------------------------- [rtrecord_table] 下 -----------------------------*/
+
+        rtrecord_table =
+        $("#rtrecord_table").bootstrapTable({
+            url: '@Url.Content("~/RTRecord/RecordListData")',
+            method: 'post',
+            queryParams: { "StartDate": $('#SearchTitle #StartDate').val(), "EndDate": $('#SearchTitle #EndDate').val(), "setIpdno": $('#SearchTitle #setIpdno').val(), "getOnModel": true },
+            undefinedText: '',
+            uniqueId: 'rt_record.record_id',
+            pagination: true,
+            toolbar: "#SearchTitle",
+            pageSize: 6,
+            pageList: [6],
+            flat: true
+        }).on('click-row.bs.table', function (e, row, $element) {
+           //重新取得最新呼吸照護記錄單資料
+            row['onIntubate'] = {};
+            row['onBreath'] = {};
+            row['onOxygen'] = {};
+            openRecordView('rt_record_form_div', '@Url.Content("~/RTRecord/openRTRecordFormView")', convert_flat_obj(row));
+        }).on('load-success.bs.table', function () {
+            $("[data-toggle='tooltip']").tooltip({ html: true, placement: "top" });
+        }).on('reset-view.bs.table', function () {
+            //console.log(JSON.stringify($("#rtrecord_table").bootstrapTable('getData')));
+        }).on('pre-body.bs.table', function () {
+            $("#rtrecord_table").bootstrapTable('hideLoading');
+            $("#record_list_search").button('reset');
+        }).ready($("#rtrecord_table").prev(".fixed-table-loading").css('top', '0px'));
+
+        /*----------------------------- [rtrecord_table] 上 -----------------------------*/
+
+        // 綁定所有具有exec_func的click事件
+        $(".extra_function > button[exec_func]").unbind('click').click(function () {
+            var this_btn = $(this);
+            switch ($(this).attr("exec_func")) {
+                case "make":
+                    $('#make_record_panel').modal('show');
+                    break;
+                case "add":
+                    //重新取得最新呼吸照護記錄單資料
+                    openRecordView('rt_record_form_div', '@Url.Content("~/RTRecord/openRTRecordFormView")', null,this_btn);
+                    break;
+                case "pre":
+                    $("#rtrecord_table").hide('slide', { direction: 'right', easing: "easeOutQuint" }, 300, function () {
+                        rtrecord_table.bootstrapTable("prevPage");
+                        $("#rtrecord_table").show('slide', { direction: 'left', easing: "easeOutQuint" }, 300);
+                    });
+                    break;
+                case "next":
+                    $("#rtrecord_table").hide('slide', { direction: 'left', easing: "easeOutQuint" }, 300, function () {
+                        rtrecord_table.bootstrapTable("nextPage");
+                        $("#rtrecord_table").show('slide', { direction: 'right', easing: "easeOutQuint" }, 300);
+                    });
+                    break;
+                case "zoom":
+                    if (document.fullscreenElement ||
+                       document.webkitFullscreenElement ||
+                       document.mozFullScreenElement ||
+                       document.msFullscreenElement
+                     ) {
+                        //非全螢幕按鈕顯示
+                        this_btn.closest("div").find("[not_full=true]").show();
+                        if (document.exitFullscreen) {
+                            document.exitFullscreen();
+                        } else if (document.mozCancelFullScreen) {
+                            document.mozCancelFullScreen();
+                        } else if (document.webkitExitFullscreen) {
+                            document.webkitExitFullscreen();
+                        } else if (document.msExitFullscreen) {
+                            document.msExitFullscreen();
+                        }
+                        $("#tab_rt_record .flip-scroll").css({
+                            "background-color": "",
+                            "font-size": "1em"
+                        });
+                    } else {
+                        //非全螢幕按鈕隱藏
+                        this_btn.closest("div").find("[not_full=true]").hide();
+                        element = $("#tab_rt_record .flip-scroll").get(0);
+                        if (element.requestFullscreen) {
+                            element.requestFullscreen();
+                        } else if (element.mozRequestFullScreen) {
+                            element.mozRequestFullScreen();
+                        } else if (element.webkitRequestFullscreen) {
+                            element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+                        } else if (element.msRequestFullscreen) {
+                            element.msRequestFullscreen();
+                        }
+                        $("#tab_rt_record .flip-scroll").css({
+                            "background-color": "#FFFFFF",
+                            "font-size": "0.9em"
+                        });
+                    }
+                    break;
+                case "print_IDkey": 
+                    win = window.open('about:blank', 'TheNewWindow');
+                    $.ajax({
+                        url: '@Url.Content("~/RTRecord/showRTRecord")',
+                        type: 'POST',
+                        async: false,
+                        data: { record_id: $('#print_idkey').val()},
+                        success: function (data) {
+                            $("#pdfForm #HtmlStr").val(encodeURIComponent(data));
+                            document.getElementById('pdfForm').submit();
+                        },
+                        error: function (jqXHR) {
+                            log(jqXHR);
+                            msg = '程式發生錯誤!';
+                        }
+                    });
+
+                    break;
+            }
+            return false;
+        });
+        //設定是否唯讀
+        setRecodRule("#SearchTitle", false, type_mode);
+        // set_readonly("#SearchTitle", false, 'RTRecord', type_mode);
+
+        //預載呼吸記錄單
+        $("#index_loading").modal('hide');
+    });//$(document).ready(function
+
+    function show_RTRecord() { //[列印清單] 按鍵
+        var ifok = false;
+        var msg = '';
+       if ($("#rtrecord_table").bootstrapTable('getData').length > 0) {
+            win = window.open('about:blank', 'TheNewWindow');
+            $.ajax({
+                url: '@Url.Content("~/RTRecord/showRTRecord")',
+                type: 'POST',
+                async: false,
+                data: { sDate: $('#SearchTitle #StartDate').val(), eDate: $('#SearchTitle #EndDate').val(), setIpdno: $('#SearchTitle #setIpdno').val() },
+                success: function (data) {
+                    $("#pdfForm #HtmlStr").val(encodeURIComponent(data));
+                    document.getElementById('pdfForm').submit();
+                },
+                error: function (jqXHR) {
+                    log(jqXHR);
+                    msg = '程式發生錯誤!';
+                }
+            });
+        } else {
+           msg = '沒有資料，無法列印';
+           showAlert(msg, msg_stat.Warning, 2500);
+        }
+    }
+
+    function show_RTRecord_empty() { //[列印空白清單] 按鍵
+        var ifok = false;
+        var msg = '';        
+        win = window.open('about:blank', 'TheNewWindow');
+        $.ajax({
+            url: '@Url.Content("~/RTRecord/showRTRecord")',
+            type: 'POST',
+            async: false,
+            data: { sDate: "", eDate: "", setIpdno: "" },
+            success: function (data) {
+                $("#pdfForm #HtmlStr").val(encodeURIComponent(data));
+                document.getElementById('pdfForm').submit();
+            },
+            error: function (jqXHR) {
+                log(jqXHR);
+                msg = '程式發生錯誤!';
+            }
+        });        
+    }
+</script>
+<div id="date_time_dom" style="position:relative;"></div>
+<div>
+    <section class="flip-scroll">
+        <div class="extra_function" id="SearchTitle">
+            <button class="btn btn-default" id="add" exec_func="add" title="新增項目" not_full="true" newBtn><span class="glyphicon glyphicon-plus"></span>&nbsp;新增項目</button>
+
+                <button class="btn btn-default" id="pre_page" exec_func="pre" title="上一頁"><span class="glyphicon glyphicon-arrow-left"></span>&nbsp;上一頁</button>
+                <button class="btn btn-default" id="next_page" exec_func="next" title="下一頁"><span class="glyphicon glyphicon-arrow-right"></span>&nbsp;下一頁</button>
+              
+                @if (RCS.Controllers.BaseController.funSetting.printSwitch || RCS.Controllers.BaseController.funSetting.printRTRecordSwitch)
+                {
+                    <input type="button" class="btn btn-info" value="列印清單" onclick="show_RTRecord();" notlock />
+                    <input type="button" class="btn btn-primary" value="列印空白清單" onclick="show_RTRecord_empty();" notlock />
+                }
+                @if (RCS.Controllers.BaseController.isDebuggerMode)
+                {
+                    <button class="btn btn-default" exec_func="print_IDkey" not_full="true"><span class="glyphicon glyphicon-print"></span>列印</button>
+                    @:&emsp;
+                    <input type="text" class="form-control" style="width: 200px; height: 27px; display: inline;vertical-align:middle;" id="print_idkey" name="print_idkey" value="" notlock>
+                }
+                  <div>
+                 <span not_full="true" class="form-inline">
+                     <span class='input-group date dt-picker col-lg-1 col-md-1 col-sm-1' dt-format="dt" dt-sidebyside="true" dt-widgetparent="date_time_dom">
+                         <input type='text'style="width: 140px; height: 27px; display: inline;vertical-align:middle;" class="form-control searchSDate"  id="StartDate" name="StartDate" value="@sDate" placeholder="" readonly="" notlock />
+                         <span class="input-group-addon">
+                             <span class="glyphicon glyphicon-calendar"></span>
+                         </span>
+                     </span>
+                     ~
+                     <span class='input-group date dt-picker col-lg-1 col-md-1 col-sm-1' dt-format="dt" dt-sidebyside="true" dt-widgetparent="date_time_dom">
+                         <input type="text" style="width: 140px; height: 27px; display: inline;vertical-align:middle;" class="form-control searchEDate" id="EndDate" name="EndDate" value="@eDate" placeholder="" readonly="" notlock />
+                         <span class="input-group-addon">
+                             <span class="glyphicon glyphicon-calendar"></span>
+                         </span>
+                     </span>
+                     &emsp;住院/門診/急診日期&emsp;
+                     <select id="setIpdno" name="setIpdno" onchange = "changeFeeNo($(this), 'SearchTitle');" notlock >
+                         @{
+                             List<string> tempLabelList = ipdnoList.Select(x => x.Value.Substring(x.Value.Length - 1)).Distinct().ToList();
+                             foreach (string Label in tempLabelList)
+                             {
+                                <optgroup label="@(Label)">
+                                    @foreach (SelectListItem item in ipdnoList.FindAll(x => x.Value.Substring(x.Value.Length - 1) == Label))
+                                    {
+                                        if (item.Selected)
+                                        {
+                                            <option value="@(item.Value)" selected>@(item.Text)</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@(item.Value)">@(item.Text)</option>
+                                        }
+                                    }
+                                </optgroup>
+                             }
+                          }
+                     </select>
+                     @*@Html.DropDownList("setIpdno", ipdnoList, new { @onchange = "changeFeeNo($(this),'SearchTitle');", @notlock = "" })*@
+                     <input type="button" id="record_list_search" class="btn btn-default listSearch" value="搜尋" data-loading-text="搜尋中..." onclick="record_list_search();" />
+                     &emsp;
+                 </span>
+            </div>
+        </div>
+        <table class="table table-hover table-bordered table-condensed" id="rtrecord_table" data-row-style="table" data-pagination-V-Align="both">
+            <thead>
+                <tr>
+                    <th data-field="RECORDDATE" data-formatter="showDateFormat" data-sortable="true">記&emsp;錄&emsp;時&emsp;間</th>
+                    <th data-field="onmode" data-formatter="merge_text" data-class="onmodeTd">
+                        <span class="stickers" style="color: #ff6a00">插管</span>、
+                        <span class="stickers" style="color: #84d135">呼吸器</span>、
+                        <span class="stickers" style="color: #7589e2">氧療</span>
+                        狀態
+                    </th>
+                    <th data-field="rt_record.work_data" data-formatter="merge_text">統計註記</th>
+                    @*<th data-field="rt_record.respid">呼吸器編號</th>*@
+                    @*<th data-formatter="merge_text" data-field="rt_record.use_days_how">MV使用天數</th>*@
+                    <th data-formatter="merge_text" data-field="rt_record.device">Ventilator Type</th>
+                    <th data-formatter="merge_text" data-field="rt_record.mode|rt_record.device_o2">Ventilation Mode / O<sub>2</sub> equipment</th>
+                    <th data-formatter="merge_text" data-field="rt_record.vt_set|rt_record.exp_tv">Tidal Volume Set / Total</th>
+                    <th data-formatter="merge_text" data-field="rt_record.vr_set|rt_record.vr">Ventilation Rate Set / Total</th>
+                    <th data-formatter="merge_text" data-field="rt_record.flow|rt_record.flow_pattern">Flow / Flow Pattern</th>
+                    <th data-formatter="merge_text" data-field="rt_record.mv_set|rt_record.mv">MV set / Total</th>
+                    <th data-formatter="merge_text" data-field="rt_record.insp_time|rt_record.ie_ratio|rt_record.thigh|rt_record.tlow">Insp T / I:E / Thigh / Tlow</th>
+                    <th data-formatter="merge_text" data-field="rt_record.ipap|rt_record.epap|rt_record.phigh|rt_record.plow">IPAP / EPAP / Phigh / Plow</th>
+                    <th data-formatter="merge_text" data-field="rt_record.pressure_ps|rt_record.pressure_pc">PS / PC</th>
+                    <th data-formatter="merge_text" data-field="rt_record.pressure_peak|rt_record.pressure_plateau">Peak / Plateau</th>
+                    <th data-formatter="merge_text" data-field="rt_record.pressure_mean|rt_record.pressure_peep">Mean / PEEP</th>
+                    <th data-formatter="merge_text" data-field="rt_record.RM|rt_record.optimal_peep">RM / Optimal PEEP</th>
+                    <th data-formatter="merge_text" data-field="rt_record.fio2_set|rt_record.fio2_measured" data-text_split="/" data-warning_check='[{"digit":1,"min_v":21,"max_v":55,"list":""},{"digit":1,"min_v":21,"max_v":55,"list":""}]'>FiO<sub>2</sub>(%) / FiO<sub>2</sub> Analyzer measure</th>
+                    <th data-formatter="merge_text" data-field="rt_record.o2flow">O<sub>2</sub> flow (LPM)</th>
+                    <th data-formatter="merge_text" data-field="rt_record.pressure_sensitivity|rt_record.sensitivity_flow">Sensitivity (Pr cmH<sub>2</sub>O / F lpm)</th>
+                    <th data-formatter="merge_text" data-field="rt_record.resistance|rt_record.Compliance">Raw / C</th>
+                    <th data-formatter="merge_text" data-field="rt_record.low_mv_alarm|rt_record.paw_alarm">Min. MV alarm / Pr. Alarm</th>
+                    <th data-formatter="merge_text" class="list_split_block" data-field="rt_record.abg_time">ABG time</th>
+                    <th data-formatter="merge_text" class="list_split_block" data-field="rt_record.abg_ph">pH</th>
+                    <th data-formatter="merge_text" class="list_split_block" data-field="rt_record.abg_paco2">PaCO<sub>2</sub></th>
+                    <th data-formatter="merge_text" class="list_split_block" data-field="rt_record.abg_pao2">PaO<sub>2</sub></th>
+                    <th data-formatter="merge_text" class="list_split_block" data-field="rt_record.abg_hco3|rt_record.abg_be">HCO3- / B.E</th>
+                    <th data-formatter="merge_text" class="list_split_block" data-field="rt_record.abg_sao2|rt_record.spo2">SaO<sub>2</sub> / SpO<sub>2</sub> (%)</th>
+                    <th data-formatter="merge_text" data-field="rt_record.vt_value|rt_record.rsi_srr">VT (ml) / RR（bpm）</th>
+                    <th data-formatter="merge_text" data-field="rt_record.rsbi">RSBI</th>
+                    <th data-formatter="merge_text" data-field="rt_record.pi_max|rt_record.pe_max">P I/E max (cmH<sub>2</sub>O)</th>
+                    <th data-formatter="merge_text" data-field="rt_record.cuff_leak_ml">Cuff leak test (ml)</th>
+                    <th data-formatter="merge_text" data-field="rt_record.no_set|rt_record.no">NO set / mea.(ppm)</th>
+                    <th data-formatter="merge_text" data-field="rt_record.other_no2|rt_record.ecmo_co">NO<sub>2</sub> mea. (ppm) / C.O.</th>
+                    <th data-formatter="merge_text" data-field="rt_record.et_size|rt_record.et_mark">E.T. size / mark</th>
+                    <th data-formatter="merge_text" data-field="rt_record.cuff">Cuff pressure (cmH<sub>2</sub>O) ml</th>
+                    <th data-formatter="merge_text" data-field="rt_record.breath_sound">Breath sound</th>
+                    <th data-formatter="merge_text" class="list_split_block" data-field="rt_record.pulse|rt_record.vital_signs_temp">PR / Temp</th>
+                    <th data-formatter="merge_text" class="list_split_block" data-field="rt_record.bps|rt_record.bpd">BP(S/D)(mmHg)</th>
+                    <th data-formatter="merge_text" data-field="rt_record.gcse|rt_record.gcsv|rt_record.gcsm">Con's level (E.V.M.)</th>
+                    <th data-formatter="merge_text" data-field="rt_record.water_collecting_cup|rt_record.fixed_tripod">集水杯 / 固定腳架</th>
+                    <th data-formatter="merge_text" data-field="rt_record.memo" data-class="memo">備註</th>
+                    <th data-formatter="merge_text" data-field="rt_record.drug_memo" data-class="drug_memo">藥物備註</th>
+                    <th data-formatter="merge_text" data-field="CREATE_NAME">Signature</th>
+                <tr>
+            </thead>
+        </table>
+    </section>
+</div>
+@*補單記錄單日期時間*@
+<div class="modal fade" tabindex="-1" role="dialog" id="make_record_panel">
+    <div class="modal-dialog">
+        <div class="modal-content" style="width:350px;">
+            <div class="modal-header">
+                <div class="btn-group">
+                    <h4 class="modal-title">補單記錄單日期時間</h4>
+                </div>
+                <div class="btn-group pull-right">
+                    <button class="btn btn-success" id="saveMake" data-loading-text="補單中..." onclick="makeRecord($('#makeDate').val(),$(this));">補單</button>
+                    <button class="btn btn-warning" data-dismiss="modal">關閉</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form name="update_patient_form" id="make_record_panel_form">
+                    <input type="text" class="form-control dt-picker" style="width: 140px; height: 27px; display: inline;vertical-align:middle;vertical-align:middle;" dt-format="dt" dt-sidebyside="true" id="makeDate" name="makeDate" value="@DateTime.Now.Date.ToString("yyyy-MM-dd HH:mm")" placeholder="" readonly="">
+                </form>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+ 
+@*補單記錄單日期時間*@
+ 
+<form id="pdfForm" action="@(Url.Content("~/RTRecord/DownloadPdf"))" method="post" target="TheNewWindow">
+    <input type="hidden" id="HtmlStr" name="HtmlStr" />
+</form>

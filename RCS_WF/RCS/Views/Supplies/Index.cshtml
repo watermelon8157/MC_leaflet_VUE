@@ -1,0 +1,199 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#suppliesDt").bootstrapTable({
+            url: '@Url.Content("~/Supplies/supplies_DB")',
+            method: 'post',
+            search: true,
+            showRefresh: true,
+            pagination: true,
+            pageSize: 15,
+            undefinedText: '',
+        }).on('click-row.bs.table', function (e, row, $element) {
+            Modifysupplies(row);
+            //console.log(row);
+        });
+    });
+
+    function ReSetsuppliesDtText(value, row) {
+        return row.C_MEMO.replace(/\n/g, '<br/>');
+    }
+
+    function Modifysupplies(JsonObj) {
+        console.log(JsonObj);
+        ResetsuppliesModalBody();
+        if (!!JsonObj) {
+            $('#suppliesModalTitle').html('修改耗材');
+            $('#viewstats').val('edit');
+            $('#suppliesID').val(JsonObj.C_ID);
+            $('#suppliesID').attr('readOnly', true);//於修改耗材中，代碼不得修改
+            $('#suppliesName').val(JsonObj.C_CNAME);
+            $('#suppliesName_en').val(JsonObj.C_ENAME);
+            $('#suppliesVenderCode').val(JsonObj.VENDER_CODE);
+            $('#suppliesRemark').val(JsonObj.C_MEMO);
+        }
+        else {
+            $('#suppliesModalTitle').html('新增耗材');
+            $('#viewstats').val('add');
+            $('#suppliesID').attr('readOnly', false);//於修改耗材中，代碼可以修改
+        }
+        $('#suppliesModal').modal('show');
+    }
+
+    function Delsupplies(obj) {
+        if ($("#suppliesDt").bootstrapTable('getSelections').length > 0) {
+            if (confirm('確認刪除?')) {
+                $(obj).button('loading');
+                Save('@Url.Content("~/Supplies/Supplies_Del")',
+                    'POST',
+                    { 'JsonList': JSON.stringify($("#suppliesDt").bootstrapTable('getSelections')) },
+                    function (data) {
+                        if (data.status=='0') {
+                            showAlert(data.message, msg_stat.Success);
+                            $("#suppliesDt").bootstrapTable('refresh', { silent: true });
+                        }
+                        else {
+                            showAlert(data.message, msg_stat.Danger);
+                        }
+                    },
+                    function (data) {
+                        $(obj).button('reset');
+                    });
+            }
+        } else {
+            showAlert('至少勾選一項資料!', msg_stat.Warning);
+        }
+
+    }
+
+    function ResetsuppliesModalBody() { 
+        $('#suppliesModalBody')
+            .find('input[type=text], input[type=hidden], textarea').val('')
+            .end()
+            .find('select').prop('selectedIndex', 0);
+    }
+
+    function ToSavesupplies(obj) {
+        $(obj).button('loading');
+        if (CheckReq('suppliesModalBody')) {
+            if ($.grep($("#suppliesDt").bootstrapTable('getData'), function (e) { return (e.C_VALUE == $.trim($('#suppliesID').val()) && e.C_ID != $('#supplies_C_ID').val()); }) == 0) {
+                Save('@Url.Content("~/supplies/supplies_Save")',
+                    'POST',
+                    {
+                        'suppliesID': $.trim($('#suppliesID').val()),
+                        'viewstats': $.trim($('#viewstats').val()),
+                        'suppliesName': $.trim($('#suppliesName').val()),
+                        'suppliesName_en': $.trim($('#suppliesName_en').val()),
+                        'suppliesVenderCode': $('#suppliesVenderCode').val(),
+                        'suppliesRemark': $.trim($('#suppliesRemark').val())
+                    },
+                    function (data) {
+                        if (data.status == '3') {//重複
+                            showAlert(data.message, msg_stat.Danger);
+                        }
+                        else {
+                            if (data.status == '0') {
+                                showAlert(data.message, msg_stat.Success);
+                                $('#suppliesModal').modal('hide');
+                                $("#suppliesDt").bootstrapTable('refresh', { silent: true });
+                            }
+                            else {
+                                showAlert(data.message, msg_stat.Danger);
+                            }
+                        }
+                    },
+                    function (data) {
+                        $(obj).button('reset');
+                    });
+            }
+            else {
+                showAlert('ID：' + $.trim($('#suppliesID').val()) + ' 已存在!', msg_stat.Warning);
+                $(obj).button('reset');
+            }
+        }
+        else {
+            $(obj).button('reset');
+        }
+    }
+    $('#Supplies_status input').click(function () {
+        if ($(this).prop('checked')) {
+            $('#Supplies_status li input:status').prop('checked', false);
+            $(this).prop('checked', true);
+        }
+    });
+</script>
+<div style="padding: 0 10vw 0 10vw;">
+    <button type="button" class="navbar-toggle tp" onclick="Delsupplies(this);" data-loading-text="刪除中..." style="float:left;color:#e21818;">
+        <i class="fa fa-minus-circle" aria-hidden="true"></i>
+        刪除耗材
+    </button>
+    <button id="join_item" class="navbar-toggle tp" onclick="Modifysupplies();" style="color:#42b343;">
+        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+        新增耗材
+    </button>
+    <table id="suppliesDt" data-toggle="table" class="table table-bordered table-striped table-condensed">
+        <thead style="background-color: #5BA198; color: #FFF;">
+            <tr>
+                <th data-field="state" data-checkbox="true"></th>
+                <th data-field="C_ID" data-sortable="true">耗材代碼</th>
+                <th data-field="C_CNAME" data-sortable="true">耗材名稱</th>
+                <th data-field="VENDER_CODE" data-sortable="true">供應商代碼</th>
+                <th data-field="C_MEMO" data-sortable="true" data-formatter="ReSetsuppliesDtText">備註</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+<div class="modal fade modal_assess" tabindex="-1" role="dialog" data-backdrop="true" id="suppliesModal">
+    <div class="modal-dialog modal-slg">
+        <div class="modal-content rcs_form">
+            <div class="modal-header col-*-12">
+                <div class="btn-group col-*-6">
+                    <h4 class="modal-title" id="suppliesModalTitle"></h4>
+                </div>
+                <div class="btn-group pull-right">
+                    <button class="btn btn-success" data-loading-text="儲存中..." onclick="ToSavesupplies(this);">儲存</button>
+                    <button class="btn btn-warning" data-dismiss="modal">關閉</button>
+                </div>
+            </div>
+            <div class="modal-body" id="suppliesModalBody" style="background-color:#ebebeb;">
+                <input type="hidden" id="supplies_C_ID" name="supplies_C_ID" />
+                <table class="table table-bordered table-condensed table-striped" style="background-color:#FFF;">
+                    <tr>
+                        <td>
+                            <label>耗材代碼：</label>
+                            <input type="text" class="form-control req_text" id="suppliesID" name="suppliesID" style="max-width:160px;display:inline-block;" maxlength="10" />
+                            <input type="hidden"  id="viewstats" name="viewstats"/>
+                        </td>                        
+                    </tr>
+                    <tr>
+                        <td>
+                            <label>中文名稱：</label>
+                            <input type="text" class="form-control req_text" id="suppliesName" name="suppliesName" style="max-width:160px;display:inline-block;" maxlength="10" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label>英文名稱：</label>
+                            <input type="text" class="form-control" id="suppliesName_en" name="suppliesName_en" style="max-width:160px;display:inline-block;" maxlength="10" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label>供應商代碼：</label>
+                            <input type="text" class="form-control req_text" id="suppliesVenderCode" name="suppliesVenderCode" style="max-width:160px;display:inline-block;" maxlength="10" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-bottom:10px;">
+                            <label>備註：</label>
+                            <textarea id="suppliesRemark" name="suppliesRemark" rows="8" style="width:100%;" maxlength="200"></textarea>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

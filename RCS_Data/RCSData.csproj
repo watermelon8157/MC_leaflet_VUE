@@ -1,0 +1,263 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8A469319-373A-41E6-8FD1-D748864217AF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>RCS_Data</RootNamespace>
+    <AssemblyName>RCS_Data</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Dapper, Version=1.50.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\RCS\packages\Dapper.1.50.2\lib\net40\Dapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="jose-jwt, Version=2.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\RCS\packages\jose-jwt.2.4.0\lib\net40\jose-jwt.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="jxDBA">
+      <HintPath>.\jxDBA.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\RCS\packages\log4net.2.0.8\lib\net40-full\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MayaLibrary">
+      <HintPath>.\MayaLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\RCS\packages\Newtonsoft.Json.7.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Oracle.ManagedDataAccess, Version=4.122.1.0, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL">
+      <HintPath>..\RCS\packages\Oracle.ManagedDataAccess.12.2.1100\lib\net40\Oracle.ManagedDataAccess.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="App_Config.cs" />
+    <Compile Include="Basic.cs" />
+    <Compile Include="CompressTool.cs" />
+    <Compile Include="Controllers\BaseModels.cs" />
+    <Compile Include="Controllers\Bord\Interface.cs" />
+    <Compile Include="Controllers\Bord\Models.cs" />
+    <Compile Include="Controllers\HisData\Interface.cs" />
+    <Compile Include="Controllers\HisData\Models.cs" />
+    <Compile Include="Controllers\HisData\RTChart.cs" />
+    <Compile Include="Controllers\ListHistory\Interface.cs" />
+    <Compile Include="Controllers\ListHistory\Models.cs" />
+    <Compile Include="Controllers\OPDScheduling\Interface.cs" />
+    <Compile Include="Controllers\OPDScheduling\Models.cs" />
+    <Compile Include="Controllers\RtAssess\Interface.cs" />
+    <Compile Include="Controllers\RtAssess\Models.cs" />
+    <Compile Include="Controllers\RTCalendar\Model.cs" />
+    <Compile Include="Controllers\RtOPDShift\Interface.cs" />
+    <Compile Include="Controllers\RtOPDShift\Models.cs" />
+    <Compile Include="Controllers\RtCptAss\Interface.cs" />
+    <Compile Include="Controllers\RtCptAss\Models.cs" />
+    <Compile Include="Controllers\RtValuation\Interface.cs" />
+    <Compile Include="Controllers\RtValuation\Models.cs" />
+    <Compile Include="Controllers\VpnUpload\Interface.cs" />
+    <Compile Include="Controllers\VpnUpload\Models.cs" />
+    <Compile Include="Controllers\RtCptReq\Interface.cs" />
+    <Compile Include="Controllers\RtCptReq\Models.cs" />
+    <Compile Include="Controllers\RtCptRecord\Interface.cs" />
+    <Compile Include="Controllers\RtCptRecord\Models.cs" />
+    <Compile Include="Controllers\RtRecord\Interface.cs" />
+    <Compile Include="Controllers\RtRecord\Models.cs" />
+    <Compile Include="Controllers\RtRecord\RCS_WEANING_ASSESS_CHECKLIST.cs" />
+    <Compile Include="Controllers\RtRecord\Record.cs" />
+    <Compile Include="Controllers\RtRecord\RtRecordPDF.cs" />
+    <Compile Include="Controllers\RtRecord\UpLoad.cs" />
+    <Compile Include="Controllers\RtStatus\Interface.cs" />
+    <Compile Include="Controllers\RtStatus\Models.cs" />
+    <Compile Include="Controllers\RtTakeoff\Interface.cs" />
+    <Compile Include="Controllers\RtTakeoff\Models.cs" />
+    <Compile Include="Controllers\RT\Interface.cs" />
+    <Compile Include="Controllers\RT\Models.cs" />
+    <Compile Include="Controllers\Shift\Interface.cs" />
+    <Compile Include="Controllers\Shift\Models.cs" />
+    <Compile Include="Controllers\System\Interface.cs" />
+    <Compile Include="Controllers\System\Models.cs" />
+    <Compile Include="Controllers\Upload\Interface.cs" />
+    <Compile Include="Controllers\Upload\Models.cs" />
+    <Compile Include="Models\DB\DB_MC_HOSP_INFO.cs" />
+    <Compile Include="Models\DB\DB_MC_PATIENT_INFO.cs" />
+    <Compile Include="Models\DB\DB_RCS_OPD_SHIFT_DTL.cs" />
+    <Compile Include="Models\DB\DB_RCS_CPT_NEW_ASS.cs" />
+    <Compile Include="Models\DB\DB_RCS_CPT_NEW_ASS_DTL.cs" />
+    <Compile Include="Models\DB\DB_RCS_CPT_NEW_RECORD_DTL.cs" />
+    <Compile Include="Models\DB\DB_RCS_CPT_REQ_DETAIL.cs" />
+    <Compile Include="Models\DB\DB_RCS_CPT_REQ_MASTER.cs" />
+    <Compile Include="Models\DB\DB_RCS_RT_ISBAR_SHIFT.cs" />
+    <Compile Include="Models\DB\DB_RCS_SYS_CONSUMABLE_LIST.cs" />
+    <Compile Include="Models\DB\DB_RCS_UPLOAD_JAG_DOC_NO.cs" />
+    <Compile Include="Models\DB\DB_RCS_UPLOAD_SHIFT_LOG.cs" />
+    <Compile Include="Models\DB\DB_RCS_VALUATION_DETAIL.cs" />
+    <Compile Include="Models\DB\DB_RCS_VALUATION_MASTER.cs" />
+    <Compile Include="Models\DB\DB_RCS_VALUATION_SUB_MASTER.cs" />
+    <Compile Include="Models\DB\DB_TCRecord.cs" />
+    <Compile Include="Models\DB\IDB.cs" />
+    <Compile Include="Models\HISDataExchangeEMR.cs" />
+    <Compile Include="Models\JAG\HISDataExchangeJAG.cs" />
+    <Compile Include="Models\JAG\JAGOrderRoot.cs" />
+    <Compile Include="Models\ViewModels\OnePagePDF.cs" />
+    <Compile Include="Models\ViewModels\VpnUpload.cs" />
+    <Compile Include="Models\ViewModels\RTCptReq.cs" />
+    <Compile Include="Models\ViewModels\RT_ISBAR_SHIFT.cs" />
+    <Compile Include="Models\ViewModels\Upload.cs" />
+    <Compile Include="Models\VIP\Models\VIP_AVEA.cs" />
+    <Compile Include="Models\VIP\Models\VIP_E500.cs" />
+    <Compile Include="Models\VIP\Models\VIP_EvitaV300.cs" />
+    <Compile Include="Models\VIP\Models\VIP_EVITA_4.cs" />
+    <Compile Include="Models\VIP\Models\VIP_Evita_XL.cs" />
+    <Compile Include="Models\VIP\Models\VIP_Galileo.cs" />
+    <Compile Include="Models\VIP\Models\VIP_HamiltonC3.cs" />
+    <Compile Include="Models\VIP\Models\VIP_HamiltonG5.cs" />
+    <Compile Include="Models\ViewModels\VIP.cs" />
+    <Compile Include="Models\VIP\Models\VIP_PB760.cs" />
+    <Compile Include="Models\VIP\Models\VIP_PB840.cs" />
+    <Compile Include="Models\VIP\Models\VIP_RAPHEAL.cs" />
+    <Compile Include="Models\VIP\Models\VIP_Savina300.cs" />
+    <Compile Include="Models\VIP\Models\VIP_SERVO_i.cs" />
+    <Compile Include="Models\VIP\Models\VIP_V60.cs" />
+    <Compile Include="Models\VIP\Models\VIP_300C.cs" />
+    <Compile Include="Models\WebMethod\WebService\CreateEMRSign.cs" />
+    <Compile Include="Models\WebMethod\WebService\HISGetPatient_ER_OPD_LIST.cs" />
+    <Compile Include="Models\WebMethod\WebService\UploadEMRFile.cs" />
+    <Compile Include="Models\WebMethod\WS_AddTeamCareRecordMessage.cs" />
+    <Compile Include="Models\WebMethod\WS_CreateEMRSign.cs" />
+    <Compile Include="Models\WebMethod\WS_UploadEMRFile.cs" />
+    <Compile Include="T4Json.cs" />
+    <Compile Include="DB.cs" />
+    <Compile Include="ERROR_MSG.cs" />
+    <Compile Include="Hospital.cs" />
+    <Compile Include="IniFile.cs" />
+    <Compile Include="LogTool.cs" />
+    <Compile Include="Models\BasicFunction.cs" />
+    <Compile Include="Models\DB\DB_RCS_CPT_NEW_RECORD.cs" />
+    <Compile Include="Models\DB\DB_RCS_WEANING_ASSESS.cs" />
+    <Compile Include="Models\DB\DB_RCS_CPT_DTL.cs" />
+    <Compile Include="Models\DB\DB_RCS_CPT_ASS_MASTER.cs" />
+    <Compile Include="Models\DB\DB_RCS_RECORD_DETAIL.cs" />
+    <Compile Include="Models\DB\DB_RCS_RECORD_MASTER.cs" />
+    <Compile Include="Models\DB\DB_RCS_RT_CARE_SCHEDULING.cs" />
+    <Compile Include="Models\DB\DB_RCS_RT_CASE.cs" />
+    <Compile Include="Models\DB\DB_RCS_RT_MV_DAY.cs" />
+    <Compile Include="Models\APIConnector.cs" />
+    <Compile Include="Models\DB\DBA\DBLink.cs" />
+    <Compile Include="Models\DB\DBA\DBConnector.cs" />
+    <Compile Include="Models\DB\DBA\DBProvider.cs" />
+    <Compile Include="Models\DB\DB_RCS_RT_RECORD_JSON.cs" />
+    <Compile Include="Models\DB\DB_RCS_SYS_PARAMS.cs" />
+    <Compile Include="Models\DB\DB_RCS_TEMP_RECORD_MASTER.cs" />
+    <Compile Include="Models\DB\DB_RCS_TEMP_RECORD_DETAIL.cs" />
+    <Compile Include="Models\DB\DB_RCS_VENTILATOR_SCHEDULING_CHECKLIST.cs" />
+    <Compile Include="Models\DB\DB_RCS_VENTILATOR_SCHEDULING_CHECKLIST_DEATAIL.cs" />
+    <Compile Include="Models\DB\DB_RCS_VENTILATOR_SETTINGS.cs" />
+    <Compile Include="Models\DB\DB_RCS_WEANING_ASSESS_CHECKLIST.cs" />
+    <Compile Include="Models\DB\DB_RCS_WEANING_ASSESS_DTL.cs" />
+    <Compile Include="Models\Function_Library.cs" />
+    <Compile Include="Models\HISDataExchange.cs" />
+    <Compile Include="Models\JWT.cs" />
+    <Compile Include="Models\QVT_XML.cs" />
+    <Compile Include="Models\ViewModels\RtCptRecord.cs" />
+    <Compile Include="Models\ViewModels\RTTakeoff.cs" />
+    <Compile Include="Models\ViewModels\ListHistory.cs" />
+    <Compile Include="Models\ViewModels\SetDDL.cs" />
+    <Compile Include="Models\ViewModels\RTAsses.cs" />
+    <Compile Include="Models\ViewModels\CPT.cs" />
+    <Compile Include="Models\ViewModels\Device.cs" />
+    <Compile Include="Models\ViewModels\HisData.cs" />
+    <Compile Include="Models\ViewModels\PatientListItem.cs" />
+    <Compile Include="Models\ViewModels\RT_RECORD_MAIN.cs" />
+    <Compile Include="Models\ViewModels\VENTILATORModel.cs" />
+    <Compile Include="Models\VIP\EXTEND_ITEM.cs" />
+    <Compile Include="Models\VIP\VIPRTTBL.cs" />
+    <Compile Include="Models\WebMethod\WebMethod.cs" />
+    <Compile Include="Models\WebMethod\WS_AreaPatientList.cs" />
+    <Compile Include="Models\WebMethod\WS_AVBGData.cs" />
+    <Compile Include="Models\WebMethod\WS_BloodBiochemicalData.cs" />
+    <Compile Include="Models\WebMethod\WS_checkLoginUser.cs" />
+    <Compile Include="Models\WebMethod\WS_ConsultList.cs" />
+    <Compile Include="Models\WebMethod\WS_ERAndOPDListbyChartNo.cs" />
+    <Compile Include="Models\WebMethod\WS_GetInputOutput.cs" />
+    <Compile Include="Models\WebMethod\WS_GetPatientICD10.cs" />
+    <Compile Include="Models\WebMethod\WS_GetVitalSign.cs" />
+    <Compile Include="Models\WebMethod\WS_HisBedAreaList.cs" />
+    <Compile Include="Models\WebMethod\WS_LabData.cs" />
+    <Compile Include="Models\WebMethod\WS_OrderList.cs" />
+    <Compile Include="Models\WebMethod\WS_PatientHistory.cs" />
+    <Compile Include="Models\WebMethod\WS_PatOperationList.cs" />
+    <Compile Include="Models\WebMethod\WS_ReportData.cs" />
+    <Compile Include="Models\WebMethod\WebService\WebService.cs" />
+    <Compile Include="Models\WebMethod\WebService\AreaPatientList.cs" />
+    <Compile Include="Models\WebMethod\WebService\HISABGLabData.cs" />
+    <Compile Include="Models\WebMethod\WebService\HisBedAreaList.cs" />
+    <Compile Include="Models\WebMethod\WebService\HISBloodBiochemicalLabData.cs" />
+    <Compile Include="Models\WebMethod\WebService\HISInputOutput.cs" />
+    <Compile Include="Models\WebMethod\WebService\HISLabData.cs" />
+    <Compile Include="Models\WebMethod\WebService\HisLoginUser.cs" />
+    <Compile Include="Models\WebMethod\WebService\HISOrderList.cs" />
+    <Compile Include="Models\WebMethod\WebService\HISPatientHistory.cs" />
+    <Compile Include="Models\WebMethod\WebService\HISPatientInfo.cs" />
+    <Compile Include="Models\WebMethod\WebService\HISPatOperationList.cs" />
+    <Compile Include="Models\WebMethod\WebService\HISReportData.cs" />
+    <Compile Include="Models\WebMethod\WebService\HISVitalSign.cs" />
+    <Compile Include="Models\WebMethod\WebService\RCSConsultList.cs" />
+    <Compile Include="Patient.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SecurityTool.cs" />
+    <Compile Include="SsytemInterface.cs" />
+    <Compile Include="System.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

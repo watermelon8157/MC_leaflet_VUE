@@ -1,0 +1,147 @@
+﻿@using RCS_Data;
+@{
+    Layout = null;
+    UserInfo user_info = (UserInfo)Session["user_info"];
+    string authority = user_info.authority;
+    bool is_edit = false;
+    //只有管理者與RT小組長，才可編輯。 
+
+}
+<script>
+    var is_edit = "@(is_edit)" === "True";
+    var scheduling_date = new Date();
+    var startday = 21;
+
+    $(document).ready(function () {
+        var nowd = scheduling_date.getDate();
+        if (nowd > startday && startday != 1) {
+            scheduling_date.setMonth(scheduling_date.getMonth() + 1);
+        }
+        load_scheduling();
+        $('#noprint').on('mouseover', function () {
+            $('#scheduling').schedulingForm('clearSelected');
+        });
+    });
+
+    function scheduling_goto(goto_v) {
+        scheduling_date.setMonth(scheduling_date.getMonth() + goto_v, 1);
+        load_scheduling();
+    }
+
+    function scheduling_save() {
+        $btn = $("#scheduling_title");
+        var obj = $('#scheduling').schedulingForm('getSaveData');
+        obj['month_off'] = $('#month_off').val();
+        obj['working_hr'] = $('#working_hr').val();
+        $.ajax({
+            url: '@Url.Content("~/SystemManage/Scheduling_Save")', type: "post", timeout: 10000,
+            data: { "scheduling_data": JSON.stringify(obj) },
+            beforeSend: function () {
+                $btn.button('loading');
+            },
+            success: function (data) {
+                if (data.status == '0') {
+                    showAlert('儲存成功!', msg_stat.Success);
+                }
+                else {
+                    showAlert('儲存失敗!', msg_stat.Danger);
+                }
+                //load_scheduling();
+            }, complete: function () {
+                $btn.button('reset');
+            }
+        });
+    }
+
+    function load_scheduling() {
+        var s_year = scheduling_date.getFullYear();
+        var s_month = scheduling_date.getMonth() + 1;
+        var save_text = "";
+        if (is_edit) {
+            save_text = "儲存";
+            $("#scheduling_title").attr("disabled", false);
+        }
+        var setValue = function (event, obj) {
+            $('#month_off').val(obj.month_off);
+            $('#working_hr').val(obj.working_hr);
+            var $container = $('#Rt_Scheduling');
+            var $table = $('#scheduling').find('table');
+            if ($table.outerWidth() > $container.outerWidth()) {
+                $('#Rt_Scheduling').css('width', ($('#scheduling').find('table').outerWidth() + 30) + 'px');
+            }
+        }
+        $("#scheduling_title").val(save_text + " " + s_year + "年 " + s_month + "月份 排班表");
+        $('#scheduling').schedulingForm(
+            {
+                url: '@Url.Content("~/SystemManage/Scheduling?data_type=json")' + '&year=' + s_year + '&month=' + s_month,
+                year: s_year,
+                month: s_month,
+                start_day: startday,
+                editable: is_edit,
+                toolbar_pos: { top: 0, left: 5 },
+                extra_col:
+                [
+                    { type: 'text', key: 'real_off', name: '實休' },
+                    { type: 'text', key: 'vo_month', name: 'VO月休' },
+                    { type: 'text', key: 'vo_left', name: 'VO餘' },
+                    { type: 'text', key: 'overtime', name: '加班' },
+                    { type: 'text', key: 'pre_off', name: '借休' },
+                    { type: 'text', key: 'last_hr', name: '上月時數' },
+                    { type: 'text', key: 'this_hr', name: '本月時數' }
+                ],
+                firefunc: setValue
+            });
+    }
+    function scheduling_print() {
+        var obj = $('#scheduling').schedulingForm('getSaveData');
+        obj['month_off'] = $('#month_off').val();
+        obj['working_hr'] = $('#working_hr').val();
+        var sumdata = $('#scheduling').schedulingForm('getDaySumData');
+        $.each(obj.schedul_data, function (idx, val) {
+            this.day_data['holiday'].area = sumdata.holiday[this.op_id].sum;
+            this.day_data['workday'].area = sumdata.workday[this.op_id].sum;
+        });
+        $('#pJsonDataStr').val(JSON.stringify(obj));
+        $('#ScheduleForm')[0].submit();
+        return false;
+    }
+</script>
+<form id="ScheduleForm" action="@Url.Content("~/SystemManage/ExportScheduleExcel")" method="post">
+    <input type="hidden" name="pJsonDataStr" id="pJsonDataStr" />
+    <input type="submit" id="BtnDownloadSch" style="display:none;" />
+</form>
+<div id="scheduling_print" class="schedulingExtra">
+    <div id="noprint" class="row" style="text-align:center;">
+        <div class="btn-group">
+            <input type="button" class="btn btn-info scheduling_btn" value="<< 上一個月" title="上一個月" onclick="scheduling_goto(-1);">
+            <input type="button" class="btn btn-default scheduling_btn" id="scheduling_title" data-loading-text="排班表儲存中..." value="排班表" onclick="scheduling_save();" disabled>
+            <input type="button" class="btn btn-info scheduling_btn" value="下一個月 >>" title="下一個月" onclick="scheduling_goto(1);">
+            @if (RCS.Controllers.BaseController.funSetting.printSwitch)
+            {
+                <input type="button" class="btn btn-success scheduling_btn" id="sch_print" value="排班表列印" onclick="scheduling_print();">
+            }
+        </div>
+    </div>
+    <div class="row panel-default">
+        <div class="col-xs-4 col-md-4"></div>
+        <div class="col-xs-4 col-md-4 panel panel-heading">
+            <div class="col-md-6 extra_text">
+                當月OF天
+                <input type="text" id="month_off" />天
+            </div>
+            <div class="col-md-6 extra_text">
+                工時
+                <input type="text" id="working_hr" />小時
+            </div>
+        </div>
+        <div class="col-xs-4 col-md-4"></div>
+    </div>
+    <div id="scheduling">
+        <div id="icon_help" class="panel panel-default">
+            <div class="panel-heading">區域示意</div>
+            <div id="area_block" class="panel-body row"></div>
+        </div>
+        <div id="schedulingTable">
+        </div>
+    </div>
+</div>

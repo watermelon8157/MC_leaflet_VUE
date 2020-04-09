@@ -13,6 +13,15 @@ export default {
     }
     return api.post(setConfig.url, setConfig.params)
   },
+  INSERT_PAT_DATA (params) {
+    let _params = {
+    }
+    let setConfig = {
+      url: baseUrl + 'INSERT_PAT_DATA',
+      params: Object.assign(_params, params)
+    }
+    return api.post(setConfig.url, setConfig.params)
+  },
   // 是否合法登入
   JwtAuthCheck (params) {
     let _params = {}

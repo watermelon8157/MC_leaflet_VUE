@@ -1,0 +1,58 @@
+﻿<script type="text/javascript">
+
+    var queue_data_table = null;
+    $(document).ready(function () {
+        queue_data_table = $("#queue_data_table").bootstrapTable({
+            url: "@Url.Content("~/SystemManage/QueueData")", method: "post", cache: false,
+            pagination: true, pageSize: 6, pageList: [5, 10, 25, 50, 100],
+            search: true, trimOnSearch: true,
+            showRefresh: true,
+            toolbar: "#qdt_toolbar"
+        });
+
+    });
+</script>
+
+<style type="text/css">
+    #qdt_toolbar {
+        line-height: 18px;
+        margin: 8px;
+    }
+
+    #qdt_toolbar > label, #qdt_toolbar > input {
+        margin-top: 0px;
+        text-align: left;
+        vertical-align: bottom;
+    }
+</style>
+
+<div id="qdt_toolbar">
+    <label class="checkbox-inline">
+        <input type="checkbox" id="on_type1" value="1" checked> 插管
+    </label>
+    <label class="checkbox-inline">
+        <input type="checkbox" id="on_type2" value="2" checked> 呼吸器
+    </label>
+    <label class="checkbox-inline">
+        <input type="checkbox" id="on_type3" value="3" checked> 氧療
+    </label>
+</div>
+
+<table class="table table-bordered table-condensed table-hover rc_table" id="queue_data_table">
+    <thead>
+        <tr>
+            <th data-field="uw_id" data-align="center">流水號</th>
+            <th data-field="method_name" data-align="center" data-width="70">方法</th>
+            <th data-field="method_name_desc" data-align="center" data-width="70">使用方法</th>
+            <th data-field="uw_status_desc" data-align="center" data-sortable="true">目前狀態</th>
+            <th data-field="uw_pk" data-align="center" data-sortable="true">上傳表單單號</th>
+            <th data-field="uw_response" data-align="center" data-sortable="true" >上傳結果</th>
+            <th data-field="put_queue_time" data-align="center" data-sortable="true">上傳至工作列表時間</th>
+            <th data-field="exec_time" data-align="center" data-sortable="true">執行上傳時間</th>
+            <th data-field="complete_time" data-align="center" data-sortable="true">完成時間</th>
+            <th data-field="retry_times" data-align="center" data-sortable="true">補傳次數</th>
+            <th data-field="read_falg" data-align="center" data-sortable="true">讀取註記</th>
+            <th data-field="uploader" data-align="center" data-sortable="true">上傳人員</th>
+        </tr>
+    </thead>
+</table>

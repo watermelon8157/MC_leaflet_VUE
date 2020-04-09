@@ -1,0 +1,60 @@
+﻿@model  ExamView
+@{
+    ViewBag.Title = "ExamTable";
+}
+@if (Model != null && Model.RESPONSE_MSG.status == RCS_Data.RESPONSE_STATUS.SUCCESS && Model.List != null && Model.List.Count > 0)
+{
+    <section class="flip-scroll">
+        <table class="table table-hover table-bordered table-condensed">
+            <thead>
+                <tr>
+                    <th>項目</th>
+                    @foreach ( RCS_ExamData_Common item in Model.thHeadList)
+                    {
+                        <th>@item.name</th>
+                    }
+                </tr>
+            </thead>
+            <thead>
+                <tr>
+                    <th>檢體</th>
+                    @foreach ( RCS_ExamData_Common item in Model.thHeadList)
+                    {
+                        <th>@item.spem</th>
+                    }
+                </tr>
+            </thead>
+            <thead>
+                <tr>
+                    <th>單位</th>
+                    @foreach ( RCS_ExamData_Common item in Model.thHeadList)
+                    {
+                        <th>@item.unit</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ( ExamViewList item in Model.List)
+                {
+                    <tr>
+                        <td style="background:#ecffee;">@item.exam_date</td>
+                        @foreach ( RCS_ExamData_Common value in item.dataList)
+                        {
+                            <td>@value.result</td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </section>
+}
+else
+{
+    if (Model.RESPONSE_MSG.status != RCS_Data.RESPONSE_STATUS.SUCCESS)
+    {
+        <script>
+            showAlert('@Model.RESPONSE_MSG.message', msg_stat.Danger);
+        </script>
+    }
+    @:查無檢驗結果!
+}

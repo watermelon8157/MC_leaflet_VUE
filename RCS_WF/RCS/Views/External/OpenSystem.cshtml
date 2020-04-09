@@ -1,0 +1,26 @@
+﻿ 
+@{
+    Layout = null;
+    ViewBag.Title = "OpenSystem";
+    string token = (string)TempData["token"];
+    TempData["token"] = null;
+    string url = Url.Content(string.Concat(Com.Mayaminer.IniFile.GetConfig("System", "WebURL") + "#/External/" + token));
+
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+    <script> 
+        setTimeout(function () { window.location.href = '@url'; }, 500);
+    </script>
+</head>
+<body>
+    <div>
+        畫面轉跳中....
+    </div>
+</body>
+</html>

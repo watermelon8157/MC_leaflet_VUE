@@ -1,0 +1,537 @@
+﻿@using RCS_Data;
+@using Newtonsoft.Json;
+@{
+    bool isGuide = false; //如果是對外網址進來的資料
+    if (TempData["isGuide"] != null && (bool)TempData["isGuide"])
+    {
+        isGuide = true;
+    }
+    ViewBag.Title = "Index";
+    Layout = Url.Content("~/Views/Layout/MainLayout.cshtml");
+    UserInfo user_info = (UserInfo)ViewData["user_info"];
+    bool RtGrantListSwitch = RCS.Controllers.BaseController.funSetting.RtGrantListSwitch;//授權功能開關
+    List<WS_getRtGrantList> getRtGrantList = new List<WS_getRtGrantList>();
+    string authority = "";
+
+    if (user_info == null) {
+        Response.StatusCode = 301;
+        Response.AppendHeader("Location", Url.Content("~/"));
+    }
+    else {
+        authority = user_info.authority;
+    }
+}
+<style>
+    .disabledbutton {
+        pointer-events: none;
+        opacity: 0.4;
+    }
+</style>
+<script type="text/javascript">
+    var isPrintSumit = false;//判斷是否是列印
+    var isPrintDataRefresh = '';//列印資料重新整理
+    var win;
+    var winCenterMonitor;
+    var logout_click = false;
+    var type_mode = "";
+    var main_modal;
+    var authority = "@authority";
+    var user_info = @Html.Raw(JsonConvert.SerializeObject(user_info));
+    /**
+        Session 切換作業
+        2016.4.20 JoeShen
+        2016.5.4 西瓜
+        增加授權學姊，這邊需檢查是否已有授權者，修改user_info
+        user_info 改為全域變數
+    */
+    // 目前正在作業的資料
+    var current_info = { user_info: user_info, ipd_no: "", chart_no: "",user_id: '@(Html.Raw(user_info.user_id))' };
+
+    // 切換Session
+    window.onfocus = function () {
+        check_session();
+        checkTimeout();
+        $.ajax({
+            url: "@Url.Content("~/Base/ChangeSession")",
+            timeout: 10000,
+            type: "post",async: false,
+            data: JSON.stringify(current_info),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                if(data.status != 0){
+                    logout();
+                }
+            }
+        });
+    }
+
+    //http://blog.darkthread.net/post-2017-01-04-onbeforeunload-custom-message.aspx
+    //chrome 不再支援
+    //// 防止上一頁被登出
+    //window.onbeforeunload = function () {
+    //    //chrome 不再支援
+    //    if (!logout_click && !isPrintSumit) {
+    //        return "您確定要離開系統";
+    //    }
+    //    isPrintSumit = false;
+    //    //如果有字串，重新整理
+    //    try {
+    //        if(isPrintDataRefresh.length>0){
+    //            $('#'+isPrintDataRefresh).bootstrapTable('refresh');
+    //        }
+    checkTimeout//        isPrintDataRefresh = '';
+    //    } catch (e) {
+
+    //    }
+    //}
+
+    //limit 1 min check session
+    var start_check_session = setInterval(check_session, 60000);
+    //limit 1 second check timeout
+    var start_check_timeout = setInterval(checkTimeout, 30000);
+    var minTimeOut = 10;//登出時間(分鐘)
+
+    // 典型的只有一行的程式碼錯誤
+    function time_format(data, row) {
+        if (!!data) {
+            return data.replace("T", "<br />");
+        }
+        return data;
+    }
+
+    function checkTimeout(){
+        //暫時不用倒數登出，如果要倒數，將以下兩行註解即可。
+        //// ex.如下範例所示
+        //$('#useTime').hide();
+        //return false;
+        //// 20180205
+        $('#useTime').hide();
+        return false;
+        $.ajax({
+            url: '@Url.Content("~/Base/checkTimeout")',
+            type: "POST",
+            beforeSend: function () {
+
+            },
+            success: function (data) {
+                if(data.status == 0){
+                    var nowData = data.attachment;
+                    var oldData = $('#useTime').data('useTime');
+                    if (!!oldData) {
+                        var $nowDate = moment(nowData.use_time, "YYYY-MM-DD HH:mm:ss");
+                        var $oldDate = moment(oldData.use_time, "YYYY-MM-DD HH:mm:ss");
+                        //如果最新使用時間大於目前記錄的使用時間
+                        if ($nowDate > $oldDate) {
+                            $('#useTime').data('useTime',nowData);
+                        }
+                        var tempData = $('#useTime').data('useTime');
+                        //重新計算登出時間
+                        var relativeTime = showUserLoginTimeout();
+                        if (relativeTime <= 0) {
+                            logout();
+                        }else {
+                            //如過剩下1分鐘變成紅色
+                            if (relativeTime == 1) {
+                                $('#useTime a').css('color','#D24743');
+                            }else {
+                                $('#useTime a').css('color','#F2FAF4');
+                                start_timeout_shine = null;
+                            }
+                        }
+                    }else {
+                        $('#useTime').data('useTime',nowData);
+                        showUserLoginTimeout();
+                    }
+                }
+            },
+            complete: function () {
+
+            }
+        });
+    }
+    //顯示使用者登入剩下時間
+    function showUserLoginTimeout() {
+        //重新計算登出時間
+        $('.username').css('margin-right','360px');
+        $('#useTime').show();
+        var relativeTime = minTimeOut;
+        relativeTime = minTimeOut - parseInt( moment($('#useTime').data('useTime').use_time, "YYYY-MM-DD HH:mm:ss").startOf('minute').fromNow(true).toString().replace("分鐘", ""));
+        if(!$.isNumeric(relativeTime)){
+            relativeTime = minTimeOut;
+        }
+        if(parseInt($('#useTime .second').html()) != relativeTime){
+            if(relativeTime.length == 1){
+                relativeTime = '0' + relativeTime.toString();
+            }
+            $('#useTime .second').html(relativeTime);
+        }
+        return relativeTime;
+    }
+
+
+    //設定病患基本資料
+    //DNR VPN 身高、體重等資料
+    function setPatInfo(){
+        var arrayList = new Array();
+        $('#pat_info_fix input').each(function(){
+            var _obj = new Object();
+            _obj.StatusDesc = $(this).attr('id');
+            if($(this).attr('type') == 'checkbox' && this.checked){
+                _obj.showStatus = true;
+            }
+            arrayList.push(_obj);
+        });
+        set_mode_info(arrayList);
+        $('#pat_info_modal').modal('hide');
+    }
+
+    function winOpen(){
+        if (win != undefined){
+            win.close();
+        }
+        var user_nameStr =  encodeURIComponent('@Html.Raw(user_info.user_name)');
+        win = window.open('@Url.Content("~/RT/openSystem")'+'?user_name=@(user_info.user_name)&user_id=@user_info.user_id' ,'_blank');
+        return false;
+    }
+
+    function winOpenCenterMonitor(){
+        if (winCenterMonitor != undefined){
+            winCenterMonitor.close();
+        }
+        winCenterMonitor = window.open('@Url.Content("~/CenterMonitor/Index")','winCenterMonitor');
+        return false;
+    }
+
+    $(document).ready(function () {
+        $('#useTime .second').html(minTimeOut);
+        checkTimeout();
+        //如果有登入訊息，成功登入後顯示
+        @if(TempData["loginMsg"] != null)
+        {
+            <text>
+        showAlert('@(Html.Raw(TempData["loginMsg"].ToString()))', msg_stat.Warning);
+        </text>
+            TempData["loginMsg"] = null;
+        }
+
+        //測試版標示
+        @if (RCS.Controllers.BaseController.isTestWeb)
+        {
+            @:$(".main_nav").css("background", "#f0ad4e");
+                }
+
+        @if (user_info != null && user_info.user_name != null) {
+            @Html.Raw(@"$('.username').html('" + user_info.user_name + "');");
+        }
+
+        if (authority == "doctor") {
+            $(".only_rt").hide();
+        }
+
+        @if (user_info.isGuide)
+        {
+            @:$("#board_tab").addClass('hidden');
+                }
+        else
+        {
+             @:$("#board_tab").removeClass('hidden');
+        }
+
+        $("[data-toggle='tabajax_main']").bind("click", function (e) {
+            var $this = $(this);
+            var divid = $this.attr('data-target');
+            var url = $this.attr('href');
+            var loaded = $(e.target).attr('loaded');
+            var show_info = $(e.target)[0].hasAttribute("show-pat-info");
+            if(show_info){
+                $('#now_patient_info').removeClass('hide');
+            }else {
+                $('#now_patient_info').addClass('hide');
+            }
+            if (loaded == 'N' || loaded == undefined) {
+                $.ajax({
+                    url: url, timeout: 10000,
+                    beforeSend: function () {
+                        $(divid).html("資料載入中...");
+                    },
+                    success: function (data) {
+                        $(divid).html(data);
+                        if (loaded == 'N') {
+                            $(e.target).attr('loaded', 'Y');
+                        }
+                    },
+                    error: function(){
+                        $(divid).html("資料載入失敗，請嘗試重新整理。");
+                    },
+                    complete: function () {
+                        $this.tab('show');
+                    }
+                });
+            }else{
+                $this.tab('show');
+            }
+            $('.index_tab_pane').removeClass('active');
+            $(divid).addClass('active');
+            return false;
+        });
+
+
+        //權限資料
+        $('#userData').data('userAuthority', JSON.parse('@Html.Raw(JsonConvert.SerializeObject(user_info.functionMenu))'));
+
+        $("#start_tab").trigger("click");
+    });
+
+    //訊息列
+    function createAutoClosingAlert(selector, message, delay) {
+        $(selector).addClass("alert alert-warning");
+        $(selector).html('<span>' + message + '</span>');
+        $(selector).fadeTo(delay, 500, function () {
+            $(this).slideUp(500, function () {
+                $(selector).hide();
+            });
+        });
+    }
+
+    //重新整理輔具評估單
+    function refreshMeasuresForm(btn) {
+        $.ajax({
+            url: '@Url.Content("~/MeasuresForm/Index")',
+            type: 'post',
+            success: function (data) {
+                $('#tab_measures').html(data);
+            },
+            error: function (jqXHR) {
+                log(jqXHR);
+            },
+            complete: function () {
+                $(main_modal).modal('hide');
+            }
+        });
+    }
+
+    //存檔用
+    function Save(Url, Type, Data, SuccFun, CompFun) {
+        $.ajax({
+            url: Url,
+            type: Type,
+            data: Data,
+            success: function (data) {
+                if (SuccFun != null)
+                    SuccFun(data);
+            },
+            complete: function () {
+                if (CompFun != null)
+                    CompFun();
+            },
+            error: function (jqXHR) {
+                log(jqXHR);
+            }
+        });
+    }
+
+</script>
+
+<nav class="navbar navbar-default main_nav">
+    <div class="container-fluid col_full_width">
+        <span class="username pull-left"></span>
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+        <div class="collapse navbar-collapse navbar-collapse-plus" id="myNavbar">
+            <ul class="nav navbar-nav">
+                <li><a id="start_tab" href="@Url.Content("~/RT/RT_index?isGuide="+isGuide)" data-target="#tab_rt" data-toggle="tabajax_main" loaded="N" show-pat-info>呼吸治療管理</a></li> 
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li id="useTime" data-useTime=""><a style="" href="javascript:void(0);" onclick=""><span class="glyphicon glyphicon-time"></span>&ensp;剩下&ensp;<span class="second">...</span>&ensp;分登出</a></li>
+                @if ( !user_info.isGuide)
+                {
+                    <li><a id="openSystem" href="javascript:void(0);" onclick="winOpen();"><span class="glyphicon glyphicon-wrench"></span>系統管理</a></li> 
+                }
+                <li style="padding-right:20px;"><a href="javascript:void(0);" onclick="logout();"><span class="glyphicon glyphicon-log-out" id="logout"></span> 登出系統</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div style="width: 100%; background-color: #5BA198;" id="now_patient_info">
+    <div class="now_patient_source" id="now_patient_source">
+        住
+    </div>
+    <div id="now_patient" ipd_no="" chart_no="" class="now_patient" patient_name="" type_mode="">
+        <ul class="now_patient">
+            <li id="now_pat_icon"></li>
+            <li>
+                <label>病歷號碼</label><span id="now_pat_chart_no"></span>
+            </li>
+            <li>
+                <label>床號</label><span id="now_pat_bed_no"></span>
+            </li>
+            <li>
+                <label>姓名</label><span id="now_pat_name"></span>
+            </li>
+            <li>
+                <label>性別</label><span id="now_pat_gender"></span>
+            </li>
+            <li>
+                <label>年齡</label><span id="now_pat_age"></span>
+            </li>
+            <li>
+                <label>生日</label><span id="now_pat_birthday"></span>
+            </li>
+            <li>
+                <label>身高</label><span id="now_pat_height"></span>
+            </li>
+            <li>
+                <label>入院日期</label><span id="now_pat_diag_date"></span>
+            </li>
+            <li>
+                <label>出院時間</label><span id="now_pat_left_date"></span>
+            </li>
+            <li>
+                <label>主治醫生</label><span id="now_pat_vsdoc"></span>
+            </li>
+            <li>
+                <label>診斷</label><span id="now_pat_diagnosis"></span>
+            </li>
+            <li>
+                <span id="mode_info">
+
+                </span>
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="tab-content page-container" id="index_tab_pane">
+    <!-- Tab panes -->
+    <div class="tab-pane index_tab_pane active" id="tab_rt"></div>
+    <div class="tab-pane index_tab_pane" id="tab_assignment"></div>
+    <div class="tab-pane index_tab_pane" id="tab_shift"></div>
+    <div class="tab-pane index_tab_pane" id="tab_measures"></div>
+    <div class="tab-pane index_tab_pane" id="tab_SystemManage"></div>
+    <div class="tab-pane index_tab_pane" id="tab_Board"></div>
+</div>
+<!-- 病患基本資料 -->
+<div class="modal fade bs-example-modal-slg modal_record" tabindex="-1" role="dialog" id="pat_info_modal">
+    <div class="modal-dialog modal-lg" style="width:600px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="btn-group">
+                    <h4 class="modal-title">
+                        病患基本資料&ensp;
+                        <span id="pat_info_fix">
+                            <input type="checkbox" id="isVPN" name="isVPN" onchange="if($('#pat_info_block #mode_info #span_VPN').length > 0 && $(this).prop('checked')){ $('#pat_info_block #mode_info #span_VPN').show();}else{$('#pat_info_block #mode_info #span_VPN').hide(); }" />
+                            <label for="isVPN">是否是VPN</label>
+                        </span>
+                    </h4>
+                </div>
+                <div class="btn-group pull-right">
+                    <button id="patInfoSaveBtn" class="btn btn-success" onclick="setPatInfo();return false;">修改</button>
+                    <button class="btn btn-warning" data-dismiss="modal">關閉</button>
+                </div>
+                <div class="modal-body" id="pat_info_body">
+                    <div  id="pat_info_block">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="old_b_valueModal" tabindex="-1" role="dialog" aria-labelledby="old_b_valueModal-label">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="old_b_valueModal-label">交班紀錄</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+                        修改人:{{MODIFY_NAME}}&ensp;&ensp;&ensp;修改時間:{{MODIFY_DATE}}
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12">
+                        <div class="block_title" style="background-color:#ffebe5;">Kardex</div>
+                        <div class="block_content">
+                            <textarea class="form-control" id="b_value_2_old" name="b_value_2_old" placeholder="請輸入病情處置追蹤..."></textarea>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12">
+                        <div class="block_title" style="background-color:#ffebe5;">交班備註</div>
+                        <div class="block_content">
+                            <textarea class="form-control" id="b_value_1_old" name="b_value_1_old" style="height:550px;" readonly >@*{b_value_1_old}}*@</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script>
+    var old_b_value_set_vm = { b_value_2_old: '', b_value_1_old: '', MODIFY_NAME: '', MODIFY_DATE: '' };//預設物件
+    var old_b_value_vm = new Vue({
+        el: '#old_b_valueModal',
+        data: [old_b_value_set_vm, {}].reduce(function (r, o) {
+            Object.keys(o).forEach(function (k) {
+                r[k] = o[k];
+            });
+            return r;
+        }, {}),
+        mounted: function () {
+            //元素已掛載，el被建立
+
+            this.create();
+        },
+        methods: {
+            create:function(){
+                this.b_value_2_old = CKEDITOR.replace('b_value_2_old', {
+                    toolbar: [['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript'],
+                        ['FontSize'], ['TextColor', 'BGColor'], ['Table', 'HorizontalRule', 'Smiley', 'SpecialChar'] , ['Undo', 'Redo']],
+                    height: 550
+                });
+
+                this.b_value_1_old = CKEDITOR.replace('b_value_1_old', {
+                    toolbar: [['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript'],
+                        ['FontSize'], ['TextColor', 'BGColor'], ['Table', 'HorizontalRule', 'Smiley', 'SpecialChar'] , ['Undo', 'Redo']],
+                    height: 550
+                });
+            },
+            //Vue Instance 在初始化時可設定選項物件，其中可設定 method，執行一些動作。
+            show: function (data) {
+                this.setData(data);
+                $('#old_b_valueModal').modal('show');
+            },
+            hide: function () {
+                $('#old_b_valueModal').modal('hide');
+            },
+            setData: function (data) {
+                //debugger;
+                setTimeout
+                (function () 
+                    { 
+                        old_b_value_vm.b_value_1_old.setData(CKEDITOR.tools.htmlDecode(data[0]));
+                        old_b_value_vm.b_value_2_old.setData(CKEDITOR.tools.htmlDecode(data[1])); 
+                    }, 
+                    500
+                );
+                setTimeout
+                (function () 
+                    { 
+                        old_b_value_vm.b_value_1_old.setReadOnly(true);
+                        old_b_value_vm.b_value_2_old.setReadOnly(true); 
+                    }, 
+                    100
+                );
+                //this.b_value_1_old = data[0];
+                this.MODIFY_NAME = data[3];
+                this.MODIFY_DATE = data[4];
+            }
+        }
+    });
+</script>
+
+

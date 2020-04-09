@@ -1,0 +1,79 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+<div class="container" id="bord_index">
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#WP">WEANING PROFILE</a></li>
+    </ul>
+    <div class="tab-content">
+        <div id="WP" class="tab-pane fade in active">
+            <table class="table table-hover table-striped" id="wp_table" data-search="true"> 
+                <thead>
+                    <tr>
+                        <th data-field="bed_no"  data-sortable="true" >床號</th>
+                        <th data-field="chart_no">病歷號</th>
+                        <th data-field="patient_name">病患</th>
+                        <th data-field="use_day">使用天數</th>
+                        <th data-field="msg" data-formatter="bord_msg">訊息</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+ <script>
+     var bord_index_set_vm = {};//預設物件
+     var bord_index_vm = new Vue({
+         el: '#bord_index',
+         data: [bord_index_set_vm, {}].reduce(function (r, o) {
+             Object.keys(o).forEach(function (k) {
+                 r[k] = o[k];
+             });
+             return r;
+         }, {}),
+         mounted: function () {
+             
+             $('#wp_table').bootstrapTable({
+                 data: [], 
+                 pagination: true,
+                 pageList: [10, 15, 25, 50, 100],
+                 pageSize: 5
+             });
+             $('#wp_table').bootstrapTable('showLoading');
+             //元素已掛載，el被建立
+             this.$http.post('@(Url.Content("~/Board/getWearningTable"))',
+                 { jsondata: encodeURIComponent(JSON.stringify($('#care_table').bootstrapTable('getData'))) }).then(function (response) {
+                 //response is ok...
+                $('#wp_table').bootstrapTable('load', {
+                    data: response.data
+                });
+                if (response.data.length > 0) {
+                    $('#bord_lable_cnt').removeClass('hidden');
+                } 
+                $('#bord_lable_cnt').html(response.data.length);
+                $('#wp_table').bootstrapTable('hideLoading');
+             }, function (response) {
+                 //response is not ok...
+                 showAlert('程式碼發生錯誤，請洽資訊人員!', msg_stat.Warning);
+                 $('#wp_table').bootstrapTable('hideLoading');
+             });
+         },
+         methods: {
+             //Vue Instance 在初始化時可設定選項物件，其中可設定 method，執行一些動作。
+
+         },
+         computed: {
+             //當我們定義一個 computed，其相依 data 一變，computed 也會隨之更新。
+
+         },
+         watch: {
+             //當事件觸發時，瀏覽器叫事件處理器work。
+
+         }
+     });
+
+     function bord_msg(value, row, index) {
+         return '<span>' + value.split(',').join('<br />') + '</span>';
+     }
+ </script>

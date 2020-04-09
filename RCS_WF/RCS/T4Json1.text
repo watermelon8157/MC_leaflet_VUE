@@ -1,0 +1,268 @@
+﻿ 
+         RCS.Controllers.WEBAPI.OPDSchedulingController
+         RCS.Controllers.WEBAPI.RtAssessController
+         RCS.Controllers.WEBAPI.RtCptAssController
+         RCS.Controllers.WEBAPI.RtCptRecordController
+         RCS.Controllers.WEBAPI.RtCptReqController
+         RCS.Controllers.WEBAPI.RtOPDShiftController
+         RCS.Controllers.WEBAPI.RTRecordController
+         RCS.Controllers.WEBAPI.RTTakeoffController
+         RCS.Controllers.WEBAPI.SystemController
+         RCS.Models.BaseModel
+         RCS.Models.AllowedIpOnlyAttribute
+         RCS.Models.DB.DBACentralMonitor
+         RCS.Models.DocSetting
+         RCS.Models.PDFBasicProvider
+         RCS.Models.ViewModel.HisDataModel
+         RCS.Models.ViewModel.OPDScheduling
+         RCS.Models.ViewModel.RtAssess
+         RCS.Models.ViewModel.RtCptAssess
+         RCS.Models.ViewModel.RtCptRecord
+         RCS.Models.ViewModel.RtCptReq
+         RCS.Models.ViewModel.RtOPDShift
+         RCS.Models.ViewModel.RtRecord
+         RCS.Models.ViewModel.RTTakeoff
+         RCS.Models.WorkVolume_Basic
+         RCS.Models.WorkVolume_MV
+         RCS.Models.WorkVolume_Weaning_MV_Intube
+         RCS.Models.WorkVolume_Weaning_MV
+         RCS.Models.WorkVolume_N_MV
+         RCS.Models.WorkVolume_Weaning_N_MV
+         RCS.Models.WorkVolume_Bipap_M
+         RCS.Models.WorkVolume__Weaning_Bipap_M
+         RCS.Models.WorkVolume__Weaning_Parameter
+         RCS.Models.WorkVolume_O2
+         RCS.Models.WorkVolume_Weaning_O2
+         RCS.Models.WorkVolume_O2_Analysis
+         RCS.Models.WorkVolume_Inh_times
+         RCS.Models.WorkVolume_Inh_day
+         RCS_Data.Controllers.Bord.Models
+         RCS_Data.Controllers.HisData.Models
+         RCS_Data.Controllers.HisData.Models
+         RCS_Data.Controllers.HisData.RTChart_peak
+         RCS_Data.Controllers.HisData.RTChart_Plateau
+         RCS_Data.Controllers.HisData.RTChart_FiO2
+         RCS_Data.Controllers.HisData.RTChart_peep
+         RCS_Data.Controllers.HisData.RTChart_SPO2
+         RCS_Data.Controllers.HisData.RTChart_Respiration
+         RCS_Data.Controllers.HisData.RTChart_DeltaP
+         RCS_Data.Controllers.HisData.RTChart_ETCO2
+         RCS_Data.Controllers.HisData.RTChart_ventilation_total
+         RCS_Data.Controllers.HisData.RTChart_raw
+         RCS_Data.Controllers.HisData.RTChart_C
+         RCS_Data.Controllers.OPDScheduling.Models
+         
+# RCS_Data.Controllers.OPDScheduling.FormOPDList
+         
+         
+# RCS_Data.Controllers.OPDScheduling.OPD_Save
+         
+         
+# RCS_Data.Controllers.RT.FormSearchPatientList
+         
+         RCS_Data.Controllers.RtAssess.Models
+         
+# RCS_Data.Controllers.RtAssess.Form_CPTDetail
+         
+         RCS_Data.Controllers.RtAssess.Form_CPTRecordList
+         
+# RCS_Data.Controllers.RtAssess.Form_CPTRecordList
+         
+         
+# RCS_Data.Controllers.RtAssess.Form_CPTAssess_Save
+         
+         RCS_Data.Controllers.RtCptAss.Models
+         
+# RCS_Data.Controllers.RtCptAss.FormRtCPTAssDetail
+         
+         RCS_Data.Controllers.RtCptAss.FormRtCPTAssList
+         
+# RCS_Data.Controllers.RtCptAss.FormRtCPTAssList
+         
+         
+# RCS_Data.Controllers.RtCptAss.RTCptAssesDetail
+         
+         
+# RCS_Data.Controllers.RtCptAss.RTCptAsses_Save
+         
+         RCS_Data.Controllers.RtCptRecord.Models
+         RCS_Data.Controllers.RtCptRecord.FormRtCPTRecordList
+         
+# RCS_Data.Controllers.RtCptRecord.FormRtCPTRecordList
+         
+         RCS_Data.Controllers.RtCptReq.Models
+         
+# RCS_Data.Controllers.RtCptReq.FormRtCPTReqDetail
+         
+         
+# RCS_Data.Controllers.RtCptReq.RTCptReqDetail
+         
+         
+# RCS_Data.Controllers.RtCptReq.RTCptReq_Save
+         
+         RCS_Data.Controllers.RtOPDShift.Models
+         
+# RCS_Data.Controllers.RtOPDShift.RtOPDShift_Save
+         
+         
+# RCS_Data.Controllers.RtOPDShift.RtOPDShiftDetail
+         
+         
+# RCS_Data.Controllers.RtOPDShift.FormRtOPDShiftDetail
+         
+         
+# RCS_Data.Controllers.RtOPDShift.FormRtOPDShiftList
+         
+         
+# RCS_Data.Controllers.RtOPDShift.RCS_RT_OPD_SHIFT_DETAIL
+         
+         RCS_Data.Controllers.RtRecord.Models
+         
+# RCS_Data.Controllers.RtRecord.SelectItemDetail
+         
+         RCS_Data.Controllers.RtRecord.Form_SelectListItem
+         
+# RCS_Data.Controllers.RtRecord.Form_SelectListItem
+         
+         RCS_Data.Controllers.RtRecord.Form_RtRecordList
+         
+# RCS_Data.Controllers.RtRecord.Form_RtRecordList
+         
+         RCS_Data.Controllers.RtRecord.Models
+         RCS_Data.Controllers.RtRecord.Models
+         RCS_Data.Controllers.RtRecord.RT_RECORD
+         RCS_Data.Controllers.RtRecord.RT_RECORD
+         RCS_Data.Controllers.RtRecord.RT_RECORD
+         
+# RCS_Data.Controllers.RtRecord.RT_RECORD
+         
+         RCS_Data.Controllers.RtRecord.RT_RECORD_MUST_DATA
+         
+# RCS_Data.Controllers.RtRecord.RT_RECORD_MUST_DATA
+         
+         RCS_Data.Controllers.RtRecord.Models
+         RCS_Data.Controllers.RtRecord.Models
+         RCS_Data.Controllers.RtTakeoff.Models
+         RCS_Data.Controllers.RtTakeoff.Form_RtTakeOffDetail
+         
+# RCS_Data.Controllers.RtTakeoff.Form_RtTakeOffDetail
+         
+         RCS_Data.Controllers.RtTakeoff.Form_RtTakeoffList
+         
+# RCS_Data.Controllers.RtTakeoff.Form_RtTakeoffList
+         
+         
+# RCS_Data.Controllers.RtTakeoff.Form_RtTakeOff_Save
+         
+         RCS_Data.Controllers.RtValuation.Models
+         
+# RCS_Data.Controllers.RtValuation.SaveForm
+         
+         
+# RCS_Data.Controllers.RtValuation.FormRtValuationList
+         
+         
+# RCS_Data.Controllers.RtValuation.FormRtValuationDetail
+         
+         
+# RCS_Data.Controllers.Shift.FormHISData
+         
+         RCS_Data.Controllers.System.Models
+         RCS_Data.Controllers.System.USER_FORM_BODY
+         RCS_Data.Controllers.System.getUserMaintain_List_BODY
+         
+# RCS_Data.Controllers.System.getUserMaintain_List_BODY
+         
+         RCS_Data.Controllers.System.VENTILATOR_FORM_BODY
+         RCS_Data.Controllers.System.Param_Setting_FORM_BODY
+         RCS_Data.Controllers.System.VENTILATOR_DETAIL_FORM_BODY
+         RCS_Data.Controllers.System.VENTILATORExcel_FORM_BODY
+         
+# RCS_Data.Controllers.System.VENTILATORExcel_FORM_BODY
+         
+         RCS_Data.Controllers.Upload.Models
+         RCS_Data.Controllers.VpnUpload.Models
+         
+# RCS_Data.Controllers.VpnUpload.FormRtCPTAssList
+         
+         
+# RCS_Data.Controllers.VpnUpload.FormVpnUploadDetail
+         
+         
+# RCS_Data.Controllers.VpnUpload.VpnUploadDetail_save
+         
+         
+# RCS_Data.Controllers.VpnUpload.VpnUploadDetailUpload
+         
+         RCS_Data.Models.BASIC_FUNCTION
+         RCS_Data.Models.DBA_SETTING
+         RCS_Data.Models.SYS_BASIC
+         RCS_Data.Models.DB.DBA_RCS_RECORD_MASTER
+         
+# RCS_Data.Models.DB.DB_RCS_WEANING_ASSESS_CHECKLIST
+         
+         RCS_Data.DBA_Provider
+         RCS_Data.MSSQLProvider
+         RCS_Data.OracleDBProvider
+         
+# RCS_Data.Models.ViewModels.RCS_CPT_DTL_NEW_ITEMS
+         
+         
+# RCS_Data.Models.ViewModels.ListHistoryViewModels
+         
+         
+# RCS_Data.Models.ViewModels.RCS_RT_ISBAR_SHIFT
+         
+         
+# RCS_Data.Models.ViewModels.RCS_RTAsses
+         
+         
+# RCS_Data.Models.ViewModels.CPTNewRecord
+         
+         
+# RCS_Data.Models.ViewModels.RTCptReq
+         
+         
+# RCS_Data.Models.ViewModels.RCS_RTTakeoff
+         
+         
+# RCS_Data.Models.ViewModels.VM_RTTakeoffAssess
+         
+         
+# RCS_Data.Models.ViewModels.UPLOADLIST
+         
+         RCS_Data.Models.ViewModels.UPLOADSTAYBYUPLOADLISTComparer
+         
+# RCS_Data.Models.ViewModels.VpnUploadData
+         
+         RCS_Data.Models.VIP.Models.VIP_SETTING_EvitaV300
+         RCS_Data.Models.VIP.AVIP_SETTING
+         RCSData.Models.WebService.HISABGLabData
+         RCSData.Models.WebService.HisBedAreaList
+         RCSData.Models.WebServiceParam
+         RCSData.Models.WS_AddTeamCareRecordMessage
+         RCSData.Models.WS_AreaPatientList
+         RCSData.Models.WS_PatientInfo
+         RCSData.Models.WS_checkLoginUser
+         RCSData.Models.WS_ConsultList
+         RCSData.Models.WS_CreateEMRSign
+         RCSData.Models.WS_ERAndOPDListbyChartNo
+         RCSData.Models.WS_GetInputOutput
+         RCSData.Models.WS_GetPatientICD10
+         RCSData.Models.WS_GetVitalSign
+         RCSData.Models.WS_HisBedAreaList
+         RCSData.Models.WS_LabData
+         RCSData.Models.WS_OrderList
+         RCSData.Models.WS_PatientHistory
+         RCSData.Models.WS_PatOperationList
+         RCSData.Models.WS_ReportData
+         RCSData.Models.WS_UploadEMRFile
+         
+# RCS_Data.Patient
+         
+         RCS_Data.LAB_DATA
+         RCS_Data.LAB_DATA
+         RCS_Data.RT_RECORD_MAIN_BASIC
+         RCS_Data.RCS_DATA_TK_ASSESS
+         RCS_Data.RCS_DATA_RT_ASSESS
+         RCS_Data.RCS_DATA_CR_RECORD

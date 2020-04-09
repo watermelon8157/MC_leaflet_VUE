@@ -1,0 +1,480 @@
+﻿@model RCS.Models.DecisionSupportViewModel
+@{
+    ViewBag.Title = "decisionSupport";
+}
+<style>
+    .clearable {
+        background: #fff url(data:image/gif;base64,R0lGODlhBwAHAIAAAP///5KSkiH5BAAAAAAALAAAAAAHAAcAAAIMTICmsGrIXnLxuDMLADs=) no-repeat right -10px center;
+        padding: 3px 18px 3px 4px; /* Use the same right padding (18) in jQ! */
+        border-radius: 3px;
+        transition: background 0.4s;
+    }
+
+        .clearable.x {
+            background-position: right 5px center;
+        }
+
+        .clearable.onX {
+            cursor: pointer;
+        }
+
+        .clearable::-ms-clear {
+            display: none;
+            width: 0;
+            height: 0;
+        }
+</style>
+<!--typeahead-->
+<script type="text/javascript" src="@Url.Content("~/Plugin/Bootstrap-3-Typeahead/bootstrap3-typeahead.min.js")"></script>
+<script type="text/javascript">
+    var room = 1;//預設第一層開始
+    var addHtml = '';//取得欲增加的HTML
+    $(document).ready(function () {
+        setcheckboxRules('DSModal');
+        $('#DS_MASTER').bootstrapTable($.extend(true, {}, bootstrap_table_option, {
+            url: "@Url.Content("~/DecisionSupport/getTable")",
+            //toolbar: "#param_toolbar",
+            showRefresh: true,
+            //height: 750,
+            onClickRow: function (row, $element, field) {
+                formReset('DSModal');
+                $('#DSModal #DS_ID').val(row.DS_ID);
+                $('#DSModal #DS_DESC').val(row.DS_DESC);
+                $('#DSModal #DS_SUM').val(row.DS_SUM);
+                $('#DSModal input[name=DS_IDEA]').each(function(){
+                    if($(this).val() == row.DS_IDEA){
+                        $(this).prop('checked',true);
+                    } else {
+                        $(this).prop('checked', false);
+                    }
+                });
+                $('#DSModal #DS_MEMO').val(row.DS_MEMO);
+                $('#DSModal input[name=DS_STATUS]').each(function () {
+                    if ($(this).val() == row.DS_STATUS) {
+                        $(this).prop('checked', true);
+                    } else {
+                        $(this).prop('checked', false);
+                    }
+                });
+                console.log(row.DETAIL);
+                if (row.DETAIL != null && row.DETAIL.length > 0) {
+                    for (var i in row.DETAIL) {
+                        var j = 0;
+                        if (i != 'remove') {
+                            var item = row.DETAIL[i];
+                            $('#DSModal .panel_field').each(function () {
+                                if (i == j) {
+                                    $(this).find('select[name=DS_ITEM]').val(item.DS_ITEM);
+                                    $(this).find('input[name=DS_VALUE]').val(item.DS_VALUE);
+                                    $(this).find('input[name=DS_SCORE]').val(item.DS_SCORE);
+                                }
+                                j++;
+                            });
+                            if ($('#DSModal .panel_field').length < row.DETAIL.length) {
+                                education_fields();
+                            }
+                        }
+                    }
+                    addClearable($('#education_fields'));
+                }
+                $('#DSModal').modal('show');
+            },
+            rowStyle: function (row, index) {
+                if (row.DS_STATUS == "9") {
+                    return { classes: 'danger' };
+                } else {
+                    return { classes: 'default' };
+                }
+            }
+        }));
+        addClearable($(document));
+        addHtml = $('#basic_field').html(); //取得增加資料列的HTML
+        $('#basic_field').find('.btn_area').remove();//移除按鈕
+        //DOM data資料
+        $('#DSModal').data('source', JSON.parse('@Html.Raw(Model.DS_SysParams.get_modal_data("RTRecord_Detail"))'));
+
+
+        $('input[name=DS_SCORE]').each(function () {
+            $(this).keyup(function () {
+                sumSource();
+            });
+        });
+
+
+    });
+
+    //增加清空的X，方便使用者清空
+    function addClearable(pdocument) {
+        //增加清空的X，方便使用者清空
+        //參考網址:http://jsbin.com/bebug/11/edit?html,css,js,output
+        // CLEARABLE INPUT
+        function tog(v) { return v ? 'addClass' : 'removeClass'; }
+        pdocument.on('input', '.clearable', function () {
+            $(this)[tog(this.value)]('x');
+        }).on('mousemove focus', '.x', function (e) {
+            $(this)[tog(this.offsetWidth - 18 < e.clientX - this.getBoundingClientRect().left)]('onX');
+        }).on('touchstart click', '.onX', function (ev) {
+            ev.preventDefault();
+            $(this).removeClass('x onX').val('').change();
+        });
+        pdocument.find('.clearable').focus(function (e) {
+            $(this)[tog(this.value)]('x');
+        });
+    }
+
+    //重新設定指定ID清空資料
+    function formReset(pId) {
+        room = 1;
+        $('#education_fields').html('');//清空判斷項目
+        var block = $('#' + pId);
+        if (block != null && block.length > 0) {
+            //清空隱藏欄位
+            if (block.find('input[type=hidden]').length > 0) {
+                block.find('input[type=hidden]').val('');
+            }
+            //清空檢查輸入框
+            if (block.find('input[type=text]').length > 0) {
+                block.find('input[type=text]').val('');
+            }
+            //清空textarea
+            if (block.find('textarea').length > 0) {
+                block.find('textarea').val('');
+            }
+            //清空checkbox，且設定預設值
+            if (block.find('input[type=checkbox]').length > 0) {
+                block.find('input[type=checkbox]').prop('checked', false);
+                block.find('.chkDefault').prop('checked', true);
+            }
+            //清空search
+            if (block.find('input[type=search]').length > 0) {
+                block.find('input[type=search]').val('');
+            }
+            //清空 select 下拉式選單
+            if (block.find('select').length > 0) {
+                block.find('select').val('');
+            }
+        }
+        $("#DSModal [data-field]").each(function () {
+            if ($(this).attr("data-field") == "Y") {
+                switch ($(this).find("input").attr('type')) {
+                    case 'text':
+                    case 'search':
+                        chk_flag = checkData(1, $(this).find("input"));
+                        break;
+                    case 'checkbox':
+                        chk_flag = checkData(1, $(this).find("input:checked"));
+                        break;
+                    default:
+                        if ($(this).find('select').length > 0) {
+                            chk_flag = checkData(1, $(this).find('select'));
+                        }
+                        if ($(this).find('textarea').length > 0) {
+                            chk_flag = checkData(1, $(this).find('textarea'));
+                        }
+                        break;
+                }
+            }
+        });
+    }
+    //新增DS
+    function showDSModal(btn) {
+        formReset('DSModal');
+        $('#DSModal').modal('show');
+    }
+    //儲存DS
+    function saveDS(btn) {
+        //檢核資料
+        var chk_flag = false;
+        $("#DSModal [data-field]").each(function () {
+            if ($(this).attr("data-field") == "Y") {
+                switch ($(this).find("input").attr('type')) {
+                    case 'text':
+                    case 'search':
+                        chk_flag = checkData($(this).find("input").val(), $(this).find("input"),chk_flag);
+                        break;
+                    case 'checkbox':
+                        chk_flag = checkData($(this).find("input:checked"), $(this),chk_flag);
+                        break;
+                    default:
+                        if ($(this).find('select').length >0) {
+                            chk_flag = checkData($(this).find('select').val(), $(this).find('select'),chk_flag);
+                        }
+                        if ($(this).find('textarea').length > 0) {
+                            chk_flag = checkData($(this).find('textarea').val(), $(this).find('textarea'),chk_flag);
+                        }
+                        break;
+                }
+            }
+        });
+        if (chk_flag) {
+            showAlert("有必選欄位未填寫!", msg_stat.Warning, 2500);
+            return false;
+        }
+        chk_flag = false;
+        $("#DSModal input[name=DS_SCORE]").each(function () {
+            //isPositiveNumber
+            if (!isPositiveNumber($(this).val())) {
+                chk_flag = true;
+                $(this).css("background-color", '#E8CCFF');
+            } else {
+                $(this).css("background-color", "");
+            }
+        });
+        if (chk_flag) {
+            showAlert("分數請填寫正整數!", msg_stat.Warning, 2500);
+            return false;
+        }
+
+        //組儲存的資料
+        var obj = new Object();//物件
+        obj.DS_ID = $('#DSModal #DS_ID').val();
+        obj.DS_DESC = $('#DSModal #DS_DESC').val();
+        obj.DS_SUM = $('#DSModal #DS_SUM').val();
+        obj.DS_IDEA = $('#DSModal input[name=DS_IDEA]:checked').val();
+        obj.DS_MEMO = $('#DSModal #DS_MEMO').val();
+        obj.DS_STATUS = $('#DSModal input[name=DS_STATUS]:checked').val();
+        obj.DETAIL = new Array();
+        $('#DSModal .panel_field').each(function () {
+            var item = new Object();//物件
+            item.DS_ID = $('#DSModal #DS_ID').val();
+            item.DS_ITEM = $(this).find('select[name=DS_ITEM]').val();
+            item.DS_VALUE = $(this).find('input[name=DS_VALUE]').val();
+            item.DS_SCORE = $(this).find('input[name=DS_SCORE]').val();
+            obj.DETAIL.push(item);
+        });
+
+         $.ajax({
+            url: '@Url.Content("~/DecisionSupport/decisionSupportSave")',
+            type: 'POST',
+            async: false,
+            beforeSend: function () {
+                btn.button('loading');
+            },
+            data: { objStr: encodeURIComponent(JSON.stringify(obj))},
+            success: function (data) {
+                if (data.status == 0) {
+                    showAlert(data.message, msg_stat.Success);
+                    $('#DSModal').modal('hide');
+                    $('#DS_MASTER').bootstrapTable('refresh');
+                } else {
+                    showAlert(data.message, msg_stat.Danger);
+                }
+            },
+            error: function (jqXHR) {
+                log(jqXHR);
+                msg = '程式發生錯誤!';
+            },
+            complete: function () {
+                btn.button('reset');
+            }
+        });
+    }
+
+    //檢核資料判斷
+    function checkData(pVal, pThis,pChk_flag) {
+        var colorStr = '#E8CCFF';
+        if (pVal.length == 0) {
+            pThis.css("background-color", colorStr);
+            return true;
+        } else {
+            pThis.css("background-color", "");
+            if (pChk_flag) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    //增加資料列
+    function education_fields() {
+        room++;
+        var objTo = document.getElementById('education_fields')
+        var divtest = document.createElement("div");
+        divtest.setAttribute("class", "form-group removeclass" + room);
+        var rdiv = 'removeclass' + room;
+        divtest.innerHTML = addHtml.replace("$a", room);
+        objTo.appendChild(divtest);
+
+        $('#education_fields input[name=DS_SCORE]').each(function () {
+            $(this).keyup(function () {
+                sumSource();
+            });
+        });
+    }
+
+    function sumSource() {
+        var sumInt = 0;
+        $('input[name=DS_SCORE]').each(function () {
+            if ($(this).val().length > 0 && isPositiveNumber($(this).val())) {
+                sumInt += parseInt($(this).val());
+            }
+        });
+        $('#DSModal #DS_SUM').val(sumInt);
+    }
+    //設定動態下拉式選單
+    function setTypeahead(pThis) {
+        var array = '';
+        var dataList = pThis.attr('list');
+        $('#'+dataList).html(array);
+        var selectStr = pThis.parent().parent().parent().find('select[name=DS_ITEM]').val();
+        if (selectStr.length > 0) {
+            var source = $('#DSModal').data('source');
+            for (var i in source) {
+                var obj = source[i];
+                if (obj.P_GROUP == selectStr) {
+                    array += '<option value="' + obj.P_NAME + '">';
+                }
+            }
+            $('#' + dataList).html(array);
+        } else {
+            showAlert('請選擇項目!', msg_stat.Warning);
+        }
+    }
+</script>
+<div style="padding: 0 10vw 0 10vw;">
+    <button id="join_item" class="navbar-toggle tp" onclick="showDSModal($(this));" style="color:#42b343;">
+        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+        新增決策資源
+    </button>
+    <table id="DS_MASTER" data-toggle="table" class="table table-bordered table-striped table-condensed">
+        <thead style="background-color: #5BA198; color: #FFF;">
+            <tr>
+                <th data-field="DS_SUM" data-sortable="true">權重總分</th>
+                <th data-field="SHOW_IDEA" data-sortable="true">權重判斷</th>
+                <th data-field="DS_DESC" data-sortable="true">內容描述</th>
+                <th data-field="SHOW_STATUS" data-sortable="true">狀態</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+<div class="modal fade" tabindex="-1" role="dialog" data-backdrop="true" id="DSModal" data-source="">
+    <div class="modal-dialog modal-slg">
+        <div class="modal-content" style="width:800px;">
+            <div class="modal-header col-*-12">
+                <div class="btn-group col-*-12">
+                    <h4 class="modal-title" id="DSModalTitle">決策資源</h4>
+                </div>
+                <div class="btn-group pull-right">
+                    <button class="btn btn-success" data-loading-text="儲存中..." onclick="saveDS($(this));">儲存</button>
+                    <button class="btn btn-warning" data-dismiss="modal">關閉</button>
+                </div>
+            </div>
+            <div class="modal-body" id="DSModalBody" style="background-color:#ebebeb;">
+                <input type="hidden" id="DS_ID" name="DS_ID" />
+                <table class="table table-bordered table-condensed table-striped" style="background-color:#FFF;">
+                    <tr>
+                        <td>
+                            <label>權重總分：</label>
+                        </td>
+                        <td data-field="Y">
+                            <input type="text" class="form-control" id="DS_SUM" name="DS_SUM" value="" style="width:80px;" disabled>
+                        </td>
+                        <td colspan="1" rowspan="3" style="width:400px;" data-field="Y">
+                            <label>訊息內容描述：</label>
+                            <textarea id="DS_DESC" name="DS_DESC" rows="4" style="width:100%;" maxlength="200" class="form-control"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label>權重判斷：</label>
+                        </td>
+                        <td data-field="Y" class="single_check">
+                            <label>
+                                <input type="checkbox"class="chkDefault" name="DS_IDEA" value="1" checked />&emsp;大於權重總分&emsp;
+                            </label>
+                            <label>
+                                <input type="checkbox" name="DS_IDEA" value="2" />&emsp;小於權重總分
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label>狀態：</label>
+                        </td>
+                        <td data-field="Y" class="single_check">
+                            <label>
+                                <input type="checkbox" class="chkDefault" name="DS_STATUS" value="1" checked />&emsp;使用中&emsp;
+                            </label>
+                            <label>
+                                <input type="checkbox"  name="DS_STATUS" value="9" />&emsp;停用
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" style="padding-bottom:10px;">
+                            <label>備註：</label>
+                            <input type="text" class="form-control" id="DS_MEMO" name="DS_MEMO" style="width:600px;display:inline-block;" maxlength="50" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    判斷項目
+                                    &emsp;
+                                    <button class="btn btn-success" type="button" onclick="education_fields();" style="padding:10px;">
+                                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                                    </button>
+                                    <datalist id="typeahead"></datalist>
+                                </div>
+                                <div class="panel-body" style="height:200px;overflow-y:scroll;">
+                                    <div id="basic_field">
+                                        <div class="panel_field">
+                                            <div class="col-sm-4 nopadding">
+                                                <div class="form-group" data-field="Y">
+                                                    <select name="DS_ITEM" class="form-control" style="width:180px;" onchange="$(this).parent().parent().parent().find('input[name=DS_VALUE]').val('').focus();">
+                                                        <option value="">選擇項目</option>
+                                                        @foreach (var optgroup in Model.DS_SysParams.get_group_list("RTRecord_group", "RTRecord_Item"))
+                                                        {
+                                                            if (!string.IsNullOrWhiteSpace(optgroup.P_STATUS) && optgroup.P_STATUS == "1")
+                                                            {
+                                                                <optgroup label="@(optgroup.P_NAME)">
+                                                                    @foreach (var option in Model.DS_SysParams.get_group_list("RTRecord_Item", optgroup.P_VALUE))
+                                                                    {
+                                                                        <option value="@(option.P_VALUE)">@option.P_NAME</option>
+                                                                    }
+                                                                </optgroup>
+                                                            }
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4 nopadding">
+                                                <div class="form-group" data-field="Y">
+                                                    <input type="search" list="typeahead" class="form-control typeahead clearable" name="DS_VALUE" placeholder="條件" onmousedown="setTypeahead($(this));" style="width:180px;">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-2 nopadding">
+                                                <div class="form-group" data-field="Y">
+                                                    <input type="text" class="form-control clearable" name="DS_SCORE" placeholder="權重" value="" style="width:80px;">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-2 nopadding">
+                                                <div class="form-group">
+                                                    <div class="btn_area" style="display:table-cell;vertical-align:middle;">
+                                                        &emsp;
+                                                        <button class="btn btn-danger" type="button" onclick="$('.removeclass$a').remove();sumSource();" style="padding:10px;">
+                                                            <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="education_fields">
+
+                                    </div>
+                                    <div class="clear"></div>
+
+                                </div>
+                                <div class="panel-footer"></div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+

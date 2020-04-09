@@ -1,0 +1,60 @@
+﻿@{
+    ViewBag.Title = "list";
+}
+<script>
+    $(document).ready(function () {
+        $('#pat_tran_vpn_tbl').bootstrapTable($.extend(true, {}, bootstrap_table_option, {
+            url: '@Url.Content("~/VPN_UPLOAD/getXMLVPN_UPLOAD")',
+            showRefresh: true,
+            toolbar: "#pat_tran_tool_bar",
+            queryParams: function (para) {
+                return { isAllData: true, ipd_no: $('#now_patient').attr('ipd_no') };
+            },
+            onClickRow: function (row, e) {
+                openVPN_DATA(row.TRAN_ID);
+            }
+        }));
+    });
+
+    function openVPN_DATA(TRAN_ID) {
+        $.ajax({
+            url: "@Url.Content("~/VPN_UPLOAD/Index")", type: "post",
+            dataType: "html",
+            data: { "tran_id": TRAN_ID },
+            beforeSend: function () {
+                $("#index_loading").modal('show');
+            },
+            success: function (html) {
+                $('#showpat_tran_index').html(html);
+                //$('#showpat_tran_index').modal('show');
+            }, complete: function () {
+                $("#index_loading").modal('hide');
+            }
+        });
+    }
+</script>
+<div id="date_time_dom" style="position:relative;"></div>
+<div class="row">
+    <div class="col-lg-12" id="pat_tran_tool_bar">
+        <button class="btn btn-danger" id="add" onclick="openVPN_DATA('');" data-loading-text="新增中..."><i class="fa fa-plus" aria-hidden="true"></i>&emsp;新增一筆資料</button>
+    </div>
+    <div class="col-lg-12">
+        <table style="background-color: #FFF;" data-cache="false" data-row-style="accept_rowStyle" data-classes="table table-hover" data-flat="true" data-search="true" id="pat_tran_vpn_tbl">
+            <thead style="background-color: #5BA198; color: #FFF;">
+                <tr>
+                    <th data-field="TRAN_DATE" data-sortable="true">轉入日期</th>
+                    <th data-field="TRAN_TYPE" data-sortable="true">異動類別</th>
+                    <th data-field="HOSP_ID" data-sortable="true">轉入醫事機構代碼</th>
+                    <th data-field="HOSP_NAME" data-sortable="true">轉入醫事機構名稱</th>
+                    <th data-field="TRAN_STATION_TYPE" data-sortable="true">轉入病床類別</th>
+                    <th data-field="TRAN_OUT" data-sortable="true">轉出日期</th>
+                    <th data-field="OUT_TRAN_TYPE" data-sortable="true">異動類別</th>
+                    <th data-field="TRAN_SITUATION" data-sortable="true">轉出情形</th>
+                    <th data-field="OUT_HOSP_ID" data-sortable="true">轉出醫事機構代碼</th>
+                    <th data-field="OUT_HOSP_NAME" data-sortable="true">轉出醫事機構名稱</th>
+                    <th data-field="TRAN_BED" data-sortable="true">轉出病床類別</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>

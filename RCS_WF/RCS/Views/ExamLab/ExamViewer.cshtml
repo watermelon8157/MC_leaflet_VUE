@@ -1,0 +1,115 @@
+﻿<script type="text/javascript">
+    var exam_set = null;
+    $(document).ready(function () {
+        // 查詢
+        $("#btn_exam_search").click(function () {
+            $("#exam_loading, #exam_cover").fadeIn(800);
+
+            // load exam data
+            $.ajax({
+                url: "@Url.Content("~/ExamLab/ExamData")",
+                type: "post", data: "st_data=" + $("#search_st_date").val(), timeout: 50000,
+                success: function (data) {
+                    $('#exam_resultTable').html(data);
+                },
+                complete: function () {
+                    // 將讀取條消失
+                    $("#exam_loading, #exam_cover").fadeOut(800);
+                }
+            });
+        }).trigger("click");
+
+    });
+</script>
+
+<style type="text/css">
+    #exam_search_panel {
+        width: 96%;
+    }
+
+        #exam_search_panel > row {
+            margin: 0;
+        }
+
+    #exam_result .tab-pane {
+        padding: 1em;
+    }
+
+    #btn_exam_search {
+        color: #ffffff;
+        cursor: pointer;
+    }
+
+    #exam_search_panel .form-control {
+        height: 34px;
+    }
+
+    #exam_cover, #exam_loading {
+        display: none;
+        position: fixed;
+    }
+
+    #exam_cover {
+        top: 0px;
+        left: 0px;
+        right: 0px;
+        bottom: 0px;
+        z-index: 90000;
+        background: #666666;
+        opacity: 0.6;
+    }
+
+    #exam_loading {
+        margin-left: -200px;
+        left: 50%;
+        top: 50%;
+        z-index: 99999;
+    }
+
+    #exam_search_panel .table > tbody > tr > td, #exam_search_panel .table > thead > tr > th, #exam_search_panel .table > tbody > tr > th {
+        font-size: 12px;
+        line-height: 20px;
+        height: 24px;
+        padding: 1px 0.4em;
+        margin: 0;
+        border: 1px solid #CCCCCC !important;
+
+    }
+
+    #exam_search_panel table,#exam_search_panel tr {
+        vertical-align: top;
+    }
+</style>
+
+<!-- 讀取條 -->
+<div id="exam_loading" class="progress">
+    <div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 400px;">
+        <span style="color: #ffffff;">檢驗資料讀取中....</span>
+    </div>
+</div>
+<!-- 背景遮罩 -->
+<div id="exam_cover"></div>
+
+<!-- 瀏覽視窗 -->
+<div id="exam_search_panel">
+    <div class="row" style="padding:0.5em;">
+        <div class="col-md-5">
+            <div class="input-group">
+                <input type="text" class="form-control dt-picker" dt-format="d" dt-sidebyside="true" id="search_st_date" value="@(DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd"))" />
+                <span class="input-group-addon">~</span>
+                <input type="text" class="form-control" dt-format="dt" dt-sidebyside="true" id="search_en_date" value="@(DateTime.Now.ToString("yyyy-MM-dd"))" readonly />
+                <span class="input-group-addon btn-success" id="btn_exam_search">
+                    <span class="glyphicon glyphicon-search"></span>
+                </span>
+
+            </div>
+        </div>
+    </div>
+    <div class="row" style="padding:0 0.5em;">
+        <div class="col-md-12" id="exam_result">
+            <!-- Nav tabs -->
+            <div class="tab-content" id="exam_resultTable">
+            </div>
+        </div>
+    </div>
+</div>

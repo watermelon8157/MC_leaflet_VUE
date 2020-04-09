@@ -1,0 +1,227 @@
+﻿@{
+    Layout = null;
+    List<Dictionary<string, string>> FuncList = (List<Dictionary<string, string>>)ViewData["FuncList"];
+    List<Dictionary<string, string>> PhraseList = (List<Dictionary<string, string>>)ViewData["PhraseList"];
+    List<Dictionary<string, string>> Temp = null;
+}
+
+<div style="padding:0 10vw 0 10vw;">
+    <div style="padding-top:10px;">
+        <label style="font-size:16px;">功能：</label>
+        <select id="ItemFuncList" onchange="ReLoadPhraseDt();" class="form-control" style="display:inline-block;width:auto;">
+            @if (FuncList != null && FuncList.Count > 0) {
+                foreach (var Func in FuncList) {
+                    <option value="@Func["VALUE"]">@Func["NAME"]</option>
+                }
+            }
+        </select>
+    </div>
+    <button type="button" class="navbar-toggle tp" onclick="DelItem(this);" data-loading-text="刪除中..." style="float:left;color:#e21818;">
+        <span class="glyphicon glyphicon-minus-sign" aria-hidden="true" style="">
+            <span class="icon-text">刪除選項</span>
+        </span>
+    </button>
+    <button id="join_item" class="navbar-toggle tp" onclick="ModifyItem();" style="color:#42b343;">
+        <span class="glyphicon glyphicon-plus-sign" aria-hidden="true" style="">
+            <span class="icon-text">新增選項</span>
+        </span>
+    </button>
+    <table id="PhraseDt" data-toggle="table" class="table table-bordered table-striped table-condensed">
+        <thead style="background-color: #5BA198; color: #FFF;">
+            <tr>
+                <th data-field="state" data-checkbox="true"></th>
+                <th data-field="P_GROUP_NAME" data-sortable="true">項目名稱</th>
+                <th data-field="P_NAME" data-sortable="true">選項名</th>
+                <th data-field="P_VALUE" data-sortable="true">選項值</th>
+                <th data-field="P_SORT" data-sortable="true">排序順序</th>
+                <th data-field="P_MEMO" data-sortable="true" data-formatter="ReSetItemDtText">備註</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+
+<div class="modal modal-wide fade" tabindex="-1" role="dialog" data-backdrop="true" data-keyboard="false" id="PhraseModal">
+    <div class="modal-dialog">
+        <div class="modal-content rcs_form">
+            <div class="modal-header">
+                <div class="btn-group">
+                    <h4 class="modal-title" id="PhraseModalTitle"></h4>
+                </div>
+                <div class="btn-group pull-right">
+                    <button class="btn btn-success" data-loading-text="儲存中..." onclick="ToSaveItem(this);">儲存</button>
+                    <button class="btn btn-warning" data-dismiss="modal">關閉</button>
+                </div>
+            </div>
+            <div class="modal-body" id="PhraseModalBody" style="background-color:#ebebeb;">
+                <input type="hidden" id="Item_P_ID" name="Item_P_ID" />
+                <table class="table table-bordered table-condensed table-striped" style="background-color:#FFF;">
+                    <tr>
+                        <td>
+                            <label>項目：</label>
+                            @if (FuncList != null && FuncList.Count > 0)
+                            {
+                                foreach (var Func in FuncList)
+                                {
+                                    Temp = PhraseList.FindAll(x => x["MODEL"] == Func["VALUE"]);
+                                    <select id="@(Func["VALUE"])_Select" class="FuncSelect form-control" style="display:inline-block;width:auto;">
+                                        @if (Temp != null && Temp.Count > 0)
+                                        {
+                                            foreach (var Phrase in Temp)
+                                            {
+                                                <option value="@Phrase["VALUE"]">@Phrase["NAME"]</option>
+                                            }
+                                        }
+                                    </select>
+                                }
+                            }
+                        </td>
+                        <td>
+                            <label>選項名：</label>
+                            <input type="text" class="form-control req_text" id="ItemName" name="ItemName" style="max-width:160px;display:inline-block;" maxlength="200" />
+                        </td>
+                        <td>
+                            <label>選項值：</label>
+                            <input type="text" class="form-control req_text" id="ItemValue" name="ItemValue" style="max-width:160px;display:inline-block;" maxlength="200" />
+                        </td>
+                        <td>
+                            <label>排序順序：</label>
+                            <input type="text" class="form-control req_text" id="ItemSort" name="ItemSort" onkeyup="numcheck_(this);" style="max-width:60px;display:inline-block;" maxlength="6" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" style="padding-bottom:10px;">
+                            <label>備註：</label>
+                            <textarea id="ItemRemark" name="ItemRemark" rows="8" style="width:100%;" maxlength="200"></textarea>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#PhraseDt").bootstrapTable({
+            url: '@Url.Content("~/SystemManage/PhraseMaintain_List")',
+            method: 'post',
+            queryParams: { "P_Model": $('#ItemFuncList').val() },
+            search: true,
+            showRefresh: true,
+            undefinedText: '',
+        }).on('click-row.bs.table', function (e, row, $element) {
+            ModifyItem(row);
+        });
+    });
+
+    function ReSetItemDtText(value, row) {
+        return row.P_MEMO.replace(/\n/g, '<br/>');
+    }
+
+    function ReLoadPhraseDt() {
+        $("#PhraseDt").bootstrapTable('refresh', {
+            silent: true,
+            search: true,
+            query: { "P_Model": $('#ItemFuncList').val() },
+        });
+    }
+
+    function ModifyItem(JsonObj) {
+        $('.FuncSelect').hide();
+        $('#' + $('#ItemFuncList').val() + '_Select').show();
+        ResetItemModalBody();
+        if (!!JsonObj) {
+            $('#PhraseModalTitle').html('修改表單片語選項');
+            $('#Item_P_ID').val(JsonObj.P_ID);
+            $('#' + $('#ItemFuncList').val() + '_Select').val(JsonObj.P_GROUP);
+            $('#ItemName').val(JsonObj.P_NAME);
+            $('#ItemValue').val(JsonObj.P_VALUE);
+            $('#ItemSort').val(JsonObj.P_SORT);
+            $('#ItemRemark').val(JsonObj.P_MEMO);
+        }
+        else {
+            $('#PhraseModalTitle').html('新增表單片語選項');
+        }
+        $('#PhraseModal').modal('show');
+    }
+
+    function ResetItemModalBody() {
+        $('#PhraseModalBody')
+            .find('input[type=text], input[type=hidden], textarea').val('')
+            .end()
+            .find('select').prop('selectedIndex', 0);
+    }
+
+    function ToSaveItem(obj) {
+        $(obj).button('loading');
+        Save('@Url.Content("~/SystemManage/PhraseMaintain_Save")',
+            'POST',
+            {
+                'P_ID': $('#Item_P_ID').val(),
+                'FuncType': $('#ItemFuncList').val(),
+                'PhraseType': $('#' + $('#ItemFuncList').val() + '_Select').val(),
+                'ItemName': $.trim($('#ItemName').val()),
+                'ItemValue': $.trim($('#ItemValue').val()),
+                'ItemSort': $.trim($('#ItemSort').val()),
+                'ItemRemark': $.trim($('#ItemRemark').val())
+            },
+            function (data) {
+                if (data.status == '3') {//重複
+                    showAlert(data.message, msg_stat.Danger);
+                }
+                else {
+                    if (data.status == '0') {
+                        showAlert('儲存成功!', msg_stat.Success);
+                        $('#PhraseModal').modal('hide');
+                        ReLoadPhraseDt();
+                    }
+                    else {
+                        showAlert('儲存失敗!', msg_stat.Danger);
+                    }
+                }
+            },
+            function (data) {
+                $(obj).button('reset');
+            });
+    }
+
+    function DelItem(obj) {
+        if (confirm('確認刪除?')) {
+            $(obj).button('loading');
+            Save('@Url.Content("~/SystemManage/SysParams_Del")',
+                'POST',
+                { 'JsonList': JSON.stringify($("#PhraseDt").bootstrapTable('getSelections')) },
+                function (data) {
+                    if (data == 'True') {
+                        showAlert('刪除成功!', msg_stat.Success);
+                        ReLoadPhraseDt();
+                    }
+                    else {
+                        showAlert('刪除失敗!', msg_stat.Danger);
+                    }
+                },
+                function (data) {
+                    $(obj).button('reset');
+                });
+        }
+    }
+
+    //驗證欄位_數字
+    function numcheck_(obj) {
+        var success = true;
+        var re = /^[0-9]+$/;
+        if (!re.test(obj.value) && obj.value != "") {
+            showAlert('此項目只能輸入數字!', msg_stat.Warning);
+            $(obj).val('');
+            success = false;
+        }
+        else if ($(obj).hasClass('req_month')) {
+            if (parseInt(obj.value) > 11)
+                $(obj).val('11');
+        }
+        return success;
+    }
+
+</script>

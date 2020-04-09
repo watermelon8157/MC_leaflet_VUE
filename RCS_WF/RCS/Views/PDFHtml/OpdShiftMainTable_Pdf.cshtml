@@ -1,0 +1,288 @@
+﻿@using RCS_Data;
+@model RCS_Data.Controllers.RtOPDShift.OpdShift_MainTable_PDF
+@{
+    /* 2018.10.03
+    1.伺服器ajax請求，獲得Html網頁頁面。
+        控制器：OpdShiftMainTable_AjaxGetPdfHtml_ByDate
+        輸入：搜尋日期。
+        輸出：Html網頁。
+    2.伺服器URL請求，開啟PDF列印頁面。
+        控制器：OpdShiftMainTable_UrlGetPdfPrint_byHtmlStr
+        輸入：Html網頁。
+        輸出：PDF頁面。
+    */
+    ViewBag.Title = "OpdShiftMainTable_Pdf";
+    IPDPatientInfo PatientData = Model.PatientInformation;
+    List<string> _Sputum_txt = new List<string>();
+    List<string> _temp_CAT = new List<string>();
+    List<string> _ProgramDrugInhalation_List = new List<string>();
+    List<string> _temp_Inhalation = new List<string>();
+    List<string> _Program_List = new List<string>();
+    List<string> _Breathing_exercise_List = new List<string>();
+    List<string> _Program_B_List = new List<string>();
+    string Program_TempStr = "";
+    string InhalationStr = "";
+    int cat_total = 0;
+    int PR_Count = 0;
+
+}
+
+@for (int PdfPageNumber = 1; PdfPageNumber < (Model.OpdShiftDetail_rList.Count/6)+1; PdfPageNumber++)
+{
+<table style="width:100%;height:100%; ">
+    <tr>
+        <td style="width:100%;height:9%;border:0px;">
+            @*---------- 標題 ----------*@
+            <table cellspacing="2" cellpadding="0" style="width:100%;text-align:center;font-size:30px;">
+                <tr>
+                    <td>門診胸腔復原治療-交班單</td>
+                </tr>
+            </table>
+            @*---------- 基本資料 ----------*@
+            <table cellspacing="0" cellpadding="5" style="width:100%;border:0px;font-size:12px;">
+                <tr>
+                    <td style="border:1px;width:15%;">病患姓名:@(PatientData.patient_name)</td>
+                    <td style="border:1px;width:30%;">病歷號:@(PatientData.chart_no)</td>
+                    <td style="border:1px;width:15%;">診斷:@(PatientData.diagnosis_code)</td>
+                    <td style="border:1px;width:20%;">VS:@(PatientData.vs_doc)</td>
+                    <td style="border:1px;width:20%;">電話:</td>
+                </tr>
+                <tr>
+                    <td style="border:1px;" colspan="5">
+                        過去病史:
+                        @*@if (Model.OpdShiftDetail_rList != null && Model.OpdShiftDetail_rList.Count > 0)
+                        {*@
+                            @(Model.OpdShiftDetail_rList[0].OPD_Shift_history.Contains("Asthma") == true ? "■  " : "□")Asthma
+                            @(Model.OpdShiftDetail_rList[0].OPD_Shift_history.Contains( "heart_disease") == true ? "■  " : "□")HeartDisease
+                            @(Model.OpdShiftDetail_rList[0].OPD_Shift_history.Contains( "COPD") == true ? "■  " : "□")COPD
+                            @(Model.OpdShiftDetail_rList[0].OPD_Shift_history.Contains( "past_smoke_history") == true ? "■  " : "□")抽菸
+                            @(Model.OpdShiftDetail_rList[0].OPD_Shift_history.Contains( "Other") == true ? "■ :" : "□")其它
+                            @(Model.OpdShiftDetail_rList[0].OPD_Shift_his_other_txt != null ?
+                            Model.OpdShiftDetail_rList[0].OPD_Shift_his_other_txt : "")
+                        @*}*@
+                    </td>
+                </tr>
+                <tr>
+                    <td style="border:1px;" colspan="5">
+                        病患居家狀況:
+                        @*@if (Model.OpdShiftDetail_rList != null && Model.OpdShiftDetail_rList.Count > 0)
+                        {*@
+                            @(Model.OpdShiftDetail_rList[0].OPD_In_House_Condition.Contains("sputum1") == true ? "■" : "□")Sputum
+                            @(Model.OpdShiftDetail_rList[0].OPD_In_House_Condition.Contains("有運動") == true ? "■" : "□")有運動
+                            @(Model.OpdShiftDetail_rList[0].OPD_In_House_Condition.Contains("走路喘") == true ? "■" : "□")走路喘
+                            @(Model.OpdShiftDetail_rList[0].OPD_In_House_Condition.Contains("使用O2") == true ? "■" : "□")使用O2
+                            @(Model.OpdShiftDetail_rList[0].OPD_In_House_Condition.Contains("Other") == true ? "■" : "□")病患居家狀況其它
+                            @(Model.OpdShiftDetail_rList[0].OPD_In_House_other_txt != null ?
+                              Model.OpdShiftDetail_rList[0].OPD_In_House_other_txt : "")
+                        @*}*@
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td style="width:100%;height:80%;border:0px;">
+            @*---------- 交班內容 [下] ----------*@
+            @if (Model.OpdShiftDetail_rList != null && Model.OpdShiftDetail_rList.Count > 0)
+            {
+                PR_Count = 0;
+            foreach (var item in Model.OpdShiftDetail_rList.GetRange((PdfPageNumber - 1) * 6, 6))
+            {
+                PR_Count++;
+                <table cellspacing="0" cellpadding="5" style="width:100%;height:100%;border:0px;font-size:12px;">
+                    <tr>
+                        <td style="border:1px;background-color:#ffff99;font-size:11px;width:4%;height:1%;">
+                            PR@(PR_Count)
+                        </td>
+                        <td style="border:1px;background-color:#ffff99;font-size:11px;width:18%;">
+                            記錄日:
+                            @(!string.IsNullOrWhiteSpace(item.opt_Shift_date) ? item.opt_Shift_date.Substring(0, 10) : "")
+                        </td>
+                        <td style="border:1px;background-color:#ffff99;font-size:11px;width:18%;">
+                            看診日:
+                            @(!string.IsNullOrWhiteSpace(item.opd_date) ? item.opd_date.Substring(0, 10) : "")
+                        </td>
+                        <td style="border:1px;background-color:#ffff99;font-size:11px;width:15%;">
+                            HR:
+                            @if (item.HR != null && !string.IsNullOrWhiteSpace(item.HR))
+                            {
+                                @(item.HR)
+                            }
+                            /
+                            @if (item.HR2 != null && !string.IsNullOrWhiteSpace(item.HR2))
+                            {
+                                @(item.HR2)
+                            }
+                        </td>
+                        <td style="border:1px;background-color:#ffff99;font-size:11px;width:15%;">
+                            SpO2:
+                            @if (item.SpO2 != null && !string.IsNullOrWhiteSpace(item.SpO2))
+                            {
+                                @(item.SpO2)
+                            }
+                            /
+                            @if (item.SpO2_2 != null && !string.IsNullOrWhiteSpace(item.SpO2_2))
+                            {
+                                @(item.SpO2_2)
+                            }                    
+                        </td>
+                        <td style="border:1px;background-color:#ffff99;font-size:11px;width:15%;">
+                            BP:
+                            @if (item.SpO2_2 != null && !string.IsNullOrWhiteSpace(item.BP))
+                            {
+                                @(item.BP)
+                            }
+                            /
+                            @if (item.SpO2_2 != null && !string.IsNullOrWhiteSpace(item.BP2))
+                            {
+                                @(item.BP2)
+                            }
+                        </td>
+                        <td style="border:1px;background-color:#ffff99;font-size:11px;width:15%;">
+                            療程:
+                            @(!string.IsNullOrWhiteSpace(item.OPDShift_treatment) ? item.OPDShift_treatment : "")
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px;font-size:12px;height:1%;" colspan="2">
+                            Sputum:
+                            @{
+                                _Sputum_txt = new List<string>();
+                                if (!string.IsNullOrWhiteSpace(item.sputum_count)) { _Sputum_txt.Add(item.sputum_count); }
+                                if (!string.IsNullOrWhiteSpace(item.sputum_status)) { _Sputum_txt.Add(item.sputum_status); }
+                                if (!string.IsNullOrWhiteSpace(item.sputum_small)) { _Sputum_txt.Add(item.sputum_small); }
+                                if (!string.IsNullOrWhiteSpace(item.sputum_color)) { _Sputum_txt.Add(item.sputum_color); }
+                            }
+                            @(_Sputum_txt.Count > 0 ? string.Join(", ", _Sputum_txt) : "")                   
+                            
+                        </td>
+                        <td style="border:1px;" colspan="2">
+                            Breath_Sound:
+                            @(string.IsNullOrWhiteSpace(item.breath_sound) ? "" : item.breath_sound)
+                        </td>
+                        <td style="border:1px;" colspan="2">
+                            CAT:
+                            @(!string.IsNullOrWhiteSpace(item.CAT_1) ? item.CAT_1 : "□")&emsp;
+                            @(!string.IsNullOrWhiteSpace(item.CAT_2) ? item.CAT_2 : "□")&emsp;
+                            @(!string.IsNullOrWhiteSpace(item.CAT_3) ? item.CAT_3 : "□")&emsp;
+                            @(!string.IsNullOrWhiteSpace(item.CAT_4) ? item.CAT_4 : "□")&emsp;
+                            @(!string.IsNullOrWhiteSpace(item.CAT_5) ? item.CAT_5 : "□")&emsp;
+                            @(!string.IsNullOrWhiteSpace(item.CAT_6) ? item.CAT_6 : "□")&emsp;
+                            @(!string.IsNullOrWhiteSpace(item.CAT_7) ? item.CAT_7 : "□")&emsp;
+                            @(!string.IsNullOrWhiteSpace(item.CAT_8) ? item.CAT_8 : "□")&emsp;
+                            <br/>CAT加總 =
+                            @(!string.IsNullOrWhiteSpace(item.CAT_Total) ? item.CAT_Total : "")
+                        </td>
+                        <td style="border:1px;">
+                            mMRC:
+                            @(!string.IsNullOrWhiteSpace(item.mMRC) ? item.mMRC : "")
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px;height:5%;" colspan="7">
+
+                            Program:
+                            @{
+                                var Program = new List<string>();
+                                if (!string.IsNullOrWhiteSpace(item.drug_inhalation_1A)) { Program.Add(item.drug_inhalation_1A); }
+                                if (!string.IsNullOrWhiteSpace(item.drug_inhalation_1B)) { Program.Add(item.drug_inhalation_1B); }
+                                if (!string.IsNullOrWhiteSpace(item.drug_inhalation_2A)) { Program.Add(item.drug_inhalation_2A); }
+                                if (!string.IsNullOrWhiteSpace(item.drug_inhalation_2B)) { Program.Add(item.drug_inhalation_2B); }
+                                if (!string.IsNullOrWhiteSpace(item.drug_inhalation_3A)) { Program.Add(item.drug_inhalation_3A); }
+                                if (!string.IsNullOrWhiteSpace(item.drug_inhalation_3B)) { Program.Add(item.drug_inhalation_3B); }
+                            }
+                            @if (Program.Any())
+                            {
+                                @("Drug_Inhalation:" + (!string.IsNullOrWhiteSpace(item.drug_inhalation_1A) ? item.drug_inhalation_1A + ":" : "")
+                                    + (!string.IsNullOrWhiteSpace(item.drug_inhalation_1B) ? "(" + item.drug_inhalation_1B + ")" : ""))
+                                @((!string.IsNullOrWhiteSpace(item.drug_inhalation_2A) ? item.drug_inhalation_2A + ":" : "")
+                                    + (!string.IsNullOrWhiteSpace(item.drug_inhalation_2B) ? "(" + item.drug_inhalation_2B + ")" : ""))
+                                @((!string.IsNullOrWhiteSpace(item.drug_inhalation_3A) ? item.drug_inhalation_3A + ":" : "")
+                                    + (!string.IsNullOrWhiteSpace(item.drug_inhalation_3B) ? "(" + item.drug_inhalation_3B + ")" : "") + "")
+                            }
+
+                            @{
+                                var Breathing_Exercise = new List<string>();
+                                if (!string.IsNullOrWhiteSpace(item.Breathing_exercise)) { Program.Add(item.Breathing_exercise); }
+                                if (!string.IsNullOrWhiteSpace(item.Program_check)) { Program.Add(item.Program_check); }
+                                if (!string.IsNullOrWhiteSpace(item.drug_inhalation_2A)) { Program.Add(item.drug_inhalation_2A); }
+                                if (!string.IsNullOrWhiteSpace(item.drug_inhalation_2B)) { Program.Add(item.drug_inhalation_2B); }
+                                if (!string.IsNullOrWhiteSpace(item.drug_inhalation_3A)) { Program.Add(item.drug_inhalation_3A); }
+                                if (!string.IsNullOrWhiteSpace(item.drug_inhalation_3B)) { Program.Add(item.drug_inhalation_3B); }
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(item.Breathing_exercise))
+                            {
+                                @("Breathing exercise:" + string.Join(" ", Breathing_Exercise) + " ")
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(item.Program_PEP))
+                            {
+                                @("PEP(cmH2O):" + item.Program_PEP + " ")
+                            }
+                            @if (!string.IsNullOrWhiteSpace(item.Program_IPPB))
+                            {
+                                @("IPPB(cmH2O):" + item.Program_IPPB + " ")
+                            }
+                            @if (!string.IsNullOrWhiteSpace(item.Program_IMT))
+                            {
+                                @("IMT(cmH2O):" + item.Program_IMT + " ")
+                            }
+                            @if (!string.IsNullOrWhiteSpace(item.Program_MIPorMEP))
+                            {
+                                @("IP or MEP(cmH2O):" + item.Program_MIPorMEP + " ")
+                            }
+                            @if (!string.IsNullOrWhiteSpace(item.Program_NC))
+                            {
+                                @("N.C(L/min):" + item.Program_NC + " ")
+                            }
+                            @if (!string.IsNullOrWhiteSpace(item.Program_CPAP_FIO2))
+                            {
+                                @("H.F-N-CPAP(L/min):FiO2:" + item.Program_CPAP_FIO2 + ",Flow:" + item.Program_CPAP_Flow)
+                            }
+                            @if (!string.IsNullOrWhiteSpace(item.Program_Incentive_CC))
+                            {
+                                @("Incentive spirometry:" + item.Program_Incentive_CC + "cc x" + item.Program_Incentive_sec + "sec")
+                            }
+                            @if (!string.IsNullOrWhiteSpace(item.Program_Diaphragmatic_kg))
+                            {
+                                @("Diaphragmatic traning:" + item.Program_Diaphragmatic_kg + "kg " + item.Program_Diaphragmatic_min + "min")
+                            }
+                            @if (!string.IsNullOrWhiteSpace(item.Program_Other))
+                            {
+                                @("其他:" + item.Program_Other)
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px;height:5%;" colspan="6">
+                            治療後評量及特別交班:
+                            <span style="font-size:15px;Height:5%;font-weight:bold;">
+                                @(!string.IsNullOrWhiteSpace(item.afterAssess_And_Shift_memo) ? item.afterAssess_And_Shift_memo.Replace("\n", "。") : "")
+                            </span>
+                        </td>
+                        <td style="border:1px;font-size:10px;" colspan="1">
+                            簽名:
+                            @(!string.IsNullOrWhiteSpace(item.CREATE_NAME) ? item.CREATE_NAME : "")
+                        </td>
+                    </tr>
+                </table>
+                }
+                            }
+        </td>
+    </tr>
+    <tr>
+        <td style="width:100%;height:1%;border:0px;">
+            @*---------- [上] 交班內容 ----------*@
+            <table cellspacing="1" cellpadding="5" style="width:100%;height:100%;text-align:center;font-size:12px;">
+                <tr>
+                    <td>
+                        第 @(PdfPageNumber) 頁
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+<div>我是分頁</div>
+}

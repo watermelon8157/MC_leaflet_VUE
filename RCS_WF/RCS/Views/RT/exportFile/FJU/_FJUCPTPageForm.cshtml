@@ -1,0 +1,392 @@
+﻿@model RCS.Models.DB.CPTAssessViewModel
+@using RCS_Data;
+@{
+    //輔大版本-呼吸治療評估記錄表
+    string imgSrc = "http://" + Request.Url.Authority + "/Images/FJU_P.jpg";//抬頭圖片位置
+    RCS_CPT_DTL_NEW_ITEMS cpt_data = Model.cpt_data;
+    if (cpt_data.from_unit == null) { cpt_data.from_unit = new List<JSON_DATA>(); }
+    if (cpt_data.rt_reason == null) { cpt_data.rt_reason = new List<JSON_DATA>(); }//rt_reason
+    if (cpt_data.brief_status == null) { cpt_data.brief_status = new List<JSON_DATA>(); }//brief_status
+    if (cpt_data.tip == null) { cpt_data.tip = new List<JSON_DATA>(); } //tip
+
+    IPDPatientInfo pat_info = Model.pat_info;
+    System.Data.DataTable cpt_header = Model.cpt_header;
+
+}
+
+<table id="cpt_table" border="0" cellspacing="0" cellpadding="3" style="width:100%;">
+    <tr>
+        <td width="30%" rowspan="2">
+            <table cellspacing="1" cellpadding="2" style="border:1px solid #666; font-size: 12px;width:100%;">
+                <tr>
+                    <td>病歷號碼：</td>
+                    <td></td>
+                    <td>床號：</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>姓名：</td>
+                    <td></td>
+                    <td>性別：</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>出生日期：</td>
+                    <td colspan="3">&nbsp;&nbsp;年&nbsp;&nbsp;&nbsp;&nbsp;月&nbsp;&nbsp;&nbsp;&nbsp;日</td>
+                </tr>
+            </table>
+        </td>
+        <td  width="50%">
+            <img src="@(imgSrc)" alt="gallery image or whatever" />
+        </td>
+        <td  width="20%">
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align:center; font-size:16px" width="50%">
+            呼吸治療評估記錄表
+        </td>
+        <td width="30%">
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            病歷號:
+        </td>
+        <td width="30%" align="right">
+            第&nbsp;&nbsp;頁
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3">
+           
+        </td>
+    </tr>
+</table>
+<table id="cpt_table" border="1" cellspacing="0" cellpadding="3"  style="width:100%;">
+    <tr>
+        <td width="40">入院<br />日期</td>
+        <td width="120"></td>
+        <td width="40">評估<br />日期</td>
+        <td width="120">@(cpt_header.Rows[0]["record_date"].ToString())</td>
+        <td width="70">轉入前<br />病房類別</td>
+        <td>
+            @Model.getPrintTxt(cpt_data.from_unit, "OPD")
+            @Model.getPrintTxt(cpt_data.from_unit, "ER")
+            <br />
+            @Model.getPrintTxt(cpt_data.from_unit, "Ward")
+            @Model.getPrintTxt(cpt_data.from_unit, "RCC")
+        </td>
+        <td>
+            @Model.getPrintTxt(cpt_data.from_unit, "居家呼吸器使用")
+            @Model.getPrintTxt(cpt_data.from_unit, "RCW轉入")
+            <br />
+        </td>
+    </tr>
+    <tr>
+        <td>診斷</td>
+        <td colspan="6">&nbsp;</td>
+    </tr>
+    <tr>
+        <td style="height:80px;">入院<br />病史</td>
+        <td colspan="6" valign="top">@(cpt_data.diagnosis)</td>
+    </tr>
+    <tr>
+        <td style="height:50px;">過去<br />病史</td>
+        <td colspan="6" valign="top">@(cpt_data.history_diag)</td>
+    </tr>
+    <tr>
+        <td style="height:100px;">使用<br />呼吸<br />器原<br />因</td>
+        <td colspan="4" valign="top" style="border-right-width:0;">
+            @for (int i = 0; i <= cpt_data.rt_reason.Count - 1; i++)
+            {
+                if (i % 2 == 0 && cpt_data.rt_reason[i].id != "rt_reason_post_op" && cpt_data.rt_reason[i].id != "rt_reason_post_op_hr" && cpt_data.rt_reason[i].id != "rt_reason_other")
+                {
+                    string extral_content = "";
+                    if (cpt_data.rt_reason[i].id == "rt_reason_7")
+                    {
+                        extral_content = "：" + cpt_data.rt_reason.Find(x => x.id == "rt_reason_post_op").txt + " OP ";
+                        extral_content += cpt_data.rt_reason.Find(x => x.id == "rt_reason_post_op_hr").txt + " hr.";
+                    }
+                    else if (cpt_data.rt_reason[i].id == "rt_reason_9")
+                    {
+                        extral_content = cpt_data.rt_reason.Find(x => x.id == "rt_reason_other").txt;
+                    }
+                    else
+                    {
+                        extral_content = "";
+                    }
+
+                    if (cpt_data.rt_reason[i].chkd)
+                    {
+                        @Html.Raw("<span style='display:inline-block; width:50%;'>■" + cpt_data.rt_reason[i].txt + extral_content + "</span>")
+                    }
+                    else
+                    {
+                        @Html.Raw("<span style='display:inline-block; width:50%;'>□" + cpt_data.rt_reason[i].txt + extral_content + "</span>")
+                    }
+                    @Html.Raw("&emsp;");
+
+                @Html.Raw("<br />");
+                }
+            }
+        </td>
+        <td colspan="2" valign="top" style="border-left-width:0;">
+            @for (int i = 0; i <= cpt_data.rt_reason.Count - 1; i++)
+            {
+                if (i % 2 == 1 && cpt_data.rt_reason[i].id != "rt_reason_post_op" && cpt_data.rt_reason[i].id != "rt_reason_post_op_hr" && cpt_data.rt_reason[i].id != "rt_reason_other")
+                {
+                    string extral_content = "";
+                    if (cpt_data.rt_reason[i].id == "rt_reason_7")
+                    {
+                        extral_content = "：" + cpt_data.rt_reason.Find(x => x.id == "rt_reason_post_op").txt + " OP ";
+                        extral_content += cpt_data.rt_reason.Find(x => x.id == "rt_reason_post_op_hr").txt + " hr.";
+                        cpt_data.rt_reason.RemoveAt(cpt_data.rt_reason.FindIndex(x => x.id == "rt_reason_post_op"));
+                        cpt_data.rt_reason.RemoveAt(cpt_data.rt_reason.FindIndex(x => x.id == "rt_reason_post_op_hr"));
+                    }
+                    else if (cpt_data.rt_reason[i].id == "rt_reason_9")
+                    {
+                        extral_content = cpt_data.rt_reason.Find(x => x.id == "rt_reason_other").txt;
+                        cpt_data.rt_reason.RemoveAt(cpt_data.rt_reason.FindIndex(x => x.id == "rt_reason_other"));
+                    }
+                    else
+                    {
+                        extral_content = "";
+                    }
+
+                    if (cpt_data.rt_reason[i].chkd)
+                    {
+                        @Html.Raw("<span style='display:inline-block; width:50%;'>■" + cpt_data.rt_reason[i].txt + extral_content + "</span>")
+                    }
+                    else
+                    {
+                        @Html.Raw("<span style='display:inline-block; width:50%;'>□" + cpt_data.rt_reason[i].txt + extral_content + "</span>")
+                    }
+                    @Html.Raw("&emsp;");
+                @Html.Raw("<br />");
+                }
+            }
+        </td>
+    </tr>
+    <tr>
+        <td style="height:80px;">呼吸<br />氣道<br />狀況</td>
+        <td colspan="6" valign="top">
+            @{
+                string[] tubetime = cpt_data.brief_status.Exists(x => x.id == "tube_time") && cpt_data.brief_status.Find(x => x.id == "tube_time").txt != null ? cpt_data.brief_status.Find(x => x.id == "tube_time").txt.Split('-') : ("--").Split('-');
+                string[] shileytime = cpt_data.brief_status.Exists(x => x.id == "shiley_time") && cpt_data.brief_status.Find(x => x.id == "shiley_time").txt != null ? cpt_data.brief_status.Find(x => x.id == "shiley_time").txt.Split('-') : ("--").Split('-');
+                string[] tmp_rtstarttime = cpt_data.brief_status.Exists(x => x.id == "rt_start_time") && cpt_data.brief_status.Find(x => x.id == "rt_start_time").txt != null ? cpt_data.brief_status.Find(x => x.id == "rt_start_time").txt.Split(' ') : ("-- ::").Split(' ');
+                List<string> rtstarttime = tmp_rtstarttime[0].Split('-').ToList();
+                rtstarttime.AddRange(tmp_rtstarttime[1].Split(':').ToList());
+            }
+            插管時間：@Html.Raw((string.IsNullOrWhiteSpace(tubetime[0])? "____" : tubetime[0]) + "年" + (string.IsNullOrWhiteSpace(tubetime[1]) ? "__" : tubetime[1]) + "月" + (string.IsNullOrWhiteSpace(tubetime[2]) ? "__" : tubetime[2]) + "日") &nbsp;
+            管徑：
+            <span>
+                @if (cpt_data.brief_status.Exists(x => x.id == "tube_width") && !string.IsNullOrWhiteSpace(cpt_data.brief_status.Find(x => x.id == "tube_width").txt))
+                {
+                    Html.Raw(cpt_data.brief_status.Find(x => x.id == "tube_width").txt);
+                }
+                else
+                {
+                    @:____
+                }
+            </span>mm &nbsp;
+            深度：
+            <span>
+                @if (cpt_data.brief_status.Exists(x => x.id == "tube_deep") && !string.IsNullOrWhiteSpace(cpt_data.brief_status.Find(x => x.id == "tube_deep").txt))
+                {
+                    Html.Raw(cpt_data.brief_status.Find(x => x.id == "tube_deep").txt);
+                }
+                else
+                {
+                    @:____
+                }
+            </span>cm &nbsp;
+            @*廠牌：@Html.Raw(cpt_data.brief_status.Find(x => x.id == "tube_kind").txt)*@
+            <br />
+            氣切時間：@Html.Raw((string.IsNullOrWhiteSpace(shileytime[0]) ? "____" : shileytime[0]) + "年" + (string.IsNullOrWhiteSpace(shileytime[1]) ? "__" : shileytime[1]) + "月" + (string.IsNullOrWhiteSpace(shileytime[2]) ? "__" : shileytime[2]) + "日") &nbsp;
+            管徑：
+            <span>
+                @if (cpt_data.brief_status.Exists(x => x.id == "shiley_width") && !string.IsNullOrWhiteSpace(cpt_data.brief_status.Find(x => x.id == "shiley_width").txt))
+                {
+                    Html.Raw(cpt_data.brief_status.Find(x => x.id == "shiley_width").txt);
+                }
+                else
+                {
+                    @:____
+                }
+            </span>mm &nbsp;
+            @*廠牌：@Html.Raw(cpt_data.brief_status.Find(x => x.id == "shiley_kind").txt)*@
+            <br />
+            呼吸器開始使用日期：
+            @Html.Raw((string.IsNullOrWhiteSpace(rtstarttime[0]) ? "____" : rtstarttime[0]) + "年" + (string.IsNullOrWhiteSpace(rtstarttime[1]) ? "____" : rtstarttime[1]) + "月" + (string.IsNullOrWhiteSpace(rtstarttime[2]) ? "____" : rtstarttime[2]) + "日" + (string.IsNullOrWhiteSpace(rtstarttime[3]) ? "____" : rtstarttime[3]) + "時" + (string.IsNullOrWhiteSpace(rtstarttime[4]) ? "____" : rtstarttime[4]) + "分")
+
+        </td>
+    </tr>
+    <tr>
+        <td style="height:300px;">呼吸<br />系統<br />評估</td>
+        <td colspan="6" valign="top">
+            身體評估：身高 <u>@(cpt_data.conscious.Exists(x => x.id == "body_height") && cpt_data.conscious.Find(x => x.id == "body_height").txt != null ? cpt_data.conscious.Find(x => x.id == "body_height").txt : "____")</u> cm
+            &nbsp; 體重 <u>@(cpt_data.conscious.Exists(x => x.id == "body_weight") && cpt_data.conscious.Find(x => x.id == "body_weight").txt != null ? cpt_data.conscious.Find(x => x.id == "body_weight").txt : "____")</u> kg
+            &nbsp; 理想體重 <u>@(cpt_data.conscious.Exists(x => x.id == "f_body_weight") && cpt_data.conscious.Find(x => x.id == "f_body_weight").txt != null ? cpt_data.conscious.Find(x => x.id == "f_body_weight").txt : "____")</u> kg
+            <br />
+            動脈血液氣體分析：pH <u>@(cpt_data.abg_data.Find(x => x.id == "cpt_ass_abg_4").txt != null ? cpt_data.abg_data.Find(x => x.id == "cpt_ass_abg_4").txt : "____")</u> &nbsp;
+            PaCO<sub style="font-size:8px;">2</sub> <u>@(cpt_data.abg_data.Find(x => x.id == "cpt_ass_abg_6").txt != null ? cpt_data.abg_data.Find(x => x.id == "cpt_ass_abg_6").txt : "____")</u> mmHg &nbsp;
+            PaO<sub style="font-size:8px;">2</sub> <u>@(cpt_data.abg_data.Find(x => x.id == "cpt_ass_abg_5").txt != null ? cpt_data.abg_data.Find(x => x.id == "cpt_ass_abg_5").txt : "____")</u> mmHg &nbsp;
+            HCO3 <u>@(cpt_data.abg_data.Find(x => x.id == "cpt_ass_abg_7").txt != null ? cpt_data.abg_data.Find(x => x.id == "cpt_ass_abg_7").txt : "____")</u> mmol/L &nbsp;
+            <br /> &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
+            BE <u>@(cpt_data.abg_data.Find(x => x.id == "cpt_ass_abg_9").txt != null ? cpt_data.abg_data.Find(x => x.id == "cpt_ass_abg_9").txt : "____")</u> mmol/L &nbsp;
+            SaO<sub style="font-size:8px;">2</sub> <u>@(cpt_data.abg_data.Find(x => x.id == "cpt_ass_abg_8").txt != null ? cpt_data.abg_data.Find(x => x.id == "cpt_ass_abg_8").txt : "____")</u> %
+            &nbsp;&nbsp;
+            FiO<sub style="font-size:8px;">2</sub> <u>@(cpt_data.abg_data.Find(x => x.id == "cpt_ass_abg_2").txt != null ? cpt_data.abg_data.Find(x => x.id == "cpt_ass_abg_2").txt : "____")</u> %
+            &nbsp; O<sub style="font-size:8px;">2</sub> flow <u>@(cpt_data.abg_data.Exists(x => x.id == "cpt_ass_abg_10") && cpt_data.abg_data.Find(x => x.id == "cpt_ass_abg_10").txt != null ? cpt_data.abg_data.Find(x => x.id == "cpt_ass_abg_10").txt : "____")</u> Lmp
+            &nbsp; 
+            <br /> &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
+            Device <u>@(cpt_data.abg_data.Find(x => x.id == "cpt_ass_abg_3").txt != null ? cpt_data.abg_data.Find(x => x.id == "cpt_ass_abg_3").txt : "____")</u>
+            &nbsp;
+            @{
+                DateTime test_dt;
+                var dt_parse = DateTime.TryParse(cpt_data.abg_data.Find(x => x.id == "cpt_ass_abg_1").txt, out test_dt) ? test_dt : DateTime.MinValue;
+                if (dt_parse == DateTime.MinValue)
+                {
+                    @:Date：____年__月__日
+                }
+                else
+                {
+                    <text>
+                        Date：@(dt_parse.ToString("yyyy 年 MM 月 dd 日"))
+                    </text>
+                }
+            }
+            <br />
+            生命徵象：Temp. <u>@(cpt_data.base_data.Find(x => x.id == "cpt_ass_base_1").txt != null ? cpt_data.base_data.Find(x => x.id == "cpt_ass_base_1").txt : "____")</u> ℃ &nbsp;
+            HR <u>@(cpt_data.base_data.Find(x => x.id == "cpt_ass_base_2").txt != null ? cpt_data.base_data.Find(x => x.id == "cpt_ass_base_2").txt : "____")</u> bpm &nbsp;
+            RR <u>@(cpt_data.base_data.Find(x => x.id == "cpt_ass_base_3").txt != null ? cpt_data.base_data.Find(x => x.id == "cpt_ass_base_3").txt : "____")</u> bpm &nbsp;
+            BP <u>@(cpt_data.base_data.Find(x => x.id == "cpt_ass_base_4").txt != null ? cpt_data.base_data.Find(x => x.id == "cpt_ass_base_4").txt : "____")</u> / 
+            <u>@(cpt_data.base_data.Find(x => x.id == "cpt_ass_base_5").txt != null ? cpt_data.base_data.Find(x => x.id == "cpt_ass_base_5").txt : "____")</u>
+            (mmHg)
+            <br /> &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            SpO<sub style="font-size:8px;">2</sub><u>____</u>%
+            <br />
+            意識狀態：
+            E <u>@(cpt_data.conscious.Find(x => x.id == "cpt_ass_conscious_4").txt != null ? cpt_data.conscious.Find(x => x.id == "cpt_ass_conscious_4").txt : "____")</u>
+            V <u>@(cpt_data.conscious.Find(x => x.id == "cpt_ass_conscious_5").txt != null ? cpt_data.conscious.Find(x => x.id == "cpt_ass_conscious_5").txt : "____")</u>
+            M <u>@(cpt_data.conscious.Find(x => x.id == "cpt_ass_conscious_6").txt != null ? cpt_data.conscious.Find(x => x.id == "cpt_ass_conscious_6").txt : "____")</u>
+            &nbsp;
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            @( cpt_data.conscious.Exists(x => x.id == "cpt_ass_conscious_7") && cpt_data.conscious.Find(x => x.id == "cpt_ass_conscious_7").chkd ? "■" : "□") Non-sedative &nbsp;
+            @( cpt_data.conscious.Exists(x => x.id == "cpt_ass_conscious_8") && cpt_data.conscious.Find(x => x.id == "cpt_ass_conscious_8").chkd ? "■" : "□") Sedative &nbsp;
+            @( cpt_data.conscious.Exists(x => x.id == "cpt_ass_conscious_9") && cpt_data.conscious.Find(x => x.id == "cpt_ass_conscious_9").chkd ? "■" : "□") Post-op(under anesth.)
+            <br />
+            活動力：&nbsp;
+            @(cpt_data.conscious.Exists(x => x.id == "cpt_ass_conscious_10") && cpt_data.conscious.Find(x => x.id == "cpt_ass_conscious_10").chkd ? "■" : "□") Good &nbsp;
+            @(cpt_data.conscious.Exists(x => x.id == "cpt_ass_conscious_11") && cpt_data.conscious.Find(x => x.id == "cpt_ass_conscious_11").chkd ? "■" : "□") poor &nbsp;
+            <br />
+            四肢末梢情形：&nbsp;
+            @(cpt_data.tip.Exists(x => x.id == "cpt_tip_1") && cpt_data.tip.Find(x => x.id == "cpt_tip_1").chkd ? "■" : "□") Normal &nbsp;
+            @(cpt_data.tip.Exists(x => x.id == "cpt_tip_2") && cpt_data.tip.Find(x => x.id == "cpt_tip_2").chkd ? "■" : "□") Clubbing finger &nbsp;
+            <br />
+            溫度：&nbsp;
+            @(cpt_data.tip.Exists(x => x.id == "cpt_tip_3") && cpt_data.tip.Find(x => x.id == "cpt_tip_3").chkd ? "■" : "□") Warm &nbsp;
+            @(cpt_data.tip.Exists(x => x.id == "cpt_tip_4") && cpt_data.tip.Find(x => x.id == "cpt_tip_4").chkd ? "■" : "□") Cold &nbsp;
+            <br />
+            膚色：&nbsp;
+            @(cpt_data.tip.Exists(x => x.id == "cpt_tip_5") && cpt_data.tip.Find(x => x.id == "cpt_tip_5").chkd ? "■" : "□") Pink &nbsp;
+            @(cpt_data.tip.Exists(x => x.id == "cpt_tip_6") && cpt_data.tip.Find(x => x.id == "cpt_tip_6").chkd ? "■" : "□") Cyanosis &nbsp;
+            @(cpt_data.tip.Exists(x => x.id == "cpt_tip_7") && cpt_data.tip.Find(x => x.id == "cpt_tip_7").chkd ? "■" : "□") Pale
+            <br />
+            呼吸音：&nbsp;
+            @(cpt_data.breath_sound.Exists(x => x.id == "cpt_ass_sound_1") && cpt_data.breath_sound.Find(x => x.id == "cpt_ass_sound_1").chkd ? "■" : "□") Normal &nbsp;
+            @(cpt_data.breath_sound.Exists(x => x.id == "cpt_ass_sound_41") && cpt_data.breath_sound.Find(x => x.id == "cpt_ass_sound_41").chkd ? "■" : "□") Grunting &nbsp;
+            @(cpt_data.breath_sound.Exists(x => x.id == "cpt_ass_sound_3") && cpt_data.breath_sound.Find(x => x.id == "cpt_ass_sound_3").chkd ? "■" : "□") Crackle _______ &nbsp;
+            □ Coarse _______ &nbsp;
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            @(cpt_data.breath_sound.Exists(x => x.id == "cpt_ass_sound_15") && cpt_data.breath_sound.Find(x => x.id == "cpt_ass_sound_15").chkd ? "■" : "□") Wheezing _______ &nbsp;
+            @(cpt_data.breath_sound.Exists(x => x.id == "cpt_ass_sound_2") && cpt_data.breath_sound.Find(x => x.id == "cpt_ass_sound_2").chkd ? "■" : "□") Stridor &nbsp;
+            @(cpt_data.breath_sound.Exists(x => x.id == "cpt_ass_sound_9") && cpt_data.breath_sound.Find(x => x.id == "cpt_ass_sound_9").chkd ? "■" : "□") Rhonchi _______ &nbsp;
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            @(cpt_data.breath_sound.Exists(x => x.id == "cpt_ass_sound_27") && cpt_data.breath_sound.Find(x => x.id == "cpt_ass_sound_27").chkd ? "■" : "□") Decrease _______ &nbsp;
+            @(cpt_data.breath_sound.Exists(x => x.id == "cpt_ass_sound_33") && cpt_data.breath_sound.Find(x => x.id == "cpt_ass_sound_33").chkd ? "■" : "□") Absent _______ &nbsp;
+            □ 其他 _______
+            <br />
+            呼吸型態：&nbsp;
+            @(cpt_data.patterns.Find(x => x.id == "cpt_ass_patterns_1").chkd ? "■" : "□") 無呼吸 &nbsp;
+            @(cpt_data.patterns.Find(x => x.id == "cpt_ass_patterns_2").chkd ? "■" : "□") 正常呼吸 &nbsp;
+            @(cpt_data.patterns.Find(x => x.id == "cpt_ass_patterns_3").chkd ? "■" : "□") 深 &nbsp;
+            @(cpt_data.patterns.Find(x => x.id == "cpt_ass_patterns_4").chkd ? "■" : "□") 淺 &nbsp;
+            @(cpt_data.patterns.Find(x => x.id == "cpt_ass_patterns_5").chkd ? "■" : "□") 快 &nbsp;
+            @(cpt_data.patterns.Find(x => x.id == "cpt_ass_patterns_6").chkd ? "■" : "□") 慢 &nbsp;
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            @(cpt_data.patterns.Find(x => x.id == "cpt_ass_patterns_7").chkd ? "■" : "□") 使用輔助肌 &nbsp;
+            @(cpt_data.patterns.Find(x => x.id == "cpt_ass_patterns_8").chkd ? "■" : "□") Paradoxical movement &nbsp;
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            @(cpt_data.patterns.Exists(x => x.id == "cpt_ass_patterns_11") && cpt_data.patterns.Find(x => x.id == "cpt_ass_patterns_11").chkd ? "■" : "□") Nasal flaring &nbsp;
+            @(cpt_data.patterns.Exists(x => x.id == "cpt_ass_patterns_12") && cpt_data.patterns.Find(x => x.id == "cpt_ass_patterns_12").chkd ? "■" : "□") Intercostal retraction &nbsp;
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            @(cpt_data.patterns.Find(x => x.id == "cpt_ass_patterns_9").chkd ? "■" : "□") 其他 @(cpt_data.patterns.Find(x => x.id == "cpt_ass_patterns_10").txt != null ? cpt_data.patterns.Find(x => x.id == "cpt_ass_patterns_10").txt : "____")
+            <br />
+            咳嗽能力：&nbsp;
+            @(cpt_data.cough.Find(x => x.id == "cpt_ass_cough_1").chkd ? "■" : "□") Functional &nbsp;
+            @(cpt_data.cough.Find(x => x.id == "cpt_ass_cough_2").chkd ? "■" : "□") Weak functional &nbsp;
+            @(cpt_data.cough.Find(x => x.id == "cpt_ass_cough_3").chkd ? "■" : "□") Non-functional
+            <br />
+            痰液清除方式：&nbsp;
+            @(cpt_data.sputum.Find(x => x.id == "cpt_ass_sputum_1").chkd ? "■" : "□") 自咳
+            @(cpt_data.sputum.Find(x => x.id == "cpt_ass_sputum_2").chkd ? "■" : "□") 抽吸
+
+            @{
+                var awt = cpt_data.sputum_assess.FindAll(x => x.id == "cpt_ass_sputum_ass_1" || x.id == "cpt_ass_sputum_ass_2" || x.id == "cpt_ass_sputum_ass_3");
+            }
+            @if (awt.Exists(x => x.chkd == true))
+            {
+                @:量<u>@(awt.Find(x => x.chkd == true).txt)</u>
+            }
+            else
+            {
+                @:量<u>&nbsp;&nbsp;&nbsp;&nbsp;</u>
+            }
+
+            @{
+                var type = cpt_data.sputum_assess.FindAll(x => x.id == "cpt_ass_sputum_ass_4" || x.id == "cpt_ass_sputum_ass_5" || x.id == "cpt_ass_sputum_ass_6");
+            }
+            @if (type.Exists(x => x.chkd == true))
+            {
+                @:質<u>@(type.Find(x => x.chkd == true).txt)</u>
+            }
+            else
+            {
+                @:質<u>&nbsp;&nbsp;&nbsp;&nbsp;</u>
+            }
+
+            @{
+                var color = cpt_data.sputum_assess.FindAll(x => x.id == "cpt_ass_sputum_ass_8" || x.id == "cpt_ass_sputum_ass_9" || x.id == "cpt_ass_sputum_ass_10" || x.id == "cpt_ass_sputum_ass_11" || x.id == "cpt_ass_sputum_ass_12" || x.id == "cpt_ass_sputum_ass_13" || x.id == "cpt_ass_sputum_ass_14");
+            }
+            @if (color.Exists(x => x.chkd == true))
+            {
+                @:色<u>@(color.Find(x => x.chkd == true).txt)</u>
+            }
+            else
+            {
+                @:色<u>&nbsp;&nbsp;&nbsp;&nbsp;</u>
+            }
+            味 <u> @(cpt_data.sputum_assess.Find(x => x.id == "cpt_ass_sputum_ass_7").chkd == true ? cpt_data.sputum_assess.Find(x => x.id == "cpt_ass_sputum_ass_7").txt : "___") </u>
+            <br />
+            抽菸史：&nbsp;
+            @(cpt_data.smoke_history.Find(x => x.id == "cpt_ass_smoke_history_1").chkd ? "■" : "□") 無 &nbsp;
+            @(cpt_data.smoke_history.Find(x => x.id == "cpt_ass_smoke_history_2").chkd ? "■" : "□") 有
+            @(cpt_data.smoke_history.Find(x => x.id == "cpt_ass_smoke_history_3").txt != null ? cpt_data.smoke_history.Find(x => x.id == "cpt_ass_smoke_history_3").txt : "____") PPD x
+            @(cpt_data.smoke_history.Find(x => x.id == "cpt_ass_smoke_history_4").txt != null ? cpt_data.smoke_history.Find(x => x.id == "cpt_ass_smoke_history_4").txt : "____") 年，已戒
+            @(cpt_data.smoke_history.Find(x => x.id == "cpt_ass_smoke_history_6").txt != null ? cpt_data.smoke_history.Find(x => x.id == "cpt_ass_smoke_history_6").txt : "____") 年
+        </td>
+    </tr>
+    <tr>
+        <td style="">特殊<br />狀況<br />描述</td>
+        <td colspan="6" style="">@(cpt_data.cpt_memo != null? cpt_data.cpt_memo:"")</td>
+    </tr>
+</table>
+

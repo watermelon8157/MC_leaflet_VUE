@@ -1,0 +1,635 @@
+﻿@model RCS.Models.ViewModel.ListprintCPTNewData
+@using RCS_Data;
+
+
+@for (int y = 0; y < Model.List.Count(); y++)
+{
+    UserInfo user_info = Model.List[y].user_info;
+    IPDPatientInfo pat_info = Model.List[y].pat_info;
+    RCS_CPT_DTL_NEW_ITEMS cpt_data = Model.List[y].cpt_data;
+    string foneSize = "font-size:10px;";
+
+    <table style="width:100%;height:100%;" cellpadding="3">
+        <tr>
+            <td></td>
+            <td align="center" valign="middle" class="tilteSize" style="width:50%;font-size:24px;">
+                肺部復原暨呼吸治療評估單
+            </td>
+            <td width="40%">
+                <table style="font-size:12px;width:100%;" cellspacing="0" cellpadding="3" class="ALLBorder">
+                    <tr>
+                        <td>病歷號:</td>
+                        <td>@(Model.List[y].data.cpt_id == null ? "" : pat_info.chart_no)</td>
+                        <td>床號:</td>
+                        <td>@(Model.List[y].data.cpt_id == null ? "" : pat_info.bed_no)</td>
+                    </tr>
+                    <tr>
+                        <td>姓名:</td>
+                        <td>@(Model.List[y].data.cpt_id == null ? "" : pat_info.patient_name)</td>
+                        <td>性別:</td>
+                        <td>@(Model.List[y].data.cpt_id == null ? "" : pat_info.genderCHT)</td>
+
+                    </tr>
+                    <tr>
+                        <td>出生日期：</td>
+                        <td>@(Model.List[y].data.cpt_id == null ? "" : pat_info.birth_day_CHT) @(Model.List[y].data.cpt_id == null ? "" : "(" + pat_info.age + ")")</td>
+                        <td>診別:</td>
+                        <td>@(Model.List[y].data.cpt_id == null ? "" : pat_info.nam_c) </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3" valign="top">
+                <table style="width:100%;height:100%;font-size:10px;" cellspacing="0" cellpadding="3">
+                    <tr>
+                        <td colspan="6">
+                            診斷：@(Model.List[y].data.cpt_id == null ? "_______" : Model.List[y].data.now_diagnosis_display)
+                        </td>
+                        <td colspan="3">
+                            評估時間：@(Model.List[y].data.cpt_id == null ? "_______" : Model.List[y].data.rec_date)
+                        </td>
+                        <td colspan="4">
+                            下次評估日期：@(Model.List[y].data.cpt_id == null ? "_______" : Model.List[y].data.rec_date_next)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="12" class="ALLBorder">
+                            Multiple Assessment
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="1" style="width:1%" rowspan="11" class="LBRBorder" align="center">
+                            A<br />S<br />S<br />E<br />S<br />S<br />M<br />E<br />N<br />T
+                        </td>
+                        <td colspan="2" style="width:10%" rowspan="4" class="LBRBorder">
+                            Integrated
+                        </td>
+                        <td colspan="2" style="width:15%" class="LBRBorder">
+                            Smoking History
+                        </td>
+                        <td colspan="7" class="BRBorder">
+                            <table cellpadding="1" style="font-size:10px;">
+                                <tr>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.smoke_history_data != null && Model.List[y].data.smoke_history_data.Contains("有") ? "■" : "□") 有，
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.smoke_history_PPD != null ? Model.List[y].data.smoke_history_PPD : "____")PPD x
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.smoke_history_year != null ? Model.List[y].data.smoke_history_year : "____")年
+                                    </td>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.smoke_history_data != null && Model.List[y].data.smoke_history_data.Contains("無") ? "■" : "□") 無，已戒
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.smoke_history_end_year != null ? Model.List[y].data.smoke_history_end_year : "____")年
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="LBRBorder">
+                            Vital sign
+                        </td>
+                        <td colspan="7" class="BRBorder">
+                            <table cellpadding="1" style="font-size:10px;">
+                                <tr>
+                                    <td>
+                                        Height：@(Model.List[y].data.cpt_id != null && Model.List[y].data.Height != null ? Model.List[y].data.Height : "____")cm
+                                    </td>
+                                    <td>
+                                        Body Weight：@(Model.List[y].data.cpt_id != null && Model.List[y].data.Weight != null ? Model.List[y].data.Weight : "____")kg
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        HR：@(Model.List[y].data.cpt_id != null && Model.List[y].data.HR != null ? Model.List[y].data.HR : "____")bpm
+                                    </td>
+                                    <td>
+                                        RR：@(Model.List[y].data.cpt_id != null && Model.List[y].data.RR != null ? Model.List[y].data.RR : "____")bpm
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        BP：@(Model.List[y].data.cpt_id != null && Model.List[y].data.BP != null ? Model.List[y].data.BP : "____")/@(Model.List[y].data.cpt_id != null && Model.List[y].data.BP_2 != null ? Model.List[y].data.BP_2 : "____")mmHg
+                                    </td>
+                                    <td>
+                                        SpO<sub class="sub">2</sub>：@(Model.List[y].data.cpt_id != null && Model.List[y].data.Vital_sign_SpO2 != null ? Model.List[y].data.Vital_sign_SpO2 : "____")% with FiO<sub class="sub">2</sub>：@(Model.List[y].data.cpt_id != null && Model.List[y].data.Vital_sign_FiO2 != null ? Model.List[y].data.Vital_sign_FiO2 : "____")%
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="LBRBorder">
+                            Breathing
+                        </td>
+                        <td colspan="7" class="BRBorder">
+                            <table cellpadding="1" style="font-size:10px;">
+                                <tr>
+                                    <td>
+                                        Breathing Sound/ Side：@(Model.List[y].data.cpt_id != null && Model.List[y].data.Breathing_Sound != null ? Model.List[y].data.Breathing_Sound : "____") /@(Model.List[y].data.cpt_id != null && Model.List[y].data.Breathing_Side != null ? Model.List[y].data.Breathing_Side : "____")
+                                    </td>
+                                    <td>
+                                        Breathing Pattern：@(Model.List[y].data.cpt_id != null && Model.List[y].data.Breathing_pattern != null ? Model.List[y].data.Breathing_pattern : "____")
+                                    </td>
+                                    <td style="width:5%"></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="LBRBorder">
+                            Sputum
+                        </td>
+                        <td colspan="7" class="BRBorder">
+                            <table cellpadding="1" style="font-size:10px;">
+                                <tr>
+                                    <td>
+                                        Quantity：@(Model.List[y].data.cpt_id != null && Model.List[y].data.sputum_Quantity_str != null ? Model.List[y].data.sputum_Quantity_str : "____")
+                                    </td>
+                                    <td>
+                                        Color：@(Model.List[y].data.cpt_id != null && Model.List[y].data.sputum_color_string != null ? Model.List[y].data.sputum_color_string : "____")
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Consistency：@(Model.List[y].data.cpt_id != null && Model.List[y].data.sputum_Consistency != null ? Model.List[y].data.sputum_Consistency : "____")
+                                    </td>
+                                    <td>
+                                        Smell：@(Model.List[y].data.cpt_id != null && Model.List[y].data.sputum_Smell != null ? Model.List[y].data.sputum_Smell : "____")
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="width:10%" rowspan="3" class="LBRBorder">
+                            Muscle Power
+                        </td>
+                        <td colspan="2" style="width:15%" class="LBRBorder">
+                            Activity
+                        </td>
+                        <td colspan="7" class="BRBorder">
+                            <table cellpadding="1" style="font-size:10px;">
+                                <tr>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Activity_ability_str != null && Model.List[y].data.Activity_ability_str.Contains("行走正常") ? "■" : "□") 行走正常
+                                    </td>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Activity_ability_str != null && Model.List[y].data.Activity_ability_str.Contains("行走不便但不需輔具與他人協助") ? "■" : "□") 行走不便但不需輔具與他人協助
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Activity_ability_str != null && Model.List[y].data.Activity_ability_str.Contains("需使用行走輔具但不需他人協助") ? "■" : "□") 需使用行走輔具但不需他人協助
+                                    </td>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Activity_ability_str != null && Model.List[y].data.Activity_ability_str.Contains("需使用行走輔具且需他人協助") ? "■" : "□") 需使用行走輔具且需他人協助
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Activity_ability_str != null && Model.List[y].data.Activity_ability_str.Contains("獨自站立") ? "■" : "□") 獨自站立
+                                    </td>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Activity_ability_str != null && Model.List[y].data.Activity_ability_str.Contains("扶著站立") ? "■" : "□") 扶著站立
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Activity_ability_str != null && Model.List[y].data.Activity_ability_str.Contains("助行器行走") ? "■" : "□") 助行器行走
+                                    </td>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Activity_ability_str != null && Model.List[y].data.Activity_ability_str.Contains("坐輪椅") ? "■" : "□") 坐輪椅
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Activity_ability_str != null && Model.List[y].data.Activity_ability_str.Contains("無法行走") ? "■" : "□") 無法行走
+                                    </td>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Activity_ability_str != null && Model.List[y].data.Activity_ability_str.Contains("其他") ? "■" : "□") 其他：@(Model.List[y].data.cpt_id != null && Model.List[y].data.Activity_ability_other != null ? Model.List[y].data.Activity_ability_other : "____")
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="LBRBorder">
+                            Exercise
+                        </td>
+                        <td colspan="7" class="BRBorder">
+                            <table cellpadding="1" style="font-size:10px;">
+                                <tr>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Exercise != null && Model.List[y].data.Exercise.Contains("跑步") ? "■" : "□") 跑步
+                                    </td>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Exercise != null && Model.List[y].data.Exercise.Contains("散步") ? "■" : "□") 散步
+                                    </td>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Exercise != null && Model.List[y].data.Exercise.Contains("四肢運動") ? "■" : "□") 四肢運動
+                                    </td>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Exercise != null && Model.List[y].data.Exercise.Contains("其他") ? "■" : "□") 其他：@(Model.List[y].data.cpt_id != null && Model.List[y].data.Exercise_other != null ? Model.List[y].data.Exercise_other : "____")
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        Duration：@(Model.List[y].data.cpt_id != null && Model.List[y].data.Duration_mins != null ? Model.List[y].data.Duration_mins : "____")mins /day、 @(Model.List[y].data.cpt_id != null && Model.List[y].data.Duration_week != null ? Model.List[y].data.Duration_week : "____") / week
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="LBRBorder">
+                            Muscle Strength
+                        </td>
+                        <td colspan="7" class="BRBorder">
+                            <table cellpadding="1" style="font-size:10px;">
+                                <tr>
+                                    <td>
+                                        左上：@(Model.List[y].data.cpt_id != null && Model.List[y].data.Muscle_Strength_LU != null ? Model.List[y].data.Muscle_Strength_LU : "____")
+                                    </td>
+                                    <td>
+                                        左下：@(Model.List[y].data.cpt_id != null && Model.List[y].data.Muscle_Strength_LD != null ? Model.List[y].data.Muscle_Strength_LD : "____")
+                                    </td>
+                                    <td>
+                                        右上：@(Model.List[y].data.cpt_id != null && Model.List[y].data.Muscle_Strength_RU != null ? Model.List[y].data.Muscle_Strength_RU : "____")
+                                    </td>
+                                    <td>
+                                        右下：@(Model.List[y].data.cpt_id != null && Model.List[y].data.Muscle_Strength_RD != null ? Model.List[y].data.Muscle_Strength_RD : "____")
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="width:10%" rowspan="2" class="LBRBorder">
+                            Oxygen
+                        </td>
+                        <td colspan="2" style="width:15%" class="LBRBorder">
+                            In Rest
+                        </td>
+                        <td colspan="7" class="BRBorder">
+                            @(Model.List[y].data.cpt_id != null && Model.List[y].data.In_Rest_str != null && Model.List[y].data.In_Rest_str.Contains("PaO2≦55 mmHg或SpO2≦88 %") ? "■" : "□") PaO2≦55 mmHg或SpO2≦88 %
+                            <br />
+                            @(Model.List[y].data.cpt_id != null && Model.List[y].data.In_Rest_str != null && (Model.List[y].data.In_Rest_str.Contains("心肺症或心衰竭") || Model.List[y].data.In_Rest_str.Contains("運動時或睡眠中PaO2< 60mmHg，SpO2<89%")) ? "■" : "□") PaO2≦60 mmHg或SpO2≦89 %，且合併有下列情形者：
+                            <br />
+                            &nbsp;&nbsp;&nbsp;&nbsp;@(Model.List[y].data.cpt_id != null && Model.List[y].data.In_Rest_str != null && Model.List[y].data.In_Rest_str.Contains("心肺症或心衰竭") ? "■" : "□") 心肺症或心衰竭
+                            <br />
+                            &nbsp;&nbsp;&nbsp;&nbsp;@(Model.List[y].data.cpt_id != null && Model.List[y].data.In_Rest_str != null && Model.List[y].data.In_Rest_str.Contains("運動時或睡眠中PaO2< 60mmHg，SpO2<89%") ? "■ 運動時或睡眠中PaO2< 60mmHg，SpO2<89%" : "□ 運動時或睡眠中PaO2< 60mmHg，SpO2<89%")
+                            <br />
+                            @(Model.List[y].data.cpt_id != null && Model.List[y].data.In_Rest_str != null && Model.List[y].data.In_Rest_str.Contains("Others") ? "■" : "□") Others :@(Model.List[y].data.cpt_id != null && Model.List[y].data.In_Rest_other != null ? Model.List[y].data.In_Rest_other : "____")
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="LBRBorder">
+                            Present Situation
+                        </td>
+                        <td colspan="7" class="BRBorder">
+                            <table cellpadding="1" style="font-size:10px;">
+                                <tr>
+                                    <td colspan="2">
+                                        休息時，Device：<u>@(Model.List[y].data.cpt_id != null && Model.List[y].data.Break_Devic != null ? Model.List[y].data.Break_Devic : "____")</u>
+                                        ,FIO2/O2 Flow (%/ LPM)：<u>@(Model.List[y].data.cpt_id != null && Model.List[y].data.Break_FIO2 != null ? Model.List[y].data.Break_FIO2 : "____")</u>
+                                        /：<u>@(Model.List[y].data.cpt_id != null && Model.List[y].data.Break_O2 != null ? Model.List[y].data.Break_O2 : "____")</u>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        日常活動時，Device：<u>@(Model.List[y].data.cpt_id != null && Model.List[y].data.daily_Devic != null ? Model.List[y].data.daily_Devic : "____")</u>
+                                        ,FIO2/O2 Flow (%/ LPM)：<u>@(Model.List[y].data.cpt_id != null && Model.List[y].data.daily_FIO2 != null ? Model.List[y].data.daily_FIO2 : "____")</u>
+                                        /：<u>@(Model.List[y].data.cpt_id != null && Model.List[y].data.daily_O2 != null ? Model.List[y].data.daily_O2 : "____")</u>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Present_Situation != null && Model.List[y].data.Present_Situation.Contains("未使用氧氣") ? "■" : "□") 未使用氧氣
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Present_Situation != null && (Model.List[y].data.Present_Situation.Contains("氧氣濃縮機") || Model.List[y].data.Present_Situation.Contains("高壓氧氣鋼瓶") || Model.List[y].data.Present_Situation.Contains("液態氧")) ? "■" : "□") 使用居家氧氣治療
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        使用設備：	@(Model.List[y].data.cpt_id != null && Model.List[y].data.Present_Situation != null && Model.List[y].data.Present_Situation.Contains("氧氣濃縮機") ? "■" : "□") 氧氣濃縮機@(Model.List[y].data.cpt_id != null && Model.List[y].data.Present_Situation != null && Model.List[y].data.Present_Situation.Contains("高壓氧氣鋼瓶") ? "■" : "□") 高壓氧氣鋼瓶	@(Model.List[y].data.cpt_id != null && Model.List[y].data.Present_Situation != null && Model.List[y].data.Present_Situation.Contains("液態氧") ? "■" : "□") 液態氧
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="width:10%" rowspan="2" class="LBRBorder">
+                            Problem
+                        </td>
+                        <td colspan="2" style="width:15%" class="LBRBorder">
+                            Objective Data
+                        </td>
+                        <td colspan="7" class="BRBorder" style="font-size:10px;">
+                            @(Model.List[y].data.cpt_id != null && Model.List[y].data.Objective_Data_MRC != null ? "■" : "□") 改良呼吸困難指標(Modified MRC Dyspnea Scale, mMRC)：@(Model.List[y].data.cpt_id != null && Model.List[y].data.Objective_Data_MRC != null ? Model.List[y].data.Objective_Data_MRC : "____")
+                            <br />
+                            @(Model.List[y].data.cpt_id != null && Model.List[y].data.Objective_Data_CAT != null ? "■" : "□") 慢性阻塞性病人評量測試(COPD Assessment Test, CAT)：總分：@(Model.List[y].data.cpt_id != null && Model.List[y].data.Objective_Data_CAT != null ? Model.List[y].data.Objective_Data_CAT : "____")分
+                            <br />
+                            Ventilatory Response Index(VRI)：@(Model.List[y].data.cpt_id != null && Model.List[y].data.Objective_Data_VRI != null ? Model.List[y].data.Objective_Data_VRI : "____")
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="width:15%" class="LBRBorder">
+                            Respiration related
+                        </td>
+                        <td colspan="7" class="BRBorder">
+                            <table cellpadding="1" style="font-size:10px;">
+                                <tr>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Respiration_related_str != null && Model.List[y].data.Respiration_related_str.Contains("Dysfunction of Secretion Clearance") ? "■" : "□") Dysfunction of Secretion Clearance
+                                    </td>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Respiration_related_str != null && Model.List[y].data.Respiration_related_str.Contains("Bronchospasm-induced Airway Obstruction") ? "■" : "□") Bronchospasm-induced Airway Obstruction
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Respiration_related_str != null && Model.List[y].data.Respiration_related_str.Contains("Weakness of Respiratory Muscle") ? "■" : "□") Weakness of Respiratory Muscle
+                                    </td>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Respiration_related_str != null && Model.List[y].data.Respiration_related_str.Contains("Inadequate of Vital Capacity") ? "■" : "□") Inadequate of Vital Capacity
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Respiration_related_str != null && Model.List[y].data.Respiration_related_str.Contains("Thoracic Deformity") ? "■" : "□") Thoracic Deformity
+                                    </td>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Respiration_related_str != null && Model.List[y].data.Respiration_related_str.Contains("Poor Endurance of Exercise") ? "■" : "□") Poor Endurance of Exercise
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Respiration_related_str != null && Model.List[y].data.Respiration_related_str.Contains("Hypoxia") ? "■" : "□") Hypoxia
+                                    </td>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Respiration_related_str != null && Model.List[y].data.Respiration_related_str.Contains("Others") ? "■" : "□") Others：@(Model.List[y].data.cpt_id != null && Model.List[y].data.Respiration_related_other != null ? Model.List[y].data.Respiration_related_other : "____")
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="12" class="ALLBorder">
+                            Respiratory Care Program
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" rowspan="4" class="LBRBorder">
+                            Goal of<br />
+                            Pulmonary Rehabilitation
+                        </td>
+                        <td colspan="2" style="width:15%" class="LBRBorder">
+                            Frequency
+                        </td>
+                        <td colspan="7" class="BRBorder">
+                            <table cellpadding="1" style="font-size:10px;">
+                                <tr>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Frequency_str != null && Model.List[y].data.Frequency_str.Contains("Once /week") ? "■" : "□")Once /week
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Frequency_str != null && Model.List[y].data.Frequency_str.Contains("Twice /week") ? "■" : "□")Twice /week
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Frequency_str != null && Model.List[y].data.Frequency_str.Contains("Three times /week") ? "■" : "□")Three times /week
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Frequency_str != null && Model.List[y].data.Frequency_str.Contains("Once /two weeks") ? "■" : "□")Once /two weeks
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="width:15%" class="LBRBorder">
+                            Short-term
+                        </td>
+                        <td colspan="7" class="BRBorder">
+                            @(Model.List[y].data.cpt_id != null && Model.List[y].data.Short_term_Goal != null ? Model.List[y].data.Short_term_Goal : "")
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="width:15%" class="LBRBorder">
+                            Medium-term Goal
+                        </td>
+                        <td colspan="7" class="BRBorder">
+                            @(Model.List[y].data.cpt_id != null && Model.List[y].data.Medium_term_Goal != null ? Model.List[y].data.Medium_term_Goal : "")
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="width:15%" class="LBRBorder">
+                            Long-term Goal
+                        </td>
+                        <td colspan="7" class="BRBorder">
+                            @(Model.List[y].data.cpt_id != null && Model.List[y].data.Long_term_Goal != null ? Model.List[y].data.Long_term_Goal : "")
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <table style="width:97%;">
+        <tr>
+            <td align="left" style="width:45%;"></td>
+            <td align="center" style="width:10%;font-size:10px;">
+                第 @(Model.List[y].data.cpt_id == null ? "___" : "1") 張
+            </td>
+            <td align="right" style="width:45%;"></td>
+        </tr>
+        <tr>
+            <td align="left" style="float:left;font-size:10px;">
+                @(RCS.Controllers.BaseController.hospName)
+
+            </td>
+            <td align="center" style="width:10%;font-size:10px;"></td>
+            <td align="right" style="float:right;font-size:10px;">
+                FF0300001 G
+            </td>
+        </tr>
+    </table>
+    <div>我是分頁</div>
+    <table style="width:100%;height:100%;" cellpadding="3">
+        <tr>
+            <td colspan="3" valign="top">
+                <table style="width:100%;height:100%;font-size:10px;" cellspacing="0" cellpadding="3">
+                    <tr>
+                        <td colspan="3" rowspan="7" class="LBRBorder topBorder">
+                            Approved Respiratory<br />
+                            Care<br />
+                            Program
+                        </td>
+                        <td colspan="2" style="width:15%" class="LBRBorder topBorder">
+                            Bronchial Hygiene Therapy
+                        </td>
+                        <td colspan="7" class="BRBorder topBorder">
+                            Aerosol Therapy：@(Model.List[y].data.cpt_id != null && Model.List[y].data.Aerosol_Therapy != null ? Model.List[y].data.Aerosol_Therapy : "____")
+                            Humidity Therapy：@(Model.List[y].data.cpt_id != null && Model.List[y].data.Humidity_Therapy != null ? Model.List[y].data.Humidity_Therapy : "____")
+                            <br />
+                            Airway Clearance Therapy：
+                            <br />
+                            &emsp;&emsp;@(Model.List[y].data.cpt_id != null && Model.List[y].data.Airway_Clearance_Therapy_str != null && Model.List[y].data.Airway_Clearance_Therapy_str.Contains("PDPV") ? "■" : "□") PDPV
+                            @(Model.List[y].data.cpt_id != null && Model.List[y].data.Airway_Clearance_Therapy_str != null && Model.List[y].data.Airway_Clearance_Therapy_str.Contains("HFCWO") ? "■" : "□") HFCWO
+                            @(Model.List[y].data.cpt_id != null && Model.List[y].data.Airway_Clearance_Therapy_str != null && Model.List[y].data.Airway_Clearance_Therapy_str.Contains("MI-E") ? "■" : "□") MI-E
+                            @(Model.List[y].data.cpt_id != null && Model.List[y].data.Airway_Clearance_Therapy_str != null && Model.List[y].data.Airway_Clearance_Therapy_str.Contains("Aerobica") ? "■" : "□") Aerobica
+                            <br />
+                            &emsp;&emsp;@(Model.List[y].data.cpt_id != null && Model.List[y].data.Airway_Clearance_Therapy_str != null && Model.List[y].data.Airway_Clearance_Therapy_str.Contains("Others") ? "■" : "□")Others :@(Model.List[y].data.cpt_id != null && Model.List[y].data.Airway_Clearance_Therapy_other != null ? Model.List[y].data.Airway_Clearance_Therapy_other : "____")
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="width:15%" class="LBRBorder">
+                            Lung Expansion Therapy
+                        </td>
+                        <td colspan="7" class="BRBorder" valign="middle">
+                            @(Model.List[y].data.cpt_id != null && Model.List[y].data.Lung_Expansion_Therapy_str != null && Model.List[y].data.Lung_Expansion_Therapy_str.Contains("NPV Therapy") ? "■" : "□") NPV Therapy
+                            @(Model.List[y].data.cpt_id != null && Model.List[y].data.Lung_Expansion_Therapy_str != null && Model.List[y].data.Lung_Expansion_Therapy_str.Contains("IPPB Therapy") ? "■" : "□") IPPB Therapy
+                            @(Model.List[y].data.cpt_id != null && Model.List[y].data.Lung_Expansion_Therapy_str != null && Model.List[y].data.Lung_Expansion_Therapy_str.Contains("SMI Therapy") ? "■" : "□") SMI Therapy
+                            @(Model.List[y].data.cpt_id != null && Model.List[y].data.Lung_Expansion_Therapy_str != null && Model.List[y].data.Lung_Expansion_Therapy_str.Contains("PEP Therapy") ? "■" : "□") PEP Therapy
+                            <br />
+                            @(Model.List[y].data.cpt_id != null && Model.List[y].data.Lung_Expansion_Therapy_str != null && Model.List[y].data.Lung_Expansion_Therapy_str.Contains("PAP Therapy") ? "■" : "□") PAP Therapy
+                            @(Model.List[y].data.cpt_id != null && Model.List[y].data.Lung_Expansion_Therapy_str != null && Model.List[y].data.Lung_Expansion_Therapy_str.Contains("Others") ? "■" : "□")Others :@(Model.List[y].data.cpt_id != null && Model.List[y].data.Lung_Expansion_Therapy_other != null ? Model.List[y].data.Lung_Expansion_Therapy_other : "____")
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="LBRBorder">
+                            Oxygen Therapy
+                        </td>
+                        <td colspan="7" class="BRBorder">
+                            <table cellpadding="1" style="font-size:10px;">
+                                <tr>
+                                    <td colspan="2">
+                                        休息時，Device：
+                                        <u>
+                                            @(Model.List[y].data.cpt_id != null && Model.List[y].data.Oxygen_Break_Devic != null ? Model.List[y].data.Oxygen_Break_Devic : "____")
+                                        </u>
+                                        
+                                        ,FIO2/O2 Flow (%/ LPM)：<u>@(Model.List[y].data.cpt_id != null && Model.List[y].data.Oxygen_Break_FIO2 != null ? Model.List[y].data.Oxygen_Break_FIO2 : "____")</u>
+                                        /：<u>@(Model.List[y].data.cpt_id != null && Model.List[y].data.Oxygen_Break_O2 != null ? Model.List[y].data.Oxygen_Break_O2 : "____")</u>
+                                        <br/>
+                                        日常活動時，Device：<u>@(Model.List[y].data.cpt_id != null && Model.List[y].data.Oxygen_daily_Devic != null ? Model.List[y].data.Oxygen_daily_Devic : "____")</u>
+                                        ,FIO2/O2 Flow (%/ LPM)：<u>@(Model.List[y].data.cpt_id != null && Model.List[y].data.Oxygen_daily_FIO2 != null ? Model.List[y].data.Oxygen_daily_FIO2 : "____")</u>
+                                        /：<u>@(Model.List[y].data.cpt_id != null && Model.List[y].data.Oxygen_daily_O2 != null ? Model.List[y].data.Oxygen_daily_O2 : "____")</u>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Oxygen_Therapy != null && Model.List[y].data.Oxygen_Therapy.Contains("無需使用氧氣") ? "■" : "□") 無需使用氧氣
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Oxygen_Therapy != null && (Model.List[y].data.Oxygen_Therapy.Contains("氧氣濃縮機") || Model.List[y].data.Oxygen_Therapy.Contains("高壓氧氣鋼瓶") || Model.List[y].data.Oxygen_Therapy.Contains("液態氧")) ? "■" : "□") 使用居家氧氣治療
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        使用設備: @(Model.List[y].data.cpt_id != null && Model.List[y].data.Oxygen_Therapy != null && Model.List[y].data.Oxygen_Therapy.Contains("氧氣濃縮機") ? "■" : "□") 氧氣濃縮機@(Model.List[y].data.cpt_id != null && Model.List[y].data.Oxygen_Therapy != null && Model.List[y].data.Oxygen_Therapy.Contains("高壓氧氣鋼瓶") ? "■" : "□") 高壓氧氣鋼瓶	@(Model.List[y].data.cpt_id != null && Model.List[y].data.Oxygen_Therapy != null && Model.List[y].data.Oxygen_Therapy.Contains("液態氧") ? "■" : "□") 液態氧
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="width:15%" class="LBRBorder">
+                            Breathing Exercise
+                        </td>
+                        <td colspan="7" class="BRBorder">
+                            <table cellpadding="1" style="font-size:10px;">
+                                <tr>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Breathing_Training_str != null && Model.List[y].data.Breathing_Training_str.Contains("Deep Breathing") ? "■" : "□") Deep Breathing
+                                    </td>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Breathing_Training_str != null && Model.List[y].data.Breathing_Training_str.Contains("Purse-Lip Breathing") ? "■" : "□") Purse-Lip Breathing
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Breathing_Training_str != null && Model.List[y].data.Breathing_Training_str.Contains("Diaphragmatic Breathing") ? "■" : "□") Diaphragmatic Breathing
+                                    </td>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Breathing_Training_str != null && Model.List[y].data.Breathing_Training_str.Contains("Huffing/Cough") ? "■" : "□") Huffing/Cough
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Breathing_Training_str != null && Model.List[y].data.Breathing_Training_str.Contains("呼吸困難緩解技巧") ? "■" : "□") 呼吸困難緩解技巧
+                                    </td>
+                                    <td>
+                                        @(Model.List[y].data.cpt_id != null && Model.List[y].data.Breathing_Training_str != null && Model.List[y].data.Breathing_Training_str.Contains("Others") ? "■" : "□") Others：@(Model.List[y].data.cpt_id != null && Model.List[y].data.Breathing_Training_other != null ? Model.List[y].data.Breathing_Training_other : "____")
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="width:15%" class="LBRBorder">
+                            Pulmonary Recondition
+                        </td>
+                        <td colspan="7" class="BRBorder">
+                            Inspiratory Muscle：@(Model.List[y].data.cpt_id != null && Model.List[y].data.Inspiratory_Muscle != null ? Model.List[y].data.Inspiratory_Muscle : "____")、Setting：@(Model.List[y].data.cpt_id != null && Model.List[y].data.Inspiratory_Setting != null ? Model.List[y].data.Inspiratory_Setting : "____")、Frequency：@(Model.List[y].data.cpt_id != null && Model.List[y].data.Inspiratory_Frequency != null ? Model.List[y].data.Inspiratory_Frequency : "____")
+                            <br />
+                            Expiratory Muscle：@(Model.List[y].data.cpt_id != null && Model.List[y].data.Expiratory_Muscle != null ? Model.List[y].data.Expiratory_Muscle : "____")、Setting：@(Model.List[y].data.cpt_id != null && Model.List[y].data.Expiratory_Setting != null ? Model.List[y].data.Expiratory_Setting : "____")、Frequency：@(Model.List[y].data.cpt_id != null && Model.List[y].data.Expiratory_Frequency != null ? Model.List[y].data.Expiratory_Frequency : "____")
+                            <br />
+                            上肢運動：@(Model.List[y].data.cpt_id != null && Model.List[y].data.up_Exercise != null ? Model.List[y].data.up_Exercise : "____")、Training course：@(Model.List[y].data.cpt_id != null && Model.List[y].data.up_course != null ? Model.List[y].data.up_course : "____")、Frequency：@(Model.List[y].data.cpt_id != null && Model.List[y].data.up_Frequency != null ? Model.List[y].data.up_Frequency : "____")
+                            <br />
+                            下肢運動：@(Model.List[y].data.cpt_id != null && Model.List[y].data.down_Exercise != null ? Model.List[y].data.down_Exercise : "____")、Training course：@(Model.List[y].data.cpt_id != null && Model.List[y].data.down_course != null ? Model.List[y].data.down_course : "____")、Frequency：@(Model.List[y].data.cpt_id != null && Model.List[y].data.down_Frequency != null ? Model.List[y].data.down_Frequency : "____")
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="width:15%" class="LBRBorder">
+                            衛教
+                        </td>
+                        <td colspan="7" class="BRBorder">
+                            藥物衛教：
+                            <br />
+                            &emsp;MDI：@(Model.List[y].data.cpt_id != null && Model.List[y].data.treatment_MDI_txt != null ? Model.List[y].data.treatment_MDI_txt : "____") DPI：@(Model.List[y].data.cpt_id != null && Model.List[y].data.treatment_DPI_txt != null ? Model.List[y].data.treatment_DPI_txt : "____") Others：@(Model.List[y].data.cpt_id != null && Model.List[y].data.treatment_other_txt != null ? Model.List[y].data.treatment_other_txt : "____")
+                            <br />
+                            戒菸衛教：
+                            <br />
+                            &emsp;&emsp;@(Model.List[y].data.cpt_id != null && Model.List[y].data.smoke_Guardianship != null && Model.List[y].data.smoke_Guardianship.Contains("戒菸門診") ? "■" : "□") 戒菸門診 @(Model.List[y].data.cpt_id != null && Model.List[y].data.smoke_Guardianship != null && Model.List[y].data.smoke_Guardianship.Contains("戒菸專線") ? "■" : "□") 戒菸專線 @(Model.List[y].data.cpt_id != null && Model.List[y].data.smoke_Guardianship != null && Model.List[y].data.smoke_Guardianship.Contains("戒菸藥物") ? "■" : "□") 戒菸藥物：@(Model.List[y].data.cpt_id != null && Model.List[y].data.smoke_Guardianship_other != null ? Model.List[y].data.smoke_Guardianship_other : "____")
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="width:15%" class="LBRBorder">
+                            Other
+                            Suggestion(s)
+                        </td>
+                        <td colspan="7" class="BRBorder">
+                            @(Model.List[y].data.cpt_id != null && Model.List[y].data.Remark != null ? Model.List[y].data.Remark : "")
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="5" class="LBRBorder">
+                            呼吸治療師 Signature
+                        </td>
+                        <td colspan="7" class="BRBorder">
+                            @Html.Raw(Model.List[y].data.cpt_id == null ? "" : Model.List[y].data.CREATE_NAME)
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <table style="width:97%;">
+        <tr>
+            <td align="left" style="width:45%;"></td>
+            <td align="center" style="width:10%;font-size:10px;">
+                第 @(Model.List[y].data.cpt_id == null ? "___" : "1") 張
+            </td>
+            <td align="right" style="width:45%;"></td>
+        </tr>
+        <tr>
+            <td align="left" style="float:left;font-size:10px;">
+                @(RCS.Controllers.BaseController.hospName)
+            </td>
+        </tr>
+    </table>
+    <div>我是分頁</div>
+
+}
+
+
+

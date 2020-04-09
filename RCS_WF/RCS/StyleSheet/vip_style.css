@@ -1,0 +1,186 @@
+﻿#msgbox {
+    display: none;
+    margin: 2%;
+    width: 96%;
+    position: absolute;
+    z-index: 9999;
+}
+#index_cover, #index_loading {
+    display: none;
+    position: fixed;
+}
+
+.panel-body .input-group-addon:first-child {
+    min-width: 250px;
+    text-align: left;
+    padding: 0.2em 0.5em;
+}
+
+#VIP .panel-body .input-group-addon:first-child {
+    background-color: #5BA198;
+    color: #FFFFFF;
+}
+#abg .panel-body .input-group-addon:first-child {
+    background-color: #EFA843;
+    color: #FFFFFF;
+}
+#abg textarea{
+    height:110px;
+}
+#other .panel-body .input-group-addon:first-child {
+    background-color: #5BA198;
+    color: #FFFFFF;
+}
+
+/* 垂直表單樣式 */
+.flip-scroll {
+    overflow: auto;
+}
+
+.flip-scroll .table table {
+    display: block;
+    position: relative;
+    width: 100%;
+    /*border-bottom: 1px;*/
+}
+
+.flip-scroll .table thead {
+    display: block;
+    float: left;
+}
+
+.flip-scroll .table tbody {
+    display: block;
+    /*width: 900px;*/
+    position: relative;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.flip-scroll .table tbody tr {
+    display: -moz-box;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: table-cell;
+}
+
+.flip-scroll .table > tbody > tr > td {
+    display: block;
+    min-height: 1.25em;
+    text-align: center;
+    border-left: 0px !important;
+    border-top: 0px !important;
+    padding: 3px !important;
+    /*border-bottom: 0 !important;*/
+    line-height: 18px;
+    height: 35px;
+    /*hide overflow 130px*/
+    max-width: 200px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+/* sort out borders */
+.flip-scroll .table > thead th {
+    height: 35px;
+}
+
+.flip-scroll .table thead tr:first-child th {
+    width: auto !important;
+}
+
+.flip-scroll .table th {
+    background-color: #5BA198;
+    color: #FFF;
+    display: block;
+    border-top: 1px solid #ddd;
+    border-left: 1px;
+}
+
+.flip-scroll .table th.list_split_block {
+    background-color: #477B75;
+    color: #FFF;
+    display: block;
+    border-top: 1px solid #ddd;
+    border-left: 1px;
+    line-height: 22px;
+}
+
+.flip-scroll .table .fixed-table-container tr th:first-child {
+    border-top: 1px solid #ddd !important;
+}
+
+/*Table-striped Color*/
+.table .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: #ECFFEE;
+}
+
+.sty-navbar {
+    background: #5BA198;
+    height: 80px;
+    top: 40px;
+}
+
+
+/*Status Page use*/
+ul.show_head {
+    overflow: auto;
+}
+
+ul.show_head li {
+    /* float: left; */
+    margin-right: 4px;
+    line-height: 30px;
+    padding: 0px 6px;
+    /*background: #4B77BE;*/
+    border-radius: 6px;
+    color: black;
+    display: inline;
+}
+
+#index_cover, #index_loading {
+    display: none;
+    position: fixed;
+}
+
+#index_cover {
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    z-index: 90000;
+    background: #666666;
+    opacity: 0.6;
+}
+
+#index_loading {
+    margin-left: -200px;
+    left: 50%;
+    top: 50%;
+    z-index: 99999;
+}
+
+
+
+
+@media (max-width: 768px){
+    .panel-body{
+         height:550px;
+         overflow:scroll;
+    }
+}
+@media (max-height: 800px){
+    .panel-body{
+         height:350px;
+         overflow:scroll;
+    }
+}
+
+@media (max-width: 768px){
+    #List table { display: block; height: 650px; overflow: auto;} 
+}
+@media (max-height: 800px){
+    #List table { display: block; height: 385px; overflow: auto;} 
+}

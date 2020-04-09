@@ -1,0 +1,220 @@
+﻿@{
+    ViewBag.Title = "RCS_WEANING_ASSESS_CHECKLIST";
+}
+ 
+<!--每日呼吸器脫離評估 Modal -->
+<div id="RWAC_Modal" class="modal fade setScrollbar" role="dialog" data-backdrop="static">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="btn-group">
+                    <h4 class="modal-title">每日呼吸器脫離評估</h4>
+                </div>
+                <div class="btn-group pull-right">
+                    <button class="btn btn-success" v-on:click="save" :disabled="isSendStatus" >儲存</button>
+                    <button class="btn btn-warning" v-on:click="clear" data-dismiss="modal">關閉</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group">
+                    <li class="list-group-item clearfix ">
+                        1. 呼吸衰竭誘發因素無法被控制
+                        <span class="pull-right single_check">
+                            <label>
+                                <input v-model="model.RWAC01" type="radio" value="1" />&ensp;是
+                            </label>
+                            &emsp;<label>
+                                <input v-model="model.RWAC01" type="radio" value="0" />&ensp;否
+                            </label>
+                        </span>
+                    </li>
+                    <li class="list-group-item clearfix">
+                        2. 生命徵象及整體狀況不穩定
+                        <span class="pull-right single_check">
+                            <label>
+                                <input v-model="model.RWAC02" type="radio" value="1" />&ensp;是
+                            </label>
+                            &emsp;<label>
+                                <input v-model="model.RWAC02" type="radio" value="0" />&ensp;否
+                            </label>
+                        </span>
+                    </li>
+                    <li class="list-group-item clearfix">
+                        3. MAP &lt; 65 mmHg, SBP &lt; 90 或 &gt; 180 mmHg
+                        <span class="pull-right single_check">
+                            <label>
+                                <input v-model="model.RWAC03" type="radio" value="1" />&ensp;是
+                            </label>
+                            &emsp;<label>
+                                <input v-model="model.RWAC03" type="radio" value="0" />&ensp;否
+                            </label>
+                        </span>
+                    </li>
+                    <li class="list-group-item clearfix">
+                        4. 新的心律不整
+                        <span class="pull-right single_check">
+                            <label>
+                                <input v-model="model.RWAC04" type="radio" value="1" />&ensp;是
+                            </label>
+                            &emsp;<label>
+                                <input v-model="model.RWAC04" type="radio" value="0" />&ensp;否
+                            </label>
+                        </span>
+                    </li>
+                    <li class="list-group-item clearfix">
+                        5. 24 小時內有急性冠心症
+                        <span class="pull-right single_check">
+                            <label>
+                                <input v-model="model.RWAC05" type="radio" value="1" />&ensp;是
+                            </label>
+                            &emsp;<label>
+                                <input v-model="model.RWAC05" type="radio" value="0" />&ensp;否
+                            </label>
+                        </span>
+                    </li>
+                    <li class="list-group-item clearfix">
+                        6. 顱內壓 &gt; 20 mmHg
+                        <span class="pull-right single_check">
+                            <label>
+                                <input v-model="model.RWAC06" type="radio" value="1" />&ensp;是
+                            </label>
+                            &emsp;<label>
+                                <input v-model="model.RWAC06" type="radio" value="0" />&ensp;否
+                            </label>
+                        </span>
+                    </li>
+                    <li class="list-group-item clearfix">
+                        7. FiO2 ≧ 50% 或 PEEP &gt; 8cmH2O 或 SPO2 ≦ 90%
+                        <span class="pull-right single_check">
+                            <label>
+                                <input v-model="model.RWAC07" type="radio" value="1" />&ensp;是
+                            </label>
+                            &emsp;<label>
+                                <input v-model="model.RWAC07" type="radio" value="0" />&ensp;否
+                            </label>
+                        </span>
+                    </li>
+                    @*<li class="list-group-item clearfix">
+                        8. 已評估，但無法脫離
+                        <span class="pull-right single_check">
+                            <label>
+                                <input v-model="model.RWAC09" type="radio" value="1" />&ensp;是
+                            </label>
+                            &emsp;<label>
+                                <input v-model="model.RWAC09" type="radio" value="0" />&ensp;NA
+                            </label>
+                        </span>
+                    </li>*@
+                    @*<li class="list-group-item clearfix">
+                        9. 更換呼吸器管路
+                        <span class="pull-right single_check">
+                            <label>
+                                <input v-model="model.RWAC08" type="radio" value="1" />&ensp;是
+                            </label>
+                            &emsp;<label>
+                                <input v-model="model.RWAC08" type="radio" value="0" />&ensp;NA
+                            </label>
+                        </span>
+                    </li>*@
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <div id="editBtn" class="hidden" >
+                    <span  style="color:#ff0000;cursor: pointer;"  onclick="">
+                        <i class="fas fa-exclamation-triangle" style="color:#ff0000" ></i>&ensp;無
+                    </span>
+                     
+                </div>
+                <div id="showIcon"  class="hidden">
+                    <span style="color:#5BA198">
+                        <i class="far fa-check-square" style="color:#5BA198"></i>&ensp;有資料或不用填寫
+                    </span>
+                     
+                </div>
+                
+            </div>
+        </div>
+
+    </div>
+</div><!-- Modal -->
+ 
+<script>
+    var RWAC_set_vm = { isShiftWork: false, model: { CHART_NO: '', IPD_NO: '', RWAC01: '', RWAC02: '', RWAC03: '', RWAC04: '', RWAC05: '', RWAC06: '', RWAC07: '', RWAC08: '', RWAC09: '' }, isSendStatus: false };
+    var RWAC_vm = new Vue({
+        el: '#RWAC_Modal',
+        data: JSON.parse(JSON.stringify(RWAC_set_vm)),
+        mounted: function () {
+            this.set_model = JSON.parse(JSON.stringify(RWAC_set_vm.model));
+            setcheckboxRules('RWAC_Modal');
+            //$("#RWAC_Modal").modal("show");
+        },
+        methods: {
+            clear:function(){
+                this.model = JSON.parse(JSON.stringify(this.set_model)); 
+            },
+            open: function (chart_no, ipd_no) {
+                this.clear();
+                this.model.CHART_NO = chart_no;
+                this.model.IPD_NO = ipd_no;
+                $("#RWAC_Modal").modal("show");
+            },
+            openData: function (chart_no, ipd_no) {
+                this.clear();
+                this.$http.post('@Url.Content("~/RTRecord/getTodayRWAC")', { chart_no: chart_no, ipd_no: ipd_no }).then(function (response) {
+                    this.model = response.data;
+                    this.model.CHART_NO = chart_no;
+                    this.model.IPD_NO = ipd_no;
+                    $("#RWAC_Modal").modal("show");
+                }, function (response) {
+                    showAlert('程式發生錯誤，請洽資訊人員!', msg_stat.Danger, 3000);
+                });
+
+                 
+            },
+            save: function () {
+                this.isSendStatus = true;
+                if (this.check()) {
+                    this.$http.post('@Url.Content("~/RTRecord/saveRWAC")', { vmStr: encodeURIComponent(JSON.stringify(this.model)) }).then(function (response) {
+                        if (response.data.status == 0) {
+                            showAlert(response.data.message, msg_stat.Success, 3000);
+                            this.clear();
+                            $("#RWAC_Modal").modal("hide");
+                            if (this.isShiftWork) {
+                                if ( $("#CheckShiftPtList").length> 0) {
+                                    $("#CheckShiftPtList").bootstrapTable('refresh');
+                                }
+                            }
+                            this.isShiftWork = false;
+                        } else {
+                            showAlert(response.data.message, msg_stat.Warning, 3000);
+                        }
+                        this.isSendStatus = false;
+                    }, function (response) {
+                        this.isSendStatus = false;
+                        showAlert(response.data.message, msg_stat.Danger, 3000);
+                    });
+                } else {
+                    this.isSendStatus = false;
+                }
+            },
+            check: function () {
+                //20190723 必要欄位檢查移除
+                //if (!this.model.RWAC01 || !this.model.RWAC02 || !this.model.RWAC03 || !this.model.RWAC04 || !this.model.RWAC05 || !this.model.RWAC06 || !this.model.RWAC07 || !this.model.RWAC08) {
+                //    showAlert('有欄位未勾選!', msg_stat.Warning, 3000);
+                //    return false;
+                //}
+                return true;
+            },
+            editBtn: function (chart_no, ipd_no, pbool) {
+                this.isShiftWork = !!pbool;
+                $('#editBtn').find('span').attr('onclick', '');
+                $('#editBtn').find('span').attr('onclick', 'RWAC_vm.open("' + chart_no + '","' + ipd_no + '");');
+                return $('#editBtn').html();
+            },
+            showIcon: function () {
+                return $('#showIcon').html();
+            } 
+        }
+    });
+</script>

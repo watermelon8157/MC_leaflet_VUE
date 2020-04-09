@@ -1,0 +1,233 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<div id="opd_scheduling_time_dom" style="position:relative;"></div>
+<div class="panel panel-default">
+    <div class="panel-heading  form-horizontal">
+        <div class="form-group row">
+            <div class="col-md-6">
+                &ensp;&ensp;&ensp;查詢清單&ensp;&ensp;
+                <button class="btn btn-success " v-on:click="getOPDData(-1)">
+                    上週
+                </button>&ensp;
+                <button class="btn btn-success" v-on:click="getOPDData(0)">
+                    本週
+                </button>&ensp;
+                <button class="btn btn-success" v-on:click="getOPDData(1)">
+                    下週
+                </button>
+                <button class="btn btn-danger" v-on:click="remove_Data"  >
+                    移除排程
+                </button>
+                <button class="btn btn-info" v-on:click="leave_Data" >
+                    備註
+                </button>
+                <button class="btn btn-warning" v-on:click="MEMO = '請假';leave_Data();" >
+                    請假
+                </button>
+                <button class="btn btn-primary" v-on:click="printOPDWEAKENVM">
+                    列印清單
+                </button>
+            </div>
+            <div class="input-group col-md-4">
+                <span class="input-group-addon">備註</span>
+                <input class="form-control input-sm" id="inputsm" type="text" v-model="MEMO">
+            </div>
+            
+        </div>
+    </div>
+    <div class="panel-body" style="height:600px;overflow-y:scroll;">
+        <template v-for="(i,index) in opd_list"  >
+            <template v-if="not_show_day.indexOf(i.treatment_day) < 0">
+                <div class="panel panel-success">
+                    <div class="panel-heading">
+                        <label>
+                            <template  v-if="i.treatment_person > 0 ||　opd_6_min_list[index].treatment_person > 0">
+                                <input type="checkbox" v-model="i.check_day" v-on:click="check_day(index,i.check_day)">&emsp;
+                            </template>
+                            {{i.treatment_date}}&ensp;({{i.treatment_day}})
+                        </label>
+                    </div>
+                    <div class="panel-body">
+                        <template v-if="i.treatment_person > 0 ||　opd_6_min_list[index].treatment_person > 0">
+                            <ul class="list-group">
+                                <template v-for="(j,index_j) in i.opd_per">
+                                    <li v-for="(k,index_k) in j.opd_pat" v-bind:class="[k.datastatus == '9' ? 'list-group-item-danger' : '', k.MEMO.indexOf('請假') >= 0|| k.MEMO.indexOf('住院') >= 0  ? 'list-group-item-warning' : '','list-group-item']" class="list-group-item">
+                                         <label>
+                                            <template v-if="k.datastatus == '1'">
+                                                <input type="checkbox" v-model="k.check_pat">&emsp;
+                                            </template>
+                                            {{k.treatment_per_show}}&emsp;({{!!k.opd_count?k.opd_count:'&emsp;'}}/4){{k.patient_name}}{{k.show_chart_no}}&emsp;({{k.treatment.join(',')}}<span v-if="!!k.drug_inhalation">,{{k.drug_inhalation}}</span>)
+                                             <template v-if="!!k.MEMO">
+                                                 &emsp;,{{k.MEMO}}
+                                             </template>
+                                         </label>
+                                    </li>
+                                </template>
+                                <template v-for="(j,index_j) in opd_6_min_list[index].opd_per">
+                                    <li v-for="(k,index_k) in j.opd_pat" v-bind:class="[k.datastatus == '9' ? 'list-group-item-danger' : '', k.MEMO.indexOf('請假') >= 0 || k.MEMO.indexOf('住院') >= 0 ? 'list-group-item-warning' : '', 'list-group-item']">
+                                        <label>
+                                            <template v-if="k.datastatus == '1'">
+                                                <input type="checkbox" v-model="k.check_pat">&emsp;
+                                            </template>
+                                            {{k.treatment_per_show}}&emsp;({{!!k.opd_count?k.opd_count:'&emsp;'}}/4){{k.patient_name}}{{k.show_chart_no}}&emsp;({{k.treatment.join(',')}}<span v-if="!!k.drug_inhalation">,{{k.drug_inhalation}}</span>)
+                                            <template v-if="!!k.MEMO">
+                                                &emsp;,{{k.MEMO}}
+                                            </template>
+                                        </label>
+                                    </li>
+                                </template>
+                            </ul>
+                        </template>
+                        <template v-else>
+                            無資料
+                        </template>
+                    </div>
+                </div>
+            </template>
+        </template>
+        
+    </div>
+</div>
+<form id="pdfForm" action="@(Url.Content("~/OPDScheduling/DownloadPdf"))" method="post" target="TheNewWindow">
+    <input type="hidden" id="HtmlStr" name="HtmlStr" />
+</form>
+<script>
+    var _opd_scheduling_set_vm = {
+        MEMO:'',
+        isThisWeek:false,
+        not_show_day: [ "日", "六" ],
+        weakenEdate: '',
+        weakenSdate: '',
+        opd_list: [],
+        opd_6_min_list:[]
+    };
+    var opd_scheduling_vm = new Vue({
+        el: '#OPD_TREATMENT_schedule',
+        data: _opd_scheduling_set_vm,
+        methods: {
+            leave_Data: function () {
+                $('#index_loading').modal('show');
+                this.$http.post('@Url.Content("~/OPDScheduling/update_Data")', {
+                    rowStr: encodeURIComponent(JSON.stringify({
+                        datastatus: '1',
+                        opd_list: this.opd_list,
+                        opd_6_min_list: this.opd_6_min_list,
+                        MEMO: this.MEMO
+                    }))
+                    }).then((response) => {
+                    if (response.data.status == 0) {
+                        this.getOPDData(0);
+                    }
+                    alert(response.data.message);
+                    $('#index_loading').modal('hide');
+                }, (response) => {
+                    alert('備註請假時發生錯誤，請洽資訊人員!');
+                    $('#index_loading').modal('hide');
+                });
+            },
+            remove_Data: function () {
+                $('#index_loading').modal('show');
+                this.$http.post('@Url.Content("~/OPDScheduling/update_Data")',{
+                    rowStr: encodeURIComponent(JSON.stringify({
+                        datastatus: '9',
+                        opd_list: this.opd_list,
+                        opd_6_min_list: this.opd_6_min_list,
+                        MEMO: this.MEMO
+                    }))
+                }  ).then((response) => {
+                    if (response.data.status == 0) {
+                        this.getOPDData(0);
+                    }  
+                    alert(response.data.message);
+                    $('#index_loading').modal('hide');
+                }, (response) => {
+                    alert('刪除清單資料發生錯誤，請洽資訊人員!');
+                    $('#index_loading').modal('hide');
+                });
+
+            },
+            check_day:function (index,pVal) {
+                for (var i = 0; i < this.opd_list[index].opd_per.length; i++) {
+                    for (var j = 0; j < this.opd_list[index].opd_per[i].opd_pat.length; j++) {
+                        if (this.opd_list[index].opd_per[i].opd_pat[j].datastatus == '1') {
+                            this.opd_list[index].opd_per[i].opd_pat[j].check_pat = !pVal;
+                        }
+                      
+                    }
+                }
+                for (var i = 0; i < this.opd_6_min_list[index].opd_per.length; i++) {
+                    for (var j = 0; j < this.opd_6_min_list[index].opd_per[i].opd_pat.length; j++) {
+                        if (this.opd_6_min_list[index].opd_per[i].opd_pat[j].datastatus == '1') {
+                            this.opd_6_min_list[index].opd_per[i].opd_pat[j].check_pat = !pVal;
+                        }
+                    }
+                }
+            },
+              getOPDData: function (pCnt) {
+                this.$http.post('@Url.Content("~/OPDScheduling/week_data")', {
+                    weakenSDate: this.weakenSdate,
+                    weakenEDate: this.weakenEdate,
+                    weanType: pCnt,
+                    isCopy: false,
+                    copysetCnt: 1,
+                    isList:true
+                }).then((response) => {
+                     
+                    this.weakenEdate = response.data.weakenEdate;
+                    this.weakenSdate = response.data.weakenSdate;
+                    this.opd_list = response.data.opd_list;
+                    this.opd_6_min_list = response.data.opd_6_min_list;
+                    $('#index_loading').modal('hide');
+                    if (pCnt == 0) {
+                        this.isThisWeek=true;
+                    } else {
+                        this.isThisWeek = false;
+                    }
+                }, (response) => {
+                    alert('取得清單資料發生錯誤，請洽資訊人員!');
+                    $('#index_loading').modal('hide');
+                });
+                  this.MEMO = '';
+           },
+            printOPDWEAKENVM: function () {
+                var ifok = false;
+                var msg = '';
+                if ($("#OPD_TREATMENT_schedule").bootstrapTable('getData').length > 0) {
+                    win = window.open('about:blank', 'TheNewWindow');
+                    $.ajax({
+                        url: '@Url.Content("~/OPDScheduling/week_print")',
+                        type: 'POST',
+                        async: false,
+                        data: {
+                            weakenSDate: this.weakenSdate
+                            , weakenEDate: this.weakenEdate
+                            , weanType: 2
+                            ,isCopy: false
+                            ,copysetCnt: 1
+                            ,isList: true
+                        },
+                        success: function (data) {
+                            $("#pdfForm #HtmlStr").val(encodeURIComponent(data));
+                            document.getElementById('pdfForm').submit();
+                        },
+                        error: function (jqXHR) {
+                            log(jqXHR);
+                            msg = '程式發生錯誤!';
+                        }
+                    });
+                } else {
+                    msg = '沒有資料，無法列印';
+                    showAlert(msg, msg_stat.Warning, 2500);
+                }                
+                this.MEMO = '';
+            },
+        },
+        mounted: function () {
+            $('#index_loading').modal('show');
+            this.getOPDData(0);
+            $('#OPD_TREATMENT_schedule_tab').attr('Loaded', 'N');
+        }
+    });
+</script>

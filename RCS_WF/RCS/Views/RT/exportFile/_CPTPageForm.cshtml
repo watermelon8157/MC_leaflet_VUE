@@ -1,0 +1,351 @@
+﻿@model RCS.Models.DB.CPTAssessViewModel
+@using RCS_Data;
+@{
+    RCS_CPT_DTL_NEW_ITEMS cpt_data = Model.cpt_data;
+    if (cpt_data.breath_sound == null) { cpt_data.breath_sound = new List<JSON_DATA>(); }
+    if (cpt_data.cpt_history == null) { cpt_data.cpt_history = new List<JSON_DATA>(); }
+    if (cpt_data.from_unit == null) { cpt_data.from_unit = new List<JSON_DATA>(); }
+    if (cpt_data.rt_reason == null) { cpt_data.rt_reason = new List<JSON_DATA>(); }//rt_reason
+    if (cpt_data.brief_status == null) { cpt_data.brief_status = new List<JSON_DATA>(); }//brief_status
+    if (cpt_data.tip == null) { cpt_data.tip = new List<JSON_DATA>(); } //tip
+    if (cpt_data.skin == null) { cpt_data.skin = new List<JSON_DATA>(); } //tip
+    IPDPatientInfo pat_info = Model.pat_info;
+    System.Data.DataTable cpt_header = Model.cpt_header;
+    string[] tempList = new string[] { };
+    List<string> from_unit_txt = new List<string>() { "ER", "Ward", "ICU", "RCC", "from_unit_11" };
+
+}
+
+<table id="cpt_table" border="0" cellspacing="0" cellpadding="3" style="width:95%;">
+    <tr>
+        <td width="20%">&nbsp;</td>
+        <td style="text-align:center; font-size:22px" width="50%">
+            呼吸治療評估記錄表
+        </td>
+        <td width="30%">
+            <table cellspacing="1" cellpadding="2" style="border:1px solid #666; font-size: 12px; ">
+                <tr>
+                    <td>病歷號碼：</td>
+                    <td>@(cpt_data.cpt_id == "" ? "" : pat_info.chart_no)</td>
+                    <td>床號：</td>
+                    <td>@(cpt_data.cpt_id == "" ? "" : pat_info.bed_no)</td>
+                </tr>
+                <tr>
+                    <td>姓名：</td>
+                    <td>@(cpt_data.cpt_id == "" ? "" : pat_info.patient_name)</td>
+                    <td>性別：</td>
+                    <td>@(cpt_data.cpt_id == "" ? "" : pat_info.genderCHT)</td>
+                </tr>
+                <tr>
+                    <td>出生日期：</td>
+                    <td>@(cpt_data.cpt_id == "" ? "" : pat_info.birth_day_CHT)</td>
+                    <td>診別:</td>
+                    <td>@(cpt_data.cpt_id == "" ? "" : pat_info.nam_c)  </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<table id="cpt_table" border="1" cellspacing="0" cellpadding="3" style="width:97%;">
+    <tr>
+        <td width="60">入院<br />日期</td>
+        <td colspan="2">@(cpt_data.cpt_id == "" ? "" : pat_info.diag_date.Split(' ')[0])</td>
+        <td width="60">評估<br />日期</td>
+        <td width="200">@(cpt_data.cpt_id == "" ? "" : cpt_data.record_date)</td>
+        <td width="70">轉入前<br />病人來源</td>
+        <td>
+            @(cpt_data.cpt_id == "" ? "" : cpt_data.from_unit_data)
+        </td>
+    </tr>
+    <tr>
+        <td>診斷</td>
+        <td colspan="6">&nbsp;@(cpt_data.cpt_id == "" ? "" : cpt_data.now_pat_diagnosis)</td>
+    </tr>
+    <tr>
+        <td style="height:100px;">入院<br />病史</td>
+        <td colspan="6" valign="top">@(cpt_data.cpt_id == "" ? "" : cpt_data.diagnosis)</td>
+    </tr>
+    <tr>
+        <td rowspan="2" style="height:50px;">過去<br />病史</td>
+        <td width="40">肺部<br />病史</td>
+        @{
+            List<string> cpt_history_txt = new List<string>() { "Asthma", "COPD", "TB/Old TB", "Lung cancer", "Pneumoconiosis", "其他" };
+        }
+        <td colspan="3" style="border-right-width:0;">
+
+            @for (int i = 0; i <= cpt_history_txt.Count - 1; i++)
+            {
+                if (i % 2 == 0)
+                {
+                    string extral_content = "";
+                    if (cpt_history_txt[i] == "其他")
+                    {
+                        extral_content = "：" + cpt_data.cpt_history_other_txext;
+                    }
+                    else
+                    {
+                        extral_content = "";
+                    }
+
+                    if (cpt_data.cpt_history_data != null && cpt_data.cpt_history_data.Contains(cpt_history_txt[i]))
+                    {
+                        @Html.Raw("<span style='display:inline-block; width:50%;'>■" + cpt_history_txt[i] + extral_content + "</span>")
+                    }
+                    else
+                    {
+                        @Html.Raw("<span style='display:inline-block; width:50%;'>□" + cpt_history_txt[i] + extral_content + "</span>")
+                    }
+                    @Html.Raw("&emsp;");
+
+                    @Html.Raw("<br />");
+                }
+            }
+        </td>
+        <td colspan="2" style="border-left-width:0;">
+            @for (int i = 0; i <= cpt_history_txt.Count - 1; i++)
+            {
+                if (i % 2 == 1)
+                {
+                    string extral_content = "";
+                    if (cpt_history_txt[i] == "其他")
+                    {
+                        extral_content = "：" + cpt_data.cpt_history_other_txext;
+                    }
+                    else
+                    {
+                        extral_content = "";
+                    }
+
+                    if (cpt_data.cpt_history_data != null && cpt_data.cpt_history_data.Contains(cpt_history_txt[i]))
+                    {
+                        @Html.Raw("<span style='display:inline-block; width:50%;'>■" + cpt_history_txt[i] + extral_content + "</span>")
+                    }
+                    else
+                    {
+                        @Html.Raw("<span style='display:inline-block; width:50%;'>□" + cpt_history_txt[i] + extral_content + "</span>")
+                    }
+                    @Html.Raw("&emsp;");
+
+                    @Html.Raw("<br />");
+                }
+            }
+        </td>
+    </tr>
+    <tr>
+        <td valign="top">其他病史</td>
+        <td colspan="5" valign="top">@(cpt_data.remark)</td>
+    </tr>
+    <tr>
+        <td rowspan="2" style="height:80px;">使用<br />呼吸<br />器原<br />因</td>
+        <td colspan="3" valign="top" width="300" style="border-right-width:0;border-bottom-width:0;">
+            <span style='display:inline-block; width:50%;'>
+                @Html.Raw(cpt_data.rt_reason_data != null && cpt_data.rt_reason_data.Contains("Type I respiratory failure") ? "■Type I respiratory failure" : "□Type I respiratory failure")
+            </span>
+            <br />
+            <span style='display:inline-block; width:50%;'>
+                @Html.Raw(cpt_data.rt_reason_data != null && cpt_data.rt_reason_data.Contains("Trauma") ? "■Trauma" : "□Trauma")
+                @(cpt_data.cpt_id == "" ? "" : "：" + cpt_data.rt_reason_trauma)
+            </span>
+            <br />
+            <span style='display:inline-block; width:50%;'>
+                @Html.Raw(cpt_data.rt_reason_data != null && cpt_data.rt_reason_data.Contains("Out-of-hospital cardiac arrest") ? "■Out-of-hospital cardiac arrest" : "□Out-of-hospital cardiac arrest")
+            </span>
+        </td>
+        <td colspan="3" valign="top" style="border-left-width:0;border-bottom-width:0;">
+            <span style='display:inline-block; width:50%;'>
+                @Html.Raw(cpt_data.rt_reason_data != null && cpt_data.rt_reason_data.Contains("Type II respiratory failure") ? "■Type II respiratory failure" : "□Type II respiratory failure")
+            </span>
+            <br />
+            <span style='display:inline-block; width:50%;'>
+                @Html.Raw(cpt_data.rt_reason_data != null && cpt_data.rt_reason_data.Contains("Excessive work of breathing") ? "■Excessive work of breathing" : "□Excessive work of breathing")
+            </span>
+            <br />
+            <span style='display:inline-block; width:50%;'>
+                @Html.Raw(cpt_data.rt_reason_data != null && cpt_data.rt_reason_data.Contains("In-hospital cardiac arrest") ? "■In-hospital cardiac arrest" : "□In-hospital cardiac arrest")
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="6" valign="top" style="border-top-width:0;">
+            <span style='display:inline-block; width:50%;'>
+                @Html.Raw(cpt_data.rt_reason_data != null && cpt_data.rt_reason_data.Contains("Post-op(手術名稱)") ? "■Post-op(手術名稱)" : "□Post-op(手術名稱)")
+                @(cpt_data.cpt_id == "" ? "" : "：" + cpt_data.rt_reason_postop)
+            </span>
+            <br />
+            <span style='display:inline-block; width:50%;'>
+                @Html.Raw(cpt_data.rt_reason_data != null && cpt_data.rt_reason_data.Contains("Other") ? "■Other" : "□Other")
+                @(cpt_data.cpt_id == "" ? "" : "：" + cpt_data.rt_reason_other)
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td style="height:80px;">呼吸<br />氣道<br />狀況</td>
+        <td colspan="6" valign="top">
+            <table cellpadding="1" style="font-size:10px;">
+                <tr>
+                    <td>
+                        插管時間：@(cpt_data.cpt_id == "" ? "" : cpt_data.tube_time)
+                    </td>
+                    <td>
+                        管徑：
+                        <span>
+                            @(cpt_data.cpt_id == "" ? "" : cpt_data.tube_width)
+                        </span>mm &nbsp;
+                    </td>
+                    <td>
+                        深度：
+                        <span>
+                            @(cpt_data.cpt_id == "" ? "" : cpt_data.tube_deep)
+                        </span>cm &nbsp;
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        氣切時間：@(cpt_data.cpt_id == "" ? "" : cpt_data.shiley_time) &nbsp;
+                    </td>
+                    <td>
+                        管徑：
+                        <span>
+                            @(cpt_data.cpt_id == "" ? "" : cpt_data.shiley_width)
+                        </span>mm &nbsp;
+                    </td>
+                    <td>
+                        廠牌：@(cpt_data.cpt_id == "" ? "" : cpt_data.shiley_kind)
+                    </td>
+                </tr>
+            </table>      
+            <br />
+            呼吸器開始使用日期：
+            @(cpt_data.cpt_id == "" ? "" : cpt_data.rt_start_time)
+            <br />
+            呼吸器機型：@(cpt_data.cpt_id == "" ? "" : cpt_data.rt_start_respirator_model)&nbsp;&nbsp;&nbsp;呼吸器使用介面：@(cpt_data.cpt_id == "" ? "" : cpt_data.rt_start_if)
+            <br />
+            呼吸器使用模式：Mode <u>@(cpt_data.cpt_id == "" || cpt_data.rt_start_model == null ? "________" : cpt_data.rt_start_model)</u>
+            &nbsp;&nbsp;FiO<sub class="sub">2</sub> <u>@(cpt_data.cpt_id == "" || cpt_data.rt_start_fio2 == null ? "________" : cpt_data.rt_start_fio2)</u>%
+            &nbsp;&nbsp;PEEP<u>@(cpt_data.cpt_id == "" || cpt_data.rt_start_PEEP == null ? "________" : cpt_data.rt_start_PEEP)</u>cmH<sub class="sub">2</sub>O
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            VT/PC <u>@(cpt_data.cpt_id == "" || cpt_data.rt_start_VT_PC == null ? "________" : cpt_data.rt_start_VT_PC)</u>
+            &nbsp;&nbsp;R.R. <u>@(cpt_data.cpt_id == "" || cpt_data.rt_start_RR == null ? "________" : cpt_data.rt_start_RR)</u>
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            IPAP/EPAP(CPAP) <u>@(cpt_data.cpt_id == "" || cpt_data.rt_start_IPAP == null ? "________" : cpt_data.rt_start_IPAP)</u>/<u>@(cpt_data.cpt_id == "" || cpt_data.rt_start_EPAP == null ? "________" : cpt_data.rt_start_EPAP)</u>cmH<sub class="sub">2</sub>O
+        </td>
+    </tr>
+    <tr>
+        <td>血液<br />生化</td>
+        <td colspan="6" valign="top">
+            ABG值：pH <u>@(cpt_data.cpt_id == "" || cpt_data.abg_data_pH == null ? "________" : cpt_data.abg_data_pH)</u>
+            &nbsp;&nbsp;PaO<sub class="sub">2</sub>(mmHg) <u>@(cpt_data.cpt_id == "" || cpt_data.abg_data_PaCO2 == null ? "________" : cpt_data.abg_data_PaCO2)</u>
+            &nbsp;&nbsp;PaCO<sub class="sub">2</sub>(mmHg) <u>@(cpt_data.cpt_id == "" || cpt_data.abg_data_PaO2 == null ? "________" : cpt_data.abg_data_PaO2)</u>
+            &nbsp;&nbsp;HCO<sub class="sub">3</sub>(mmol/L) <u>@(cpt_data.cpt_id == "" || cpt_data.abg_data_HCO3 == null ? "________" : cpt_data.abg_data_HCO3)</u>
+            &nbsp;&nbsp;BE(mmol/L) <u>@(cpt_data.cpt_id == "" || cpt_data.abg_data_BE == null ? "________" : cpt_data.abg_data_BE)</u>
+            &nbsp;&nbsp;SaO<sub class="sub">2</sub>(%)<u>@(cpt_data.cpt_id == "" || cpt_data.abg_data_SaO2 == null ? "________" : cpt_data.abg_data_SaO2)</u>
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            FiO<sub class="sub">2</sub>(%) <u>@(cpt_data.cpt_id == "" || cpt_data.abg_data_FiO2 == null ? "________" : cpt_data.abg_data_FiO2)</u>%
+            &nbsp;&nbsp;Device  <u>@(cpt_data.cpt_id == "" || cpt_data.abg_data_Device == null ? "________" : cpt_data.abg_data_Device)</u>日期 : @(cpt_data.cpt_id == "" || cpt_data.abg_date == null ? "________" : cpt_data.abg_date)
+        </td>
+    </tr>
+    <tr>
+        <td style="height:260px;">呼吸<br />系統<br />評估</td>
+        <td colspan="6" valign="top">
+            呼吸音：&nbsp;
+            @if (cpt_data.breath_sound_Coarse != null)
+            {
+                @Html.Raw("(" + cpt_data.breath_sound_Coarse + ")Coarse")
+            }
+            @if (cpt_data.breath_sound_Crackle != null)
+            {
+                @Html.Raw("(" + cpt_data.breath_sound_Crackle + ")Crackle")
+            }
+            @if (cpt_data.breath_sound_Wheezing != null)
+            {
+                @Html.Raw("(" + cpt_data.breath_sound_Wheezing + ")Wheezing")
+            }
+            @if (cpt_data.breath_sound_Rhonchi != null)
+            {
+                @Html.Raw("(" + cpt_data.breath_sound_Rhonchi + ")Rhonchi")
+            }
+            @if (cpt_data.breath_sound_Decreased != null)
+            {
+                @Html.Raw("(" + cpt_data.breath_sound_Decreased + ")Decreased")
+            }
+            @if (cpt_data.breath_sound_other != null)
+            {
+                @Html.Raw("(" + cpt_data.breath_sound_other + ")" + cpt_data.breath_sound_other_text)
+            }
+
+            <br />
+            意識狀態：&nbsp;
+            E&nbsp;
+            <u>@(cpt_data.cpt_id == "" || cpt_data.conscious_E == null ? "____" : cpt_data.conscious_E)</u>&nbsp;
+            V&nbsp;<u>@(cpt_data.cpt_id == "" || cpt_data.conscious_V == null ? "____" : cpt_data.conscious_V)</u>&nbsp;
+            M&nbsp;<u>@(cpt_data.cpt_id == "" || cpt_data.conscious_M == null ? "____" : cpt_data.conscious_M)</u>&nbsp;
+            <br />
+            身體評估：&nbsp;
+            身高&nbsp;<u>@(cpt_data.cpt_id == "" || cpt_data.body_height == null ? "____" : cpt_data.body_height)</u>公分&nbsp;
+            體重&nbsp;<u>@(cpt_data.cpt_id == "" || cpt_data.body_weight == null ? "____" : cpt_data.body_weight)</u>公斤&nbsp;
+            IBW&nbsp;<u>@(cpt_data.cpt_id == "" || cpt_data.body_IBW == null ? "____" : cpt_data.body_IBW)</u>&nbsp;
+            <br />
+            抽菸史：&nbsp;
+            @(cpt_data.cpt_id == "" ? "□" : cpt_data.smoke_history_data == "無" ? "■" : "□") 無 &nbsp;
+            @(cpt_data.cpt_id == "" ? "□" : cpt_data.smoke_history_data == "有" ? "■" : "□") 有
+
+            @(cpt_data.cpt_id == "" || cpt_data.smoke_history_PPD == null ? "____" : cpt_data.smoke_history_PPD)
+            PPD x
+            @(cpt_data.cpt_id == "" || cpt_data.smoke_history_year == null ? "____" : cpt_data.smoke_history_year)
+            年，已戒
+            @(cpt_data.cpt_id == "" || cpt_data.smoke_history_end_year == null ? "____" : cpt_data.smoke_history_end_year)
+            年
+            <br />
+            呼吸型態：&nbsp;
+            @(cpt_data.cpt_id == "" || cpt_data.patterns_data == null ? "□" : cpt_data.patterns_data.Contains("無呼吸") ? "■" : "□") 無呼吸 &nbsp;
+            @(cpt_data.cpt_id == "" || cpt_data.patterns_data == null ? "□" : cpt_data.patterns_data.Contains("正常呼吸") ? "■" : "□") 正常呼吸 &nbsp;
+            @(cpt_data.cpt_id == "" || cpt_data.patterns_data == null ? "□" : cpt_data.patterns_data.Contains("深快") ? "■" : "□") 深快 &nbsp;
+            @(cpt_data.cpt_id == "" || cpt_data.patterns_data == null ? "□" : cpt_data.patterns_data.Contains("淺快") ? "■" : "□") 淺快 &nbsp;
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            @(cpt_data.cpt_id == "" || cpt_data.patterns_data == null ? "□" : cpt_data.patterns_data.Contains("使用輔助肌") ? "■" : "□") 使用輔助肌 &nbsp;
+            @(cpt_data.cpt_id == "" || cpt_data.patterns_data == null ? "□" : cpt_data.patterns_data.Contains("異常胸腹運動") ? "■" : "□") 異常胸腹運動(Paradoxical movement) &nbsp;
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            @(cpt_data.cpt_id == "" || cpt_data.patterns_data == null ? "□" : cpt_data.patterns_data.Contains("其他") ? "■" : "□") 其他 @(cpt_data.cpt_id == "" || cpt_data.patterns_other == null ? "____" : cpt_data.patterns_other)
+            <br />
+            咳嗽能力：&nbsp;
+            @(cpt_data.cpt_id == "" ? "□" : cpt_data.cough_data == "Functional" ? "■" : "□") Functional &nbsp;
+            @(cpt_data.cpt_id == "" ? "□" : cpt_data.cough_data == "weakly functional" ? "■" : "□") weakly functional &nbsp;
+            @(cpt_data.cpt_id == "" ? "□" : cpt_data.cough_data == "Non-functional" ? "■" : "□") Non-functional
+            <br />
+            痰液性狀：&nbsp;
+            排出方式：<u>@(cpt_data.cpt_id == "" || cpt_data.sputum_assess_way == null ? "____" : cpt_data.sputum_assess_way)</u>&nbsp;
+            痰液性狀：
+            量&nbsp;<u>@(cpt_data.cpt_id == "" || cpt_data.sputum_assess_amount == null ? "____" : cpt_data.sputum_assess_amount)</u>&nbsp;
+            質&nbsp;<u>@(cpt_data.cpt_id == "" || cpt_data.sputum_assess_quality == null ? "____" : cpt_data.sputum_assess_quality)</u>&nbsp;
+            色&nbsp;<u>@(cpt_data.cpt_id == "" || cpt_data.sputum_assess_color == null ? "____" : cpt_data.sputum_assess_color)</u>&nbsp;
+            <br />
+        </td>
+    </tr>
+    <tr>
+        <td>備註</td>
+        <td colspan="3">@(cpt_data.other_history)</td>
+        <td>呼吸治療師</td>
+        <td colspan="2">
+            @(cpt_data.cpt_id == "" ? "" : Model.master.MODIFY_NAME == "" ? Model.master.CREATE_NAME : Model.master.MODIFY_NAME)
+        </td>
+    </tr>
+</table>
+<table style="width:97%;">
+    <tr>
+        <td>
+            <div style="float:left;">
+                @(RCS.Controllers.BaseController.hospName)
+            </div>
+            <div style="float:right;">
+                FF0320020
+            </div>
+        </td>
+    </tr>
+</table>
+

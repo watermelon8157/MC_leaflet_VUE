@@ -1,0 +1,298 @@
+﻿@{
+    ViewBag.Title = "RT_modal";
+}
+<!-- background_modal -->
+<div class="modal fade" id="background_modal" tabindex="-1" role="dialog" aria-labelledby="background_modal-label">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="pull-right">
+                    <button type="button" class="btn btn-info" v-on:click="search_background" >搜尋</button>
+                    <button type="button" class="btn btn-warning" data-dismiss="modal">Close</button>
+                </div> 
+            </div>
+            <div class="modal-body">
+                <table class="table table-hover table-striped table-bordered shift_table " id="background_Table">
+                    <thead>
+                        <tr>
+                            <th data-field="NAM" data-class="shift_dataview">藥品名稱</th>
+                            <th data-field="ORD_BGN" data-class="shift_dataview" data-formatter="time_format" data-width="80">執行時間</th> 
+                            <th data-field="ITEM_COD" data-class="shift_dataview">收費碼</th>
+                            <th data-field="QTY" data-class="shift_dataview">數量</th>
+                            <th data-field="USAGE1" data-class="shift_dataview">頻率</th>
+                        </tr>
+                    </thead>
+                </table> 
+            </div>
+        </div>
+    </div>
+</div><!-- /.modal -->
+<!-- IO_modal -->
+<div class="modal fade" id="IO_modal" tabindex="-1" role="dialog" aria-labelledby="IO_modal-label">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="pull-right">
+                    <button type="button" class="btn btn-warning" data-dismiss="modal">Close</button>
+                </div>
+                <h4 class="modal-title form-inline" id="IO_modal-label">
+                    IO&ensp;
+                    <date-picker v-model="io_sdate" :config="options" style="width:180px;" readonly></date-picker>&ensp;-&ensp;
+                    <date-picker v-model="io_edate" :config="options" style="width:180px;" readonly></date-picker>&ensp;
+                    <button type="button" class="btn btn-info" v-on:click="search_io" :disabled="isSendStatus">搜尋</button>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <table class="table table-hover table-condensed table-no-bordered table-striped" id="ioTable">
+                    <thead>
+                        <tr>
+                            <th data-field="EXAM_DATE" id="EXAM_DATE">日期</th>
+                            <th data-field="I_RESULT" id="I_RESULT">輸入量</th>
+                            <th data-field="O_RESULT" id="O_RESULT">輸出量</th>
+                            <th data-field="RESULT_DIFF" id="RESULT_DIFF">差</th>
+                            @*<th data-field="IO_DESC" id="IO_DESC">IO</th>*@
+                            @*<th data-field="RESULT" id="RESULT">量</th>*@
+                            @*<th data-field="IO_ITEM" id="IO_ITEM">項目</th>
+                                <th data-field="UNIT" id="UNIT">單位</th>*@
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div><!-- /.modal -->
+<!-- vitalSign_modal -->
+<div class="modal fade" id="vitalSign_modal" tabindex="-1" role="dialog" aria-labelledby="vitalSign_modal-label">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="pull-right">
+                    <button type="button" class="btn btn-warning" data-dismiss="modal">Close</button>
+                </div>
+                <h4 class="modal-title form-inline" id="vitalSign_modal-label">
+                    vitalSign&ensp;
+                    <date-picker v-model="vs_sdate" :config="options" style="width:180px;" readonly></date-picker>&ensp;-&ensp;
+                    <date-picker v-model="vs_edate" :config="options" style="width:180px;" readonly></date-picker>&ensp;
+                    <button type="button" class="btn btn-info" v-on:click="search_vs" :disabled="isSendStatus">搜尋</button>
+                </h4>
+
+            </div>
+            <div class="modal-body">
+                <table class="table table-hover table-condensed table-no-bordered table-striped" id="vsTable">
+                    <thead>
+                        <tr>
+                            <th data-field="EXAM_DATE" id="EXAM_DATE">檢驗時間</th>
+                            <th data-field="RESULT_gcs_e" id="RESULT_gcs_e">gcs E</th>
+                            <th data-field="RESULT_gcs_v" id="RESULT_gcs_v">gcs V</th>
+                            <th data-field="RESULT_gcs_m" id="RESULT_gcs_m">gcs M</th>
+                            <th data-field="RESULT_DBP" id="RESULT_DBP">舒張壓</th>
+                            <th data-field="RESULT_SBP" id="RESULT_SBP">收縮壓</th>
+                            <th data-field="RESULT_HB" id="RESULT_HB">心跳</th>
+                            <th data-field="RESULT_TEMP" id="RESULT_TEMP">體溫</th>
+                            <th data-field="RESULT_BW" id="RESULT_BW">體重</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div><!-- /.modal -->
+<div class="hidden" id="io_deatail_div">
+    <div id="myChildrenId_A"></div>
+    <table class="table table-hover table-condensed table-no-bordered table-striped" id="i_deatail">
+        <thead>
+            <tr>
+                <th data-field="EXAM_DATE" data-width="30%">日期</th>
+                <th data-field="IO_DESC" data-width="10%">IO</th>
+                <th data-field="IO_ITEM" data-width="30%">項目</th>
+                <th data-field="RESULT" data-width="10%">量</th>
+                <th data-field="UNIT" data-width="10%">單位</th>
+            </tr>
+        </thead>
+    </table>
+    <div id="myChildrenId_B"></div>
+    <table class="table table-hover table-condensed table-no-bordered table-striped" id="o_deatail">
+        <thead>
+            <tr>
+                <th data-field="EXAM_DATE" data-width="30%">日期</th>
+                <th data-field="IO_DESC" data-width="10%">IO</th>
+                <th data-field="IO_ITEM" data-width="30%">項目</th>
+                <th data-field="RESULT" data-width="10%">量</th>
+                <th data-field="UNIT" data-width="10%">單位</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+<div class="modal fade" id="Shit_List" tabindex="-1" role="dialog" aria-labelledby="Shit_List-label" data-backdrop="static" onscroll="fn_ShowQuickTopBtn(this)">
+    <div class="modal-dialog modal-lg" role="document" style="width:100%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="btn btn-warning pull-right" data-dismiss="modal" notlock><span class="glyphicon glyphicon-folder-close"></span>&nbsp;關閉</button>
+                <h4 class="modal-title" id="Shit_List-label">交班總覽</h4>
+            </div>
+            <div class="modal-body">
+                <table style="background-color: #FFF;" id="Shit_List_table" data-classes="table table-hover table-striped" data-search="true">
+                    <thead style="background-color: #5BA198; color: #FFF;">
+                        <tr>
+                            <th data-field="bed_no" data-valign="middle" data-sortable="true" data-width="80">床號</th>
+                            <th data-field="cost_code" data-valign="middle" data-sortable="true" data-width="80">單位</th>
+                            <th data-field="dept_desc" data-valign="middle" data-width="40">科別</th>
+                            <th data-field="chart_no" data-valign="middle" data-width="80">病歷號</th>
+                            <th data-field="patient_name" data-formatter="genderFormatterAddShift" data-valign="middle">姓名</th>
+                            <th data-field="B_VALUE_2" data-formatter="FormatterB_VALUE" data-width="35%">Kardex</th>
+                            <th data-field="B_VALUE_1" data-formatter="FormatterB_VALUE" data-width="35%">交班備註</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    //病患清單狀態樣式
+    function FormatterB_VALUE(value, row, index) {
+
+        if (!!value) {
+
+            return htmlDecode(value);
+        } else {
+            return value;
+        }
+
+    }
+    function htmlDecode(input) {
+        var e = document.createElement('div');
+        e.innerHTML = input;
+        return e.childNodes[0].nodeValue;
+    }
+
+    var rt_model_set_vm = {
+        detail_table :[],
+        onExpandRow_row:"",
+        tempDetail_search:[],
+        isSendStatus: false,
+        io_sdate: moment().format("YYYY-MM-DD"),
+        io_edate: moment().format("YYYY-MM-DD"),
+        vs_sdate: moment().format("YYYY-MM-DD"),
+        vs_edate: moment().format("YYYY-MM-DD"),
+        options: {
+            locale: moment.locale('zh-tw'), //台灣時間(中文顯示)
+            dayViewHeaderFormat: 'YYYY - MMMM', //標題(中文顯示)
+            format: 'YYYY-MM-DD',
+            useCurrent: true,
+            showClear: true,
+            showClose: true,
+            showTodayButton: true,
+            ignoreReadonly: true
+        }
+    };
+
+    var rt_model_vm = new Vue({
+        el: '#RT_modal',
+        data: JSON.parse(JSON.stringify(rt_model_set_vm)),
+        mounted: function() {
+            $('#RT_modal #ioTable').bootstrapTable({
+                data: []
+                ,detailView: "true"
+                ,onExpandRow: function (index, row, $detail) {
+                    rt_model_vm.onExpandRow_row = row;
+                    //rt_model_vm.detail_table = row.IO_List;
+
+                    $detail.each(function () {
+                        rt_model_vm.detail_search_io();
+                        this.innerHTML = $('#io_deatail_div').html();
+                        $(this).children('#myChildrenId_A').html(row.EXAM_DATE + " 輸入");
+                        $(this).children('#myChildrenId_B').html(row.EXAM_DATE + " 輸出");
+                    });
+                }
+            });
+            $("#RT_modal #background_Table").bootstrapTable({ data: [] });
+            $('#RT_modal #i_deatail').bootstrapTable({ data: [] });
+            $('#RT_modal #o_deatail').bootstrapTable({ data: [] });
+            $('#RT_modal #vsTable').bootstrapTable({ data: [] });
+            $('#RT_modal #Shit_List_table').bootstrapTable({ data: [] });
+            //this.search_io();
+            //this.search_vs();
+        },
+        methods: {
+            search_background: function () {
+                $('#RT_modal #background_Table').bootstrapTable('showLoading');
+                this.$http.post(
+                  '@Url.Content("~/Shift/GetBackgroundTable")' 
+              ).then(function (response) { 
+                  $('#RT_modal #background_Table').bootstrapTable('load', { data: response.data });
+                  $('#RT_modal #background_Table').bootstrapTable('hideLoading');  
+              }, function (response) { 
+                  showAlert(response.data.message, msg_stat.Danger, 3000);
+                  $('#RT_modal #background_Table').bootstrapTable('hideLoading');
+              });
+            },
+            shiftList_open: function(){
+                this.isSendStatus = true;
+                $('#RT_modal #Shit_List_table').bootstrapTable('showLoading');
+                //取得最新呼吸模式
+                this.$http.post(
+                    '@Url.Content("~/CARE_LIST/CARE_LIST/Shit_List")'
+                    , { jsonData: encodeURIComponent(JSON.stringify($('#care_table').bootstrapTable('getSelections'))) }
+                ).then(function (response) {
+                    $('#RT_modal #Shit_List_table').bootstrapTable('load', { data: response.data });
+                    $('#RT_modal #Shit_List_table').bootstrapTable('hideLoading');
+                    this.isSendStatus = false;
+                    $('#Shit_List').modal('show');
+                }, function (response) {
+                    this.isSendStatus = false;
+                    showAlert(response.data.message, msg_stat.Danger, 3000);
+                    $('#RT_modal #Shit_List_table').bootstrapTable('hideLoading');
+                });
+            },
+            search_io: function () {
+                this.isSendStatus = false;
+                $('#RT_modal #ioTable').bootstrapTable('showLoading');
+                //取得輸入輸出資料
+                this.$http.post(
+                    '@Url.Content("~/RT/search_io")'
+                    , { io_sdate: this.io_sdate, io_edate: this.io_edate }
+                ).then(function (response) {
+                    $('#RT_modal #ioTable').bootstrapTable('load', { data: response.data });
+                    rt_model_vm.tempDetail_search = response.data;
+                    $('#RT_modal #ioTable').bootstrapTable('hideLoading');
+                }, function (response) {
+                    showAlert(response.data.message, msg_stat.Danger, 3000);
+                    $('#RT_modal #ioTable').bootstrapTable('hideLoading');
+                });
+            },//search_io
+            detail_search_io: function () {
+                var Result_I = [];
+                var Result_O = [];
+                var tempRow = rt_model_vm.onExpandRow_row; //onExpandRow目前是第幾個row存入tempRow
+                for (var i = 0; i < tempRow.IO_List.length; i++) {
+                    if (tempRow.IO_List[i].IO_TYPE == "I") {
+                        tempResult = tempRow.IO_List[i];
+                        Result_I.push(tempResult);
+                    }//if
+                    else if (tempRow.IO_List[i].IO_TYPE == "O") {
+                        tempResult = tempRow.IO_List[i];
+                        Result_O.push(tempResult);
+                    }//else if
+                }//for
+                $('#RT_modal #i_deatail').bootstrapTable('load', { data: Result_I });
+                $('#RT_modal #o_deatail').bootstrapTable('load', { data: Result_O });
+                $('#RT_modal #i_deatail #o_deatail').bootstrapTable('hideLoading');
+            },//detail_search_io
+            search_vs: function () {
+                this.isSendStatus = true;
+                $('#RT_modal #vsTable').bootstrapTable('showLoading');
+                //取得最新呼吸模式
+                this.$http.post('@Url.Content("~/RT/search_vs")', { vs_sdate: this.vs_sdate, vs_edate: this.vs_edate }).then(function (response) {
+                    $('#RT_modal #vsTable').bootstrapTable('load', { data: response.data });
+                    $('#RT_modal #vsTable').bootstrapTable('hideLoading');
+                    this.isSendStatus = false;
+                }, function (response) {
+                    this.isSendStatus = false;
+                    showAlert(response.data.message, msg_stat.Danger, 3000);
+                    $('#RT_modal #vsTable').bootstrapTable('hideLoading');
+                });
+            }
+        }
+    });
+</script>

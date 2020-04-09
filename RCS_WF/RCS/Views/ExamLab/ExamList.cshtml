@@ -1,0 +1,90 @@
+﻿@using Newtonsoft.Json;
+@{
+    System.Collections.Generic.List< ExamReport> ExamList = (System.Collections.Generic.List< ExamReport>)ViewData["ExamList"];
+}
+@if (ExamList != null && ExamList.Count >= 0) {
+    
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".but_examlink").click(function () {
+                var report = $(this).attr("data-report");
+                //console.log(report);
+                //debugger;
+                var obj = JSON.parse(report);
+                $("#report_content #ORDERTIME").html(obj.ORDERTIME);
+                $("#report_content #ORDERDRNAME").html(obj.ORDERDRNAME);
+                $("#report_content #COMPLETTIME").html(obj.COMPLETTIME);
+                $("#report_content #ENTERDRNAME").html(obj.ENTERDRNAME);
+                $("#report_content #TYPE_NAM").html(obj.TYPE_NAM);
+                $("#report_content #STAT").html(obj.STAT);
+                $("#report_content #REPORT").html(obj.REPORT);
+                $("#exam_report_panel").modal("show");
+            });
+        });
+    </script>
+    
+    <style type="text/css">
+        #exam_list > thead > tr > th {
+            background-color: #5BA198;
+            color: #FFFFFF;
+        }
+    </style>
+    
+    <div style="height:99%;overflow-y:auto">
+        <table class="table table-hover table-bordered table-striped table-condensed" id="exam_list">
+            <thead>
+                <tr>
+                    <th>日期</th>
+                    <th>檢查項目</th>
+                    <th>狀態</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < ExamList.Count; i++)
+                {
+                    <tr>
+                        <td>@(ExamList[i].COMPLETTIME)</td>
+                        <td>@(ExamList[i].TYPE_NAM)</td>
+                        <td>@(ExamList[i].STAT)</td>
+                        <td>
+                            <button type="button" class="but_examlink btn btn-default" data-report="@(JsonConvert.SerializeObject(ExamList[i]))">報告連結</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="exam_report_panel">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">報告瀏覽</h4>
+                </div>
+                <div class="modal-body" id="report_content">
+                    <div class="row">
+                        <div class="col-md-3" >開單醫師</div><div class="col-md-3" id="ORDERDRNAME"> </div>
+                        <div class="col-md-3">開單日期</div><div class="col-md-3" id="ORDERTIME"></div><br />
+                        <div class="col-md-3" >報告登打醫師</div><div class="col-md-3" id="ENTERDRNAME"></div>
+                        <div class="col-md-3" >完成日期</div><div class="col-md-3" id="COMPLETTIME"></div><br />
+                        <div class="col-md-3" >報告類型</div><div class="col-md-3" id="TYPE_NAM"></div>
+                        <div class="col-md-3" >狀態</div><div class="col-md-3" id="STAT"></div><br />
+                        <div class="col-md-12">報告內容</div>
+                        <div class="col-md-12" id="REPORT"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+}
+else {
+    @("無檢查資料。")
+}
+
+

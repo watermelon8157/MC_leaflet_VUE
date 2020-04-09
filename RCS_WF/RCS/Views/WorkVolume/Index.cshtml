@@ -1,0 +1,79 @@
+﻿@model RCS.Models.WorkVolumeViewModel
+@{
+    ViewBag.Title = "Index";
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        setcheckboxRules('WorkVolumeView');
+        $("#WorkVolume_table").bootstrapTable({
+            url: '@Url.Content("~/WorkVolume/QueryResult")',
+            method: 'post',
+            queryParams: { "sDate": $('#WorkVolumeView #sDate').val(), "eDate": $('#WorkVolumeView #eDate').val(), "showType": $('#WorkVolumeView input[nasme=showType]:checked').val(), "showAll": $('#WorkVolumeView input[nasme=showAll]').prop('checked') },
+            undefinedText: '',
+            pagination: true,
+            pageSize: 6,
+            pageList: [6],
+            flat: true
+        }).on('click-row.bs.table', function (e, row, $element) {
+            //重新取得最新呼吸照護記錄單資料
+            openRecordView('rt_record_form_div', '@Url.Content("~/RTRecord/openRTRecordFormView")', convert_flat_obj(row));
+        }).on('load-success.bs.table', function () {
+            $("[data-toggle='tooltip']").tooltip({ html: true, placement: "top" });
+        }).on('reset-view.bs.table', function () {
+            //console.log(JSON.stringify($("#rtrecord_table").bootstrapTable('getData')));
+        }).on('pre-body.bs.table', function () {
+            $("#rtrecord_table").bootstrapTable('hideLoading');
+            $("#record_list_search").button('reset');
+        }).ready($("#rtrecord_table").prev(".fixed-table-loading").css('top', '0px'));
+
+        $('.WorkVolumeDt').datetimepicker({
+            locale: moment.locale('zh-tw'),
+            format: 'YYYY-MM-DD',
+            ignoreReadonly: true,
+            showClose: true,
+            showTodayButton: true,
+            showClear: true,
+            useCurrent: false,
+        });
+
+    });
+</script>
+<div class="container-fluid" id="WorkVolumeView">
+    <section class="flip-scroll">
+        <div class="jumbotron" id="WorkVolumeSearch" style="position: relative;">
+            查詢區間&emsp;&emsp;
+            <input type="text" name="sDate" id="sDate" class="form-control WorkVolumeDt" style="width:120px;display: inline;" value="@Model.sDate" readonly />
+            &emsp;-&emsp;
+            <input type="text" name="eDate"  id="eDate" class="form-control WorkVolumeDt" style="width:120px;display: inline;" value="@Model.eDate" readonly /><br />
+            顯示方式&emsp;&emsp;
+            <span class="single_check">
+                <label><input name="showType"  type="checkbox" value="1" checked/>&emsp;護理站</label>
+                &emsp;<label><input  name="showType"   type="checkbox" value="2" />&emsp;呼吸治療師</label><br />
+            </span>
+            設定項目&emsp;&emsp;
+            <label><input type="checkbox" name="showAll" checked/>&emsp;全部顯示</label>
+            &emsp;<input type="button" value="自訂項目" class="btn btn-info" /><br />
+            <div class="col-lg-5 col-md-4"></div>
+            <div class="col-lg-2 col-md-4">
+                <input type="button" value="查詢" class="btn btn-success" />&emsp;<input type="button" class="btn btn-warning" value="匯出" />
+            </div>
+            <div class="col-lg-5 col-md-4"></div>
+        </div>
+        <div id="QueryResult">
+            <table class="table table-hover table-bordered table-condensed" id="WorkVolume_table" data-row-style="table">
+                <thead>
+                    <tr id="WorkVolume_head">
+                        <th  data-field="RECORDDATE" data-formatter="showDateFormat" data-sortable="true">記&emsp;錄&emsp;時&emsp;間</th>
+                        <th  data-field="rt_record.device|rt_record.device_o2" data-formatter="merge_text">Ventilator Type / O<sub>2</sub> equipment</th>
+                        <th  data-field="rt_record.mode" data-formatter="merge_text">Ventilation Mode</th>
+                        <th  data-field="rt_record.no" data-formatter="merge_text">No</th>
+                        <th  data-field="rt_record.vt_set|rt_record.vt" data-formatter="merge_text">Tidal Volume set / monitor</th>
+                        <th  data-field="rt_record.vr_set|rt_record.vr" data-formatter="merge_text">Ventilation rate set / total</th>
+                        <th  data-field="rt_record.insp_time|rt_record.ie_ratio" data-formatter="merge_text" data-text_split="/" data-warning_check='[{"digit":1,"min_v":0,"max_v":1,"list":""},{"digit":"","min_v":"","max_v":"","list":["1:1","1.5:1","2:1","2.5:1","3:1"]}]'>Inspiratory Time / I:E ratio</th>
+                        <th  data-field="rt_record.flow" data-formatter="merge_text">Flow</th>
+                    <tr>
+                </thead>
+            </table>
+        </div>
+    </section>
+</div>

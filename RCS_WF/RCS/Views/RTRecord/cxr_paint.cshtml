@@ -1,0 +1,105 @@
+﻿<div class="modal fade setScrollbar phraseCarry" tabindex="-1" role="dialog" id="cxr_modal">
+    <div class="modal-dialog">
+        <div class="modal-content" style="width: 500px;">
+            <div class="modal-header">
+                <h4 class="modal-title" style="display:inline-block; margin:0 1em;">CXR檢查</h4>
+                <div class="btn-group pull-right">
+                    <button class="btn btn-success"  v-on:click="save" title="確認儲存" v-bind:disabled="isDisable">
+                        <span class="glyphicon glyphicon-ok"></span>
+                        &nbsp;儲存
+                    </button>
+                    <button class="btn btn-info" v-on:click="undo" title="返回"  v-bind:disabled="isDisable">
+                        <span class="glyphicon glyphicon-share-alt"></span>
+                        &nbsp;返回
+                    </button>
+                    <button class="btn btn-danger" v-on:click="reset" title="清空視窗"  v-bind:disabled="isDisable">
+                        <span class="glyphicon glyphicon-trash"></span>
+                        &nbsp;清空
+                    </button>
+                    <button class="btn btn-warning"  data-dismiss="modal" title="關閉">
+                        <span class="glyphicon glyphicon-remove"></span>
+                        &nbsp;關閉
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-4 col-sm-4">
+                        <div v-bind:class="[{ 'hidden': !isNotOld }]">
+                            <canvas class="signature-pad"
+                                    style="border: 1px solid black;"
+                                    id="DrawingCanvas"
+                                    width="116" height="100"></canvas>
+                        </div>
+                        <!-- 因為換成新的套件，舊的資料只能瀏覽 -->
+                        <div v-bind:class="[{ 'hidden': isNotOld },'RtRecordCanvasCls']">
+                            <canvas style="background:var(--color-white); cursor: none; border: 1px solid black;"
+                                    id="Canvas_canvasView"
+                                    width="116" height="100"></canvas>
+                        </div>
+                         
+                    </div>
+                    <div class="col-md-8 col-sm-8">
+                        
+                        <div class="input-group hidden">
+                            <span class="input-group-addon">
+                                ID隱藏
+                            </span>
+                            <input stype="text"
+                                   tyle="width:181px; height:32px; border:1px solid #ccc; display:inline-block;"
+                                   v-model="model.Cxr_CJID" />
+                            <span class="input-group-addon hidden">
+                                {{ model.Cxr_CJID }}
+                            </span>
+                        </div>
+                        
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                檢查日期
+                            </span>
+                            <date-picker class="input-group-addon" style="width:149px; height:32px; border:1px solid #ccc; display:inline-block;"
+                                         v-model="model.Result_Date"
+                                         v-bind:config="datepickerConfig"
+                                         v-bind:disabled="isDisable"
+                                         readonly>
+                            </date-picker>
+                            <span class="input-group-addon hidden">
+                                {{ model.Result_Date }}
+                            </span>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                顏色
+                            </span>
+                            <div class="input-group-addon" style="width:181px; height:32px; border:1px solid #ccc; display:inline-block;text-align:center; vertical-align: middle;">
+                                <ul class="palette">
+                                    <li v-for="myClr in penColorAarray">
+                                        <div v-bind:disabled="isDisable"
+                                             v-bind:class="myClr._class"
+                                             v-bind:style="{background: myClr._color}"
+                                             v-on:click="selectColor(myClr)">
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                       
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                結果
+                            </span>
+                            <v-select taggable v-bind:filterable="false"  
+                                      placeholder="空白"
+                                      v-bind:disabled="isDisable"
+                                      v-model="model.Result_Str"
+                                      v-bind:options="ResultDropdownlist"
+                                      v-bind:style="{width : '180px'}">
+                            </v-select>
+                        </div>
+                    </div> 
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+ 

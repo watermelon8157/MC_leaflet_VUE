@@ -80,11 +80,6 @@ export default {
     }
   },
   mounted () {
-    this.$api.MC.HelloWord().then((result) => {
-      console.log(result)
-    }).catch((err) => {
-      console.log(err)
-    })
   },
   methods: {
     handleClick (e) {

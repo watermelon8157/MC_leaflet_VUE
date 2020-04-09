@@ -1,0 +1,2372 @@
+﻿@model RT_index
+@using RCS_Data;
+@using RCS.Models;
+@{
+    Layout = null;
+    UserInfo user_info = (UserInfo)Session["user_info"];
+    bool upLoadSwitch = RCS.Controllers.BaseController.funSetting.upLoadSwitch;//上傳功能開關
+}
+<style type="text/css">
+    .fa-color{
+        color:white;
+    }
+    .circleSpan {
+        width: 30px;
+        height: 30px;
+        border-radius: 99em;
+        margin-top: 4px;
+        font-size: initial;
+    }
+
+    #pt_info_list .bs-checkbox input[type=checkbox],
+    #pt_history_info_list .bs-checkbox input[type=checkbox],
+    #hospital_list_table_block .bs-checkbox input[type=checkbox] {
+        width: 25px;
+        height: 25px;
+    }
+
+    #tab_rt_takeoff_assess {
+        padding: 5px;
+    }
+
+    #care_table > tbody > tr > td > span {
+        font-size: 12px;
+    }
+
+    .old_bed {
+        text-decoration: line-through;
+        color: red;
+    }
+
+    .new_bed {
+        color: blue;
+    }
+
+    #care_table > tbody > tr > td {
+        line-height: 12px;
+    }
+
+
+    .patient_nav .table > tbody > tr > td {
+        padding: 2px !important;
+        font-size: 12px;
+    }
+
+    .patient_nav .table > thead > tr > th {
+        padding: 0px !important;
+        font-size: 12px;
+    }
+
+        .patient_nav .table > thead > tr > th > .th-inner {
+            padding: 2px !important;
+        }
+
+    #update_patient_modal .modal-content {
+        background-color: #ECFFEE;
+    }
+
+    #care_table td, #history_table td {
+        cursor: pointer;
+    }
+</style> 
+
+<ul class="patient_nav_tab" id="main_nav_tab">
+    @if ( !user_info.isGuide)
+    {
+        <li id="nav-expander" class="light_tab" onclick="clickLeftTab( 'C', 'patlist');"><a href="javascript:void(0);"><i class="fa fa-id-card-o fa-lg fa-color" aria-hidden="true"></i><span>照護病患清單</span></a></li>
+    }
+ 
+        <li id="nav-history" class="light_tab patient_nav_tab_history" onclick="clickLeftTab( 'H', 'pathistory');"><a href="javascript:void(0);"><i class="fa fa-clock-o fa-lg fa-color" aria-hidden="true"></i><span>病患歷史記錄</span></a></li>
+ 
+ 
+</ul>
+
+<div class="patient_nav">
+    <!--照護病患清單-->
+    <div id="patlist" class="LeftTabBlock" style="margin: 0px auto;width: 95%; display:block;">
+        <div id="pat_list">
+            <div class="row ntoolbar">
+                <div class="col-lg-12 col-md-12">
+                    <button class="btn btn-danger" onclick="remove_pat('C');" title="將病人從清單中移除"><span class="glyphicon glyphicon-minus-sign"></span>&nbsp;移除病人</button>
+                    <button onclick="$('#addPatModal').modal('show'); return false;" class="btn btn-success pull-right" title="加入照護病人" data-loading-text="加入中..."><span class="glyphicon glyphicon-plus-sign"></span>&nbsp;加入病人</button>
+              @*<button class="btn btn-warning" onclick="ShiftDiv_vm.ShowShift2();" title="執行交班作業"><span class="glyphicon glyphicon-transfer"></span>&nbsp;交班作業</button>*@
+                
+                 <button class="btn btn-info" onclick="end_pat();" title="結案"><span class="glyphicon glyphicon-copy"></span>&nbsp;結案</button>
+                
+                    <div class="dropdown pull-right">
+                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                            列印清單
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a onclick="ToPrint('C');" ><span class="glyphicon glyphicon-print"></span>&nbsp;列印病人清單</a></li>
+                            @*<li><a onclick="ToPrintCare_List();" ><span class="glyphicon glyphicon-list-alt"></span>&nbsp;列印健保碼清單</a></li>*@
+                            @*<li><a onclick="ToPrintShit_List();"><i class="fas fa-file-alt"></i>&nbsp;列印交班表</a></li>*@
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 col-md-12">
+                    <div id="care_list_alert"></div>
+                </div>
+            </div>
+            <div class="row">
+                <!--Table view-->
+                <div id="pt_info_list" class="col-lg-12 col-md-12" style="">
+                    <div id="ct_toolbar">呼吸照護清單<i role="button" class="fa fa-question-circle" aria-hidden="true" title="照護清單狀態說明" onclick="$('#careListStatusModal').modal('show');"></i></div>
+                    <table style="background-color: #FFF;" id="care_table" data-cache="false" data-row-style="accept_rowStyle" data-classes="table table-hover" data-flat="true" data-search="true">
+                        <thead style="background-color: #5BA198; color: #FFF;">
+                            <tr>
+                                <th data-field="state" data-checkbox="true"></th>
+                                <th data-field="bed_no" data-valign="middle" data-formatter="bed_format" data-sortable="true" data-width="60">床號</th>
+                                <th data-field="cost_code" data-valign="middle" data-formatter="cost_code_format" data-sortable="true" data-width="40">單位</th>
+                                <th data-field="dept_desc" data-valign="middle" data-formatter="dept_desc_format" data-width="40">科別</th>
+                                <th data-field="vs_doc" data-valign="middle" data-formatter="vs_doc_format" data-width="70">主治醫生</th>
+                                <th data-field="chart_no" data-valign="middle" data-formatter="ipd_no_format" data-width="80">病歷號</th>
+                                <th data-field="patient_name" data-formatter="genderFormatterAddShift" data-valign="middle" data-width="150">姓名</th>
+                                <th data-field="age" data-valign="middle" data-width="40">年齡</th>
+                                <th data-field="use_days" data-valign="middle" data-width="50" data-formatter="use_daysFormatter">天數</th>
+                                @*<th data-field="diagnosis_code" data-valign="middle" data-width="70">診斷</th>*@
+                                @*<th data-field="_is_humidifier" data-valign="middle" data-width="70">Ventilator Type</th>*@
+                                @*<th data-field="on_mode" data-valign="middle" data-width="80">on機時間</th>*@
+                                @*<th data-field="o2_device" data-valign="middle" data-width="70">O2 device</th>*@
+                                @*<th data-field="memo" data-valign="middle"   data-width="70">備註</th>*@
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--病患歷史記錄-->
+    <div id="pathistory" class="LeftTabBlock" style="margin: 0px auto;width: 95%;display:none;">
+        <div id="pat_history">
+            <div class="row" style="background-color:oldlace;">
+                <div class="col-xs-12" style="padding: 10px;">
+                    病歷號 @Html.TextBoxFor(x => x.chart_no, new { @class = "form-control", @style = "width:120px;display: inline;vertical-align:middle;", @maxlength = "12" })
+                    &nbsp; 主治醫生 @Html.DropDownListFor(x =>x.vs_doc, new SelectList(Model.vs_doc_list, "P_VALUE", "P_NAME"), "請選擇", new { @class = "form-control", @style = "width:120px;display: inline;vertical-align:middle;" })
+                    &nbsp; 護理站 @Html.DropDownListFor(x=>x.cost_center, new SelectList(Model.bed_area, "area_code", "area_title"), "請選擇", new { @class = "form-control", @style = "width:120px;display: inline;vertical-align:middle;" })
+                </div>
+                <div class="col-xs-12"  style="padding: 10px;">
+                    住院/門診/急診日期 @Html.TextBoxFor(x => x.searchipdSDate, new { @class = "form-control dt-picker", @dt_format = "d", @readonly = "readonly", @style = "width:120px;display: inline;vertical-align:middle;" })
+                    &nbsp;~&nbsp;@Html.TextBoxFor(x => x.searchipdEDate, new { @class = "form-control dt-picker", @dt_format = "d", @readonly = "readonly", @style = "width:120px;display: inline;vertical-align:middle;" })
+                    &nbsp; &nbsp;<button id="getPathistoryBtn" class="btn btn-default" onclick="getPathistory();" title="搜尋"><span class="glyphicon glyphicon-search"></span>&nbsp;搜尋</button>
+                </div>
+            </div>
+            <div id="pt_history_info_list" class="col-xs-12 col_full_width" style="margin-top: 10px;height: 700px;overflow-y:auto;">
+                <table style="background-color: #FFF;" class="nullTable" id="history_table" data-cache="false" data-row-style="accept_rowStyle" data-classes="table table-hover" data-flat="true" data-search="true">
+                    <thead style="background-color: #5BA198; color: #FFF;">
+                        <tr>
+                            <th data-field="chart_no" data-valign="middle">病歷號</th>
+                            <th data-field="patient_name" data-formatter="genderFormatter" data-valign="middle">姓名</th>
+                            <th data-field="age" data-valign="middle" data-width="40">年齡</th>
+                            <th data-field="diag_date" data-sortable="true" data-valign="middle">住院/門診/急診時間</th>
+                            <th data-field="vs_doc" data-valign="middle" data-sortable="true">主治醫生</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!--上傳清單-->
+    @if (upLoadSwitch)
+    {
+        <div id="uploadInterface" class="LeftTabBlock" data-model="" style="margin: 0px auto;width: 95%;display:none;">
+            <div id="pat_history" class="row">
+                <div class="row" style="padding-top: 10px;height:55px;background-color:oldlace;">
+                    <div class="col-xs-12">
+                        <button class="btn btn-success" value="0" data-loading-text="上傳中..." onclick="upLoadBtnAction($(this).val(), $(this));" title="上傳"><span class="glyphicon glyphicon-open"></span>&nbsp;上傳</button>
+                        <button class="btn btn-primary" value="1" data-loading-text="忽略中..." onclick="upLoadBtnAction($(this).val(), $(this));" title="忽略"><span class="glyphicon glyphicon-star"></span>&nbsp;忽略</button>
+                        <button class="btn btn-info" value="2" data-loading-text="回復中..." onclick="upLoadBtnAction($(this).val()), $(this);" title="回復"><span class="glyphicon glyphicon-share-alt"></span>&nbsp;回復</button>
+                        <button class="btn btn-warning" onclick="getUploadTable();" title="重整"><span class="glyphicon glyphicon-repeat"></span>&nbsp;重整</button>
+                        &nbsp;&nbsp;<input type="checkbox" id="showDetail" onchange="getUploadTable();" /><label for="showDetail">顯示忽略資料</label>
+                    </div>
+                    <div class="col-xs-12">
+                        @**可直接點選修改(刪除資料除外)。*@
+                    </div>
+                </div>
+                <div style="overflow-y:auto; overflow-x: hidden;">
+                    <!-- 上傳清單 -->
+                    <div id="RT_RECORDDiv" class="col-xs-12 col_full_width" style="margin-top: 10px;">
+                        <div class="col-xs-12 col_full_width" id="hl_toolbar">呼吸照護記錄單 共<span class="listCnt"></span>筆</div>
+                        <table style="background-color: #FFF;" class="nullTable" data-tableid="RT_RECORD" id="RT_RECORDTable" data-cache="false" data-row-style="upLoad_accept_rowStyle" data-classes="table table-hover" data-flat="true">
+                            <thead style="background-color: #5BA198; color: #FFF;">
+                                <tr>
+                                    <th data-field="state" data-checkbox="true"></th>
+                                    <th data-field="chartNo" data-formatter="" data-valign="middle" data-sortable="true" data-width="">病歷號</th>
+                                    <th data-field="ipdNo" data-formatter="" data-valign="middle" data-sortable="true" data-width="">批價序號</th>
+                                    <th data-field="patName" data-formatter="" data-valign="middle" data-sortable="true" data-width="">病患姓名</th>
+                                    <th data-field="RECORDDATE" data-formatter="" data-valign="middle" data-sortable="true" data-width="">記錄時間</th>
+                                    <th data-field="Signature" data-valign="middle" data-width="">記錄人員</th>
+                                    <th data-field="SHOW_DATE" data-formatter="" data-valign="middle">新增時間</th>
+                                    <th data-field="SHOW_DATASTATUS" data-valign="middle" data-width="">資料狀態</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <div id="CPT_RECORDDiv" class="col-xs-12 col_full_width" style="margin-top: 10px;">
+                        <div class="col-xs-12 col_full_width" id="hl_toolbar">呼吸治療胸腔復健記錄單 共<span class="listCnt"></span>筆</div>
+                        <table style="background-color: #FFF;" class="nullTable" data-tableid="CPT_RECORD" id="CPT_RECORDTable" data-cache="false" data-row-style="upLoad_accept_rowStyle" data-classes="table table-hover" data-flat="true">
+                            <thead style="background-color: #5BA198; color: #FFF;">
+                                <tr>
+                                    <th data-field="state" data-checkbox="true"></th>
+                                    <th data-field="chartNo" data-formatter="" data-valign="middle" data-sortable="true" data-width="">病歷號</th>
+                                    <th data-field="ipdNo" data-formatter="" data-valign="middle" data-sortable="true" data-width="">批價序號</th>
+                                    <th data-field="patName" data-formatter="" data-valign="middle" data-sortable="true" data-width="">病患姓名</th>
+                                    <th data-field="RECORDDATE" data-formatter="" data-valign="middle" data-sortable="true" data-width="">記錄時間</th>
+                                    <th data-field="Signature" data-valign="middle" data-width="">記錄人員</th>
+                                    <th data-field="SHOW_DATE" data-formatter="" data-valign="middle">新增時間</th>
+                                    <th data-field="SHOW_DATASTATUS" data-valign="middle" data-width="">資料狀態</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <div id="WEANING_ASSESSDiv" class="col-xs-12 col_full_width" style="margin-top: 10px;">
+                        <div class="col-xs-12 col_full_width" id="hl_toolbar">呼吸脫離評估單 共<span class="listCnt"></span>筆
+                        &nbsp;&nbsp;<input type="checkbox" id="hasOnModel" name="hasOnMOdel" /><label for="hasOnModel">上傳呼吸照護記錄適應症資料</label>
+                        </div>
+                        <table style="background-color: #FFF;" class="nullTable" data-tableid="WEANING_ASSESS" id="WEANING_ASSESSTable" data-cache="false" data-row-style="upLoad_accept_rowStyle" data-classes="table table-hover" data-flat="true">
+                            <thead style="background-color: #5BA198; color: #FFF;">
+                                <tr>
+                                    <th data-field="state" data-checkbox="true"></th>
+                                    <th data-field="chartNo" data-formatter="" data-valign="middle" data-sortable="true" data-width="">病歷號</th>
+                                    <th data-field="ipdNo" data-formatter="" data-valign="middle" data-sortable="true" data-width="">批價序號</th>
+                                    <th data-field="patName" data-formatter="" data-valign="middle" data-sortable="true" data-width="">病患姓名</th>
+                                    <th data-field="RECORDDATE" data-formatter="" data-valign="middle" data-sortable="true" data-width="">記錄時間</th>
+                                    <th data-field="Signature" data-valign="middle" data-width="">記錄人員</th>
+                                    <th data-field="SHOW_DATE" data-formatter="" data-valign="middle">新增時間</th>
+                                    <th data-field="SHOW_DATASTATUS" data-valign="middle" data-width="">資料狀態</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<div id="main_content" class="main_content">
+    <!-- Nav tabs -->
+    <ul id="nav_tabs" class="nav nav-tabs" role="tablist" style="display:none;">
+        @if (!user_info.isGuide)
+        {
+            <li data-tabIndex="6" data-hisnotshow="true" role="presentation">
+                <a href="@Url.Content("~/CPT/IndexTet")" data-target="#IndexTet" role="tab" data-toggle="tabajax">
+                    呼吸治療評估單
+                    <span style="padding-left:5px;" class="glyphicon glyphicon-edit"></span>
+                </a>
+            </li>         
+        } 
+        @if (  !user_info.isGuide)
+        {
+            <li data-tabIndex="1" data-hisnotshow="true" role="presentation" class="active showDisable"><a href="@Url.Content("~/RT/StatusIndex")" data-target="#tab_rt_status" data-toggle="tabajax">呼吸器狀態<span style="padding-left:5px;" class="glyphicon glyphicon-dashboard"></span></a></li>
+        }
+      
+            <li data-tabIndex="2" data-medicalshow="true" role="presentation" class="isHistory showDisable"><a href="@Url.Content("~/RTRecord/List")" data-target="#tab_rt_record" data-toggle="tabajax">呼吸照護記錄單<span style="padding-left:5px;" class="glyphicon glyphicon-list-alt"></span></a></li>
+     
+        @*<li data-medicalshow="true" role="presentation" class="showDisable"><a href="@Url.Content("~/RTTakeoffAssess/Index")" data-target="#tab_rt_takeoff" role="tab" data-toggle="tabajax">呼吸器脫離評估<span style="padding-left:5px;" class="glyphicon glyphicon-indent-left"></span></a></li>*@
+        @*<li data-medicalshow="true" role="presentation" class="showDisable"><a href="@Url.Content("~/CPTNewAss/Index")" data-target="#tab_CPTNewRecord" role="tab" data-toggle="tabajax">肺復原評估單<span style="padding-left:5px;" class="glyphicon glyphicon-indent-left"></span></a></li>*@
+        @*<li data-medicalshow="true" role="presentation" class="showDisable"><a href="@Url.Content("~/CPTNewRecord/Index")" data-target="#tab_CPTNewRecord" role="tab" data-toggle="tabajax">肺復原及呼吸治療紀錄表<span style="padding-left:5px;" class="glyphicon glyphicon-indent-left"></span></a></li>*@
+        <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                HIS Data
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+
+                <li data-inquirernotshow="true" role="presentation" class="showDisable"><a href="@Url.Content("~/ExamLab/ExamViewer")" data-target="#tab_rt_exam_lab" role="tab" data-toggle="tabajax">檢驗<span style="padding-left:5px;" class="glyphicon glyphicon-duplicate"></span></a></li>
+
+                <li data-inquirernotshow="true" role="presentation" class="showDisable"><a href="@Url.Content("~/ExamLab/ExamList")" data-target="#tab_rt_exam_checked" role="tab" data-toggle="tabajax">檢查<span style="padding-left:5px;" class="glyphicon glyphicon-modal-window"></span></a></li>
+
+                <li onclick="$('#IO_modal').modal('show');"><a href="#">輸入輸出&ensp;<i class="fas fa-prescription-bottle"></i></a></li>
+                <li onclick="$('#vitalSign_modal').modal('show');"><a href="#">vital_sign&ensp;<i class="fas fa-heartbeat"></i></a></li>
+                <li onclick="$('#background_modal').modal('show');"><a href="#">特殊用藥及治療情形&ensp;<i class="glyphicon glyphicon-erase"></i></a></li>
+
+            </ul>
+        </li>
+        <li data-medicalshow="true" role="presentation" class="showDisable"><a href="@Url.Content("~/RTChart/RTChart")" data-target="#tab_rt_chart" role="tab" data-toggle="tabajax">參數趨勢圖<span style="padding-left:5px;" class="glyphicon glyphicon-equalizer"></span></a></li>
+        @if (  !user_info.isGuide)
+        {
+            <li data-medicalshow="true" role="presentation" class="showDisable"><a href="@Url.Content("~/RTRecord/WeaningIndex")" data-target="#tab_rt_takeoff_assess" role="tab" data-toggle="tabajax">脫離指數<span style="padding-left:5px;" class="glyphicon glyphicon-saved"></span></a></li>
+        }
+         
+    </ul>
+    <!-- Tab panes --> @*fn_ShowQuickTopBtn滾動返回頂部按鈕*@
+    <div id="tab_content" class="tab-content" style="height:0px; overflow: auto;" onscroll="fn_ShowQuickTopBtn(this)">
+        <div role="tabpanel" class="tab-pane tab_pane_set active" id="tab_rt_status"></div>
+    </div>
+</div>
+
+<div id="ShiftDiv"> 
+</div> 
+<!-- 病患資料 -->
+<div class="modal fade bs-example-modal-slg modal_record" tabindex="-1" role="dialog" data-backdrop="static" id="update_patient_modal">
+    <div class="modal-dialog modal-slg" style="width:350px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="btn-group">
+                    <h4 class="modal-title">病患基本資料</h4>
+                </div>
+                <div class="btn-group pull-right">
+                    @*<button class="btn btn-success" id="save" data-loading-text="儲存中...">儲存</button>*@ 
+                    <button class="btn btn-warning" data-dismiss="modal">關閉</button>   
+                </div>
+            </div>
+            <div class="modal-body">
+                <form name="update_patient_form" id="update_patient_form">
+                    <input id="ipd_no" name="ipd_no" type="hidden" value="" />
+                    <div class="row">
+                        <div class="col-md-2"><label>身高</label></div>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" id="body_height" name="body_height" maxlength="5" placeholder="" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 主治醫師 Modal -->
+<div class="modal fade bs-example-modal-slg modal_record" tabindex="-1" role="dialog" data-backdrop="static" id="DoctorsModal">
+    <div class="modal-dialog modal-lg" style="width:600px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="btn-group">
+                    <h4 class="modal-title">主治醫生</h4>
+                </div>
+                <div class="btn-group pull-right">
+                    <button class="btn btn-success" onclick="ReturnVal();">確定</button>
+                    <button class="btn btn-warning" data-dismiss="modal">關閉</button>
+                </div>
+                <div class="modal-body">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@{
+    string checklis_title = "vr_checklist_detail_";//呼吸器檢測記錄單
+    List<string> checklis_value = new List<string>() { "1", "2", "3" };
+    List<string> checklis_text = new List<string>() { "是", "需送修", "NA" };
+}
+<!-- 照護清單postForm -->
+<form id="patListForm" action="@Url.Content("~/RT/exportExcel")" method="post">
+    <input type="hidden" name="jsonData" id="jsonData" />
+    <input type="submit" name="patlistformSubmit" id="patlistformSubmit" style="display:none;" />
+</form>
+<form id="care_listForm" action="@Url.Content("~/CARE_LIST/CARE_LIST/createNpoiExcelMultipleSheet")" method="post">
+    <input type="hidden" name="jsonData_care_listForm" id="jsonData_care_listForm" />
+    <input type="submit" name="care_listFormSubmit" id="care_listFormSubmit" style="display:none;" />
+</form>
+<div id="rt_record_form_div"></div><!-- 預入呼吸記錄單 rt_record_form_div -->
+<div id="showCPTForm"></div><!-- 預入CPT記錄單 showCPTForm -->
+<div id="showTakeoffAssessForm"></div><!-- 預入RTTakeoffAssess記錄單 RTTakeoffAssess -->
+<div id="showpat_tran_index"></div><!-- 預入VPN記錄單 showpat_tran_index --> 
+<!-- 照護清單狀態說明 Modal -->
+<div class="modal fade bs-example-modal-slg modal_record" tabindex="-1" role="dialog" id="careListStatusModal">
+    <div class="modal-dialog modal-lg" style="width:600px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="btn-group">
+                    <h4 class="modal-title">照護清單狀態說明</h4>
+                </div>
+                <div class="btn-group pull-right">
+                    <button class="btn btn-warning" data-dismiss="modal">關閉</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <i class="fa fa-exclamation-circle" style="color:orange;" aria-hidden="true" title="呼吸器使用天數大於5天"></i>
+                        呼吸器使用天數大於5天
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fa fa-exclamation-triangle" style="color:red;" aria-hidden="true" title="呼吸器使用天數大於21天"></i>
+                        呼吸器使用天數大於21天
+                    </li>
+                    <li class="list-group-item">
+                        <span class="glyphicon glyphicon-list-alt" title="已有交班記錄"></span>
+                        已有交班記錄資料
+                    </li>
+                    <li class="list-group-item">
+                        <span class="glyphicon glyphicon-bell" title="呼吸器狀態警告訊息" style="color: red;"></span>
+                        呼吸器狀態警告訊息
+                        <br />1.提醒使用者，此有On呼吸機病患2小時內VIP沒有上傳資料
+                        <br />2.提醒使用者，此病患同時兩台呼吸機再上傳資料，請關閉其中一台機器
+                    </li>
+                    <li class="list-group-item">
+                        <span class="glyphicon glyphicon-user" style="color:#4c69eb"></span>
+                        病患性別為男性
+                    </li>
+                    <li class="list-group-item">
+                        <span class="glyphicon glyphicon-user" style="color:#fd9393"></span>
+                        病患性別為女性
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-hand-paper" style="color:#479D47"></i>
+                        多重抗藥性菌種床位提示
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- vpn_upload Modal -->
+<div class="modal fade bs-example-modal-slg modal_record" tabindex="-1" role="dialog" id="vpn_upload_Modal">
+    <div class="modal-dialog modal-lg" style="width:600px;">
+        <div class="modal-content">
+            <!-- 上傳VPN病患postForm -->
+            <form id="vpn_upload_xmlForm" action="@Url.Content("~/VPN_UPLOAD/exportVPN_XML")" method="post">
+                <div class="modal-header">
+                    <div class="btn-group">
+                        <h4 class="modal-title">呼吸照護檔案流水號</h4>
+                       
+                    </div>
+                    <div class="btn-group pull-right">
+                        <button type="submit" class="btn btn-success" onclick="$('#vpn_upload_Modal').modal('hide');"  name="vpn_upload_xmlFormSubmit" id="vpn_upload_xmlFormSubmit">確認</button>
+                        <button class="btn btn-warning" data-dismiss="modal">關閉</button>
+                    </div>
+                    <div class="modal-body row panel">
+                        <input type="hidden" name="vpn_uploadJsonData" id="vpn_uploadJsonData" />
+                        <div class="input-group">
+                            <span class="input-group-addon">輸入檔案流水號</span>
+                            <input class="form-control" type="text" name="file_no" id="file_no" value="001" maxlength="3" placeholder="預設為001" />
+                        </div>
+                        <div class="col-lg-12 panel-danger"> <br />*健保局規定上傳檔案每天都要從流水號001開始，檔名若不符合規則，則無法上傳成功。</div>
+                    </div>
+                </div>
+            </form>
+          
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="addPatModal" tabindex="-1" role="dialog" aria-labelledby="addPatModal-label">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="btn-group">
+                    <h4 class="modal-title" id="addPatModal-label">查詢病患</h4>
+                </div>
+                <div class="btn-group pull-right" role="group" aria-label="addPatBtn">
+                    <button id="join_item" class="btn btn-success" title="加入照護病人" data-loading-text="加入中..."><span class="glyphicon glyphicon-plus-sign"></span>&nbsp;加入病人</button>
+                    <button type="button" class="btn btn-warning" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">關閉</span></button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="">
+                    <div id="all_list_alert" class=""></div>
+                    <div class="input-group">
+                        <span class="input-group-addon">病歷號</span>
+                        <input class="form-control" type="text" name="s_chart_no" maxlength="15" />
+                        <span class="btn btn-default input-group-addon" onclick="search_chart_no('C')"><span class="glyphicon glyphicon-search"></span>&nbsp;搜尋</span>
+                    </div>
+                    <div class="input-group" style="margin-top: 8px;">
+                        <span class="input-group-addon">選取欲加入的病人</span>
+                        <select id="case_select" class="form-control" onchange="call_join_from()">
+                            <option value="" selected>全部</option>
+                            <option value="1">已記錄</option>
+                            <option value="0">無記錄</option>
+                        </select>
+                    </div>
+                    <!--Area select-->
+                    <select id="area_select" class="form-control" style="margin-top: 6px;" onchange="call_join_from()">
+                        <option value="null" selected>請選擇</option>
+                        <option value="">全區</option>
+                        @for (int i = 0; i <= Model.bed_area.Count - 1; i++)
+                        {
+                            @WebTool.setBedAreaSelect(Model.bed_area[i]);
+                        }
+                    </select>
+                </div>
+                <div id="hospital_list_table_block" class="">
+                    <!-- 查詢病人清單 -->
+                    <table id="hospital_list_table" style="background-color: #FFF;" data-classes="table table-hover" data-striped="true" data-click-to-select="true" data-search="true" data-formatsearch="abc">
+                        <thead style="background-color: #5BA198; color: #FFF;">
+                            <tr>
+                                <th data-field="state" data-checkbox="true"></th>
+                                <th data-field="bed_no" data-sortable="true">床號</th>
+                                <th data-field="dept_desc">科別</th>
+                                <th data-field="chart_no" data-sortable="true">病歷號</th>
+                                <th data-field="patient_name" data-formatter="searchPtFormatter" data-sortable="true">姓名</th>
+                                <th data-field="diag_date" data-sortable="true" >日期</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="showDeatailCareListModal" tabindex="-1" role="dialog" aria-labelledby="showDeatailCareListModal-label">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModal-label">照護清單</h4>
+            </div>
+            <div class="modal-body">
+                <table style="background-color: #FFF;width:1800px;" id="care_table2" data-cache="false" data-row-style="accept_rowStyle" data-classes="table table-hover" data-flat="true" data-search="true">
+                    <thead style="background-color: #5BA198; color: #FFF;">
+                        <tr>
+                            <th data-field="bed_no" data-valign="middle" data-sortable="true" data-width="60">床號</th>
+                            <th data-field="dept_code" data-valign="middle" data-width="40">科別</th>
+                            <th data-field="chart_no" data-valign="middle" data-width="80">病歷號</th>
+                            <th data-field="patient_name" data-formatter="genderFormatterAddShift" data-valign="middle" data-width="150">姓名</th>
+                            <th data-field="age" data-valign="middle" data-width="40">年齡</th>
+                            <th data-field="use_days" data-valign="middle" data-width="50" >天數</th>
+                            <th data-field="diag_date" data-valign="middle" data-width="150">入院時間</th>
+                            <th data-field="vs_doc" data-valign="middle" data-width="150">主治醫生</th>
+                            <th data-field="diagnosis_code" data-valign="middle" data-width="150">診斷</th>
+                            <th data-field="mode" data-valign="middle" data-width="150">Ventilation Mode</th>
+                            <th data-field="on_mode" data-valign="middle" data-formatter="on_modeFormatter" data-width="150">on機時間</th>
+                            <th data-field="o2_device" data-valign="middle" data-width="150">O2 device</th>
+                            <th data-field="memo" data-valign="middle" data-width="150">備註</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 每日呼吸器脫離評估 -->
+<div id="RWAC_Panel"></div><!-- /.modal -->
+ <!-- RT_modal -->
+<div id="RT_modal"></div><!-- /.modal -->
+<!-- Cxr繪圖 -->
+<div id="RtRecord_CxrVue_DivTagID"></div><!-- /.modal --> 
+<script type="text/javascript">
+    var intervalId = null;
+    var isScrollBarBtn = false;
+    // 目前選取控制項// 是否變動
+    var current_control = null, is_changed = false;
+    var care_table, history_table, giveList_table, dom_table;
+    var activeTab = '';//目前tab
+    function log(jqXHR) {
+        try {
+            jqXHR.responseText = CKEDITOR.tools.htmlEncode(jqXHR.responseText);
+            $.ajax({
+                url: "@Url.Content("~/Main/Log")",
+                type: "post",
+                data: JSON.stringify(jqXHR),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json"
+            });
+        } catch (e) {
+            alert(e);
+        }
+    }
+
+    @if (user_info == null) {
+        @Html.Raw("logout();")
+    }
+
+    var hospital_list_table;
+
+    function changeFeeNo(pThis,pId) {
+        var nowFeeNo = $('#now_patient').attr('ipd_no');
+        if (nowFeeNo == pThis.val().split('|')[0]) {
+            $('#' + pId + ' button[exec_func="add"]').prop('disabled', false);
+            $('.changeFeeNoDisabledBtn').prop('disabled', false);
+        } else {
+            $('#' + pId + ' button[exec_func="add"]').prop('disabled', true);
+            $('.changeFeeNoDisabledBtn').prop('disabled', true);
+        }
+        $('#' + pId + ' .searchSDate').each(function () {
+            $(this).val(pThis.val().split('|')[1]);
+        });
+        $('#' + pId + ' .searchEDate').each(function () {
+            $(this).val(pThis.val().split('|')[2]);
+        });
+        $('#' + pId + ' .listSearch')[0].click();
+    }
+
+    //開啟表單顯示
+    function openRecordView(selector, url, row,btn) {
+        if (row == undefined || row == null || row == '') {
+            row = {};
+        }
+        //console.log(btn);
+        $.ajax({
+            url: url,
+            type: "post",
+            data: { rowStr: encodeURIComponent(JSON.stringify(row)) },
+            dataType: "html",
+            beforeSend: function () {
+                if (btn != null) {
+                    btn.prop("disabled", true);
+                }
+                $("#index_loading").modal('show');
+            },
+            success: function (response) {
+                $('#' + selector).html(response);
+            },
+            complete: function (jqXHR, textStatus) {
+                if (btn != null) {
+                    btn.prop("disabled", false);
+                }
+                $("#index_loading").modal('hide');
+            }
+        });
+    }
+
+    //取的上傳清單資料upLoad-tab
+    function getUploadTable() {
+        $.ajax({
+            url: '@Url.Content("~/RT/getNotUploadData")',
+            type: "post",
+            data: { ListFlag: $('#showDetail').prop('checked') },
+            dataType: "json",
+            beforeSend: function (jqXHR, settings) {
+                $("#index_loading").modal('show');
+                $('.nullTable').bootstrapTable('showLoading');
+            },
+            success: function (data, textStatus, jqXHR) {
+                $('#uploadInterface').data('model', JSON.stringify(data));
+                if (data.rm.status == 0) {
+                    bindUplodaTable(data.RT_RECORD, 'RT_RECORD', 'rt_record_form_div', '@Url.Content("~/RTRecord/openRTRecordFormView")', 'RECORD_ID');
+                    bindUplodaTable(data.CPT_RECORD, 'CPT_RECORD', 'showCPTForm', '@Url.Content("~/CPT/openCPTRecord")', 'cptr_id');
+                    bindUplodaTable(data.WEANING_ASSESS, 'WEANING_ASSESS', 'showTakeoffAssessForm', '@Url.Content("~/RTTakeoffAssess/openRTTakeoffAssessForm")', 'tk_id');
+                    //如果有適應症資料，自動勾選
+                    $('#hasOnModel').prop('checked', data.hasOnModel);
+                    if (data.notUpLoadCountOver24 > 0)
+                        $('#upLoad-tab').attr('title', '您有' + data.notUpLoadCountOver24 + '筆資料超過24小時未上傳');
+                    else
+                        $('#upLoad-tab').removeAttr('title');
+                } else {
+                    showAlert(data.rm.message, msg_stat.Danger);
+                }
+            },
+            complete: function (jqXHR, textStatus) {
+                $('.nullTable').bootstrapTable('hideLoading');
+                $("#index_loading").modal('hide');
+            }
+        });
+    }
+    //取得上傳清單Table資料
+    function bindUplodaTable(obj, bindDiv, showId, url, recordidName) {
+        $('#upLoad-tab font[id="' + bindDiv + 'Font"]').html(obj.notUpLoadCount);
+        $('#uploadInterface #' + bindDiv + 'Div').find('.listCnt').html(obj.count);
+        $('#uploadInterface #' + bindDiv + 'Table').bootstrapTable('refreshOptions', {
+            data: obj.dataList,
+            onClickRow: function (row, e) {
+                e.find('input[type="checkbox"]').each(function () {
+                    e.find('input[type="checkbox"]').each(function () { $(this).trigger('click'); });
+                });
+            }
+        });
+    }
+    //type: 0=上傳、1=忽略、2=回復按鈕動作
+    function upLoadBtnAction(type, btn) {
+        var hasOnModel = $('#hasOnModel').prop('checked');
+        var checkedCnt = 0;
+        var model = JSON.parse($('#uploadInterface').data('model'));
+        model.hasOnModel = hasOnModel;
+        model.btnType = type;
+        model.btnValue = $('#uploadInterface button[value="' + type + '"]').attr('title');
+        $("#uploadInterface .nullTable").each(function () {
+            checkedCnt += $(this).bootstrapTable('getSelections').length;
+            model[$(this).data('tableid')].dataList = $(this).bootstrapTable('getSelections');
+        });
+        if (checkedCnt > 0 || model.hasOnModel) {
+            $.ajax({
+                url: '@Url.Content("~/RT/upLoadBtnAction")',
+                type: "post",
+                data: { jsonStr: encodeURIComponent(JSON.stringify(model)) },
+                dataType: "json",
+                beforeSend: function (jqXHR, settings) {
+                    if (btn != null) {
+                        btn.button('loading');
+                    }
+                    $('.nullTable').bootstrapTable('showLoading');
+                },
+                success: function (data, textStatus, jqXHR) {
+                    var setStatus = msg_stat.Success;
+                    if (data.status == 0) {
+                        getUploadTable();
+                    } else {
+                        setStatus = msg_stat.Danger;
+                    }
+                    showAlert(data.message, setStatus);
+                },
+                complete: function (jqXHR, textStatus) {
+                    $('.nullTable').bootstrapTable('hideLoading');
+                    if (btn != null) {
+                        btn.button('reset');
+                    }
+                }
+            });
+        } else {
+            var msg = '';
+            if (type == '2') {
+                msg = '請選擇一筆忽略資料!';
+            } else {
+                msg = '請選擇至少一筆資料!';
+            }
+            showAlert(msg, msg_stat.Warning);
+        }
+    }
+
+    //取得病患歷史紀錄
+    function getPathistory(pisGuide) {
+        type_mode = 'H';
+        $.ajax({
+            url: '@Url.Content("~/RT/getPathistory")',
+            type: "post",
+            data: { chart_no: $('#pathistory #chart_no').val(), searchipdSDate: $('#pathistory #searchipdSDate').val(), searchipdEDate: $('#pathistory #searchipdEDate').val(), vs_doc: $('#pathistory #vs_doc').val(), cost_center: $('#pathistory #cost_center').val() },
+            dataType: "json",
+            beforeSend: function (jqXHR, settings) {
+                $("#index_loading").modal('show');
+                $('#pathistory #history_table').bootstrapTable('showLoading');
+            },
+            success: function (data, textStatus, jqXHR) {
+                if (data.status == 0) {
+                    $('#pathistory #history_table').bootstrapTable('refreshOptions', {
+                        uniqueId: 'ipd_no',
+                        data: data.attachment,
+                        pagination: true,
+                        pageList: [10, 15, 25, 50, 100],
+                        pageSize: 15,
+                        onClickRow: function (row, e) {
+                            $("#index_loading").modal('show');
+                            $('#pathistory #history_table').css("pointer-events", "none");
+                            select_pti(e, row, "H");
+                            setTimeout(function () { $('#pathistory #history_table').css("pointer-events", ""); }, 1500);
+                            $("#index_loading").modal('hide');
+                        }
+                    });
+                } else {
+                    showAlert(data.message, msg_stat.Danger);
+                }
+            },
+            complete: function (jqXHR, textStatus) {
+                $('#pathistory #history_table').bootstrapTable('hideLoading');
+                if (pisGuide != null && pisGuide) {
+                    $('#pathistory #history_table').css("pointer-events", "none");
+                    select_pti(null, $('#pathistory #history_table').bootstrapTable('getRowByUniqueId', '@(Model.ipd_no)'), "H");
+                    setTimeout(function () { $('#pathistory #history_table').css("pointer-events", ""); }, 1500);
+                    $("#nav_tabs").show();
+                    $('#nav_tabs li[data-HisNotShow="true"]').hide();
+                    //$('#nav_tabs li[data-InquirerNotShow="true"]').hide();
+                }
+                $("#index_loading").modal('hide');
+            }
+        });
+    }
+
+    //左邊清單Tab控制
+    //type U:上傳,C:照護清單,H:歷史記錄V:VPN上傳
+    function clickLeftTab(type, divID, evalFunction) {
+        document.getElementById("myQuickTop_BtnID").style.display = "none"; //滾動返回頂部按鈕 [隱藏]
+        switch_expander_light(type);
+        //e.preventDefault();
+        if ($('#' + divID).is(':hidden')) {
+            if (!$("#mybody").hasClass("nav-expanded")) {
+                $('#mybody').toggleClass('nav-expanded');
+            }
+            $('.LeftTabBlock').hide();
+            $('#' + divID).show();
+        } else {
+            $('#mybody').toggleClass('nav-expanded');
+        }
+        //===防呆遮罩
+        if ($("#mybody").hasClass("nav-expanded")) {
+            $("#main_content").addClass("disabledbutton");
+            $('#scroll_tab').hide();
+            eval(evalFunction);//擴充Function
+        } else {
+            //檢查SetSession
+            if ($('#now_patient').attr('ipd_no') != null && $('#now_patient').attr('ipd_no') != undefined && $('#now_patient').attr('ipd_no').length > 0) {
+                $.ajax({
+                    url: "@Url.Content("~/Base/checkPatSession")",
+                    type: "post",
+                    data: { pChart_no: $('#now_pat_chart_no').html(), pIpd_no: $('#now_patient').attr('ipd_no'), typeMode: type_mode },
+                    dataType: "json",
+                    beforeSend: function () {
+                        $("#index_loading").modal('show');
+                    },
+                    success: function (rm, statusText, jqXHR) {
+                        switch (rm.status) {
+                            case 0:
+                                $("#main_content").removeClass("disabledbutton");
+                                $('#scroll_tab').show();
+                                var now_patient_ipd_no = $('#now_patient').attr('ipd_no');
+                                if (now_patient_ipd_no != null && now_patient_ipd_no != undefined && now_patient_ipd_no != '') {
+                                    if (type_mode == 'H') {
+                                        if ($("#nav_tabs .isHistory").length > 0) {
+                                            $("#nav_tabs .isHistory").find('a').trigger("click");
+                                        } else {
+                                            $("#nav_tabs li").first().find('a').trigger("click");
+                                        }
+                                    } else {
+                                        if ($("#nav_tabs .active").length >0) {
+                                            $("#nav_tabs .active").find('a').trigger("click");
+                                        } else {
+                                            $("#nav_tabs li").first().find('a').trigger("click");
+                                        }
+                                    }
+                                }
+                                break;
+                            default:
+                                showAlert(rm.message, msg_stat.Warning, 1000);
+                                log(jqXHR);
+                                break;
+                        }
+                    },
+                    complete: function () {
+                        $("#index_loading").modal('hide');
+                    },
+                    error: function (jqXHR) {
+                        log(jqXHR);
+                    }
+                });
+            }
+        }
+        $(".showDisable").removeClass("disabledbutton");
+        //===
+    }
+
+    //切換照護(C)、記錄(H) 標示
+    function switch_expander_light(mode_v) {
+        $('#main_nav_tab .light_tab').removeClass("history_active").removeClass("user_give_active").removeClass("patient_active").removeClass("tab_vpn_active");
+        if (mode_v == "C") {
+            $('#nav-expander').addClass("patient_active");
+        } else if (mode_v == "H") {
+            $('#nav-history').addClass("history_active");
+        } else if (mode_v == "U") {
+            $('#upLoad-tab').addClass("user_give_active");
+        }
+    }
+
+
+
+    $(document).ready(function () {
+        $(window).resize(function () {
+            //console.log($(window).width());
+        });
+        //卷軸
+        $('.scroll_tab_span').each(function () {
+            var _id = $(this).attr('id');
+            var pInt = 0;
+            if (_id == 'scroll_tab_up') pInt = -100;
+            if (_id == 'scroll_tab_down') pInt = 100;
+            $(this).mousedown(function () {
+                useScrollBtn(pInt);
+            });
+        });
+
+
+        $('#scroll_tab').hide();
+        @if(Model.rm != null && Model.rm.status != RESPONSE_STATUS.SUCCESS){
+            <text>
+                showAlert('@(Model.rm.message)', msg_stat.Danger);
+            </text>
+        }
+        $(".nullTable").bootstrapTable({ data: '', pageSize: 50, pageList: [50], pagination: true });//預載空的bootstrapTable樣式
+        maya_datetimepicker($(".dt-picker"));//datetimepicker樣式
+        $(".tp").tooltip(); //tip
+        $(window).resize(function () {
+            window_re_size();
+        });
+        //double click
+        hospital_list_table = $("#hospital_list_table").bootstrapTable({
+            height: 250,
+            onLoadSuccess: function (data) {
+                hospital_list_table.bootstrapTable('hideLoading');
+            }
+        });
+        //病人基本資料儲存(身高儲存click)
+        //********************************* START
+        $("#update_patient_modal #save").unbind("click").click(function () {
+            var form_data = $("#update_patient_form").serializeObject();
+            $.ajax({
+                url: "@Url.Content("~/RT/set_CarePatPatientInfo")",
+                type: "post",
+                data: JSON.stringify(form_data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                beforeSend: function () {
+                    $("#update_patient_modal #save").button('loading');
+                },
+                success: function (rm, statusText, jqXHR) {
+                    switch (rm.status) {
+                        case 0:
+                            showAlert(rm.message, msg_stat.Success, 1000, "top");
+                            $("#update_patient_modal").modal('hide');
+                            $("#now_pat_height").text(form_data.body_height);
+                            break;
+                        default:
+                            showAlert(rm.message, msg_stat.Warning, 1000, "top");
+                            log(jqXHR);
+                            break;
+                    }
+                },
+                complete: function () {
+                    $("#update_patient_modal #save").button('reset');
+                },
+                error: function (jqXHR) {
+                    log(jqXHR);
+                }
+            });
+        });
+        //********************************* END
+
+
+        //1.照護病患清單(按鈕加入病人click)
+        //********************************* START
+        $('#join_item').unbind("click").click(function () {
+            var $btn = $(this);
+            var join_json = hospital_list_table.bootstrapTable('getSelections');
+            var join_length = join_json.length;
+            if (join_length > 0) {
+                add_care_item(join_json, "C");
+            } else {
+                createAutoClosingAlert("#all_list_alert", "您至少需選擇一筆資料!", 2000);
+            }
+        });
+        //********************************* END
+        $("[data-toggle='tabajax']").on("shown.bs.tab", function (e) {
+            try {
+                $(window).trigger("resize");
+            } catch (e) {
+            }
+        });
+        //畫面中間頁籤 (控制tabajax click)
+        //呼吸器狀態、呼吸照護記錄單、參數趨勢圖、呼吸患者評估、呼吸器脫離評估、CPT評估表等功能
+        $("[data-toggle='tabajax']").unbind("click").bind("click", function (e) {
+            document.getElementById("myQuickTop_BtnID").style.display = "none"; //滾動返回頂部按鈕 [隱藏]
+            var divid = $(this).attr('data-target');
+            activeTab = divid;
+            $('.tab_pane_set').attr('id', divid.replace('#', ''));
+            $('.tab_pane_set').html('');
+            var $this = $(divid);
+            var url = $(this).attr('href');
+            var loaded = $(e.target).attr('loaded');
+            if (loaded == 'N' || loaded == undefined) {
+                $.ajax({
+                    url: url,
+                    //timeout: 10000,
+                    cache: false,
+                    beforeSend: function () {
+                        $this.unbind();
+                        $this.off(divid);
+                        $this.empty();
+                        $this.html("資料載入中...");
+                    },
+                    success: function (data) {
+                        $this.html(data);
+                        if (loaded == 'N') {
+                            $(e.target).attr('loaded', 'Y');
+                        }
+                    },
+                    complete: function () {
+                        $this.find('.fixed_table').bootstrapTable();
+                        //datetimepicker
+                        maya_datetimepicker($(".dt-picker"));
+                    }
+                });
+            }
+            $(this).tab('show');
+            return false;
+        });  
+        def_fn();
+
+        @if (Model.isGuide)
+        {
+            <text>
+        getPathistory(true);
+
+            </text>
+        }
+        //$('.tab-content').SetTopAnchor();  //加入回到Top
+
+        //每日呼吸器脫離評估
+        $('#RWAC_Panel').load('@Url.Content("~/RTRecord/RWAC_VIEW")');
+        //RT_modal
+        $('#RT_modal').load('@Url.Content("~/RT/RT_modal")');
+
+    });
+
+    //視窗尺寸改變
+    function window_re_size() {
+        var tab_content_h = $(window).height() - $('#nav_tabs').height() - $('#start_tab').height() - $('#now_patient').height();
+        $("#tab_content").css("height", tab_content_h);
+    }
+
+    //預設初始動作
+    function def_fn() {
+        type_mode = 'C';
+        //照護病患清單
+        care_table = $("#care_table").bootstrapTable({
+            url: '@Url.Content("~/RT/PatientList")',
+            queryParams: function () { return { data_type: "json", type_mode: "C" }; },
+            toolbar: "#ct_toolbar",
+            showRefresh: true,
+            sortName: "diag_date",
+            sortOrder: "desc",
+            method: 'post',
+            pagination: true,
+            pageList: [10, 15, 25, 50, 100],
+            pageSize: 15,
+            onClickRow: function (row, e) {
+                //小白機警報訊息
+                if (row.hadAlarm_msg) {
+                    showAlert(row.alarm_msg, msg_stat.Danger);
+                }
+                $("#index_loading").modal('show');
+                $("#care_table").css("pointer-events", "none");
+                select_pti(e, row, "C");
+                setTimeout(function () { $("#care_table").css("pointer-events", ""); }, 1500);
+                $("#index_loading").modal('hide');
+            }
+        }).on('reset-view.bs.table', function () {
+            // 拿掉提醒清單提示數量問題
+            @*var _ct = $('#care_table').bootstrapTable('getData');
+            if (_ct.length > 0) {
+                $.ajax({
+                    url: "@Url.Content("~/Board/getWPCnt")", type: "post", timeout: 10000,
+                    data: { jsondata: encodeURIComponent(JSON.stringify(_ct)) },
+                    success: function (data) {
+                        if (data > 0) {
+                            $('#bord_lable_cnt').removeClass('hidden');
+                        }
+                        $('#bord_lable_cnt').html(data);
+                    }, error: function (data) {
+                        showAlert('程式發生錯誤，請洽資訊人員!', msg_stat.Warning);
+                    }
+                });
+            }*@
+        });
+
+        //如果authority是doctor，只能瀏覽"照護病患記錄"，照護病患清單和授權清單隱藏
+        @if (user_info.authority == "doctor" || user_info.authority == "readonly")
+        {
+            @:$("#nav-history").trigger("click");
+                                        }
+        else
+	    {
+            @:$("#nav-expander").trigger("click");
+                                	    }
+        window_re_size();
+    }
+
+    //系統選項是否顯示
+    function system_show() {
+        if (type_mode == "H") {
+            $("#shift_tab").hide();
+            if ($("#shift_tab").hasClass("active")) {
+                $("#nav_tabs a[data-toggle='tabajax']:eq(1)").trigger("click");
+            }
+        } else {
+            $("#shift_tab").show();
+        }
+    }
+
+    //加入照護、歷史清單Action
+    function add_care_item(join_json, type_mode) {
+        var $btn = $('#join_item');
+        $.ajax({
+            url: "@Url.Content("~/RT/JoinCareItem")", type: "post",
+            data: { "join_json": encodeURIComponent(JSON.stringify(join_json)), "type_mode": type_mode },
+            beforeSend: function () {
+                $btn.button('loading');
+            },
+            success: function (data) {
+                if (data.execute_state) {
+                    if (type_mode == "C") {
+                        care_table.bootstrapTable('prepend', join_json);
+                        care_table.bootstrapTable("refresh");
+                        //排序
+                        //$("#care_table").find("th[data-field='merger_room_bed']").children(".sortable").trigger("click").trigger("click");
+                    }
+                    if (data.ws_result != "") {
+                        if (type_mode == "C") {
+                            createAutoClosingAlert("#all_list_alert", data.ws_result, 2000);
+                        } else {
+                            createAutoClosingAlert("#history_all_list_alert", data.ws_result, 2000);
+                        }
+                    }
+
+                } else {
+                    if (type_mode == "C") {
+                        createAutoClosingAlert("#all_list_alert", data.error_msg, 2000);
+                    } else {
+                        createAutoClosingAlert("#history_all_list_alert", data.error_msg, 2000);
+                    }
+                }
+                if (type_mode == "C") {
+                    hospital_list_table.bootstrapTable('uncheckAll');
+                }
+            }, complete: function () {
+                $btn.button('reset');
+            }
+        });
+    }
+
+    //病患清單狀態樣式
+    function genderFormatter(value, row, index) {
+        var source = row["source_type"];
+        var gender = row["gender"];
+        var user_color = "#333333";//其他
+        var source_text = '';
+        if (gender == "1") {
+            user_color = "#4c69eb";//男
+        }
+        if (gender == "0") {
+            user_color = "#fd9393";//女
+        }
+        if (source == "I") source_text = '住';
+        if (source == "O") source_text = '門';
+        if (source == "E") source_text = '急';
+        if (source_text != '') {
+            return '<span class="source_style">' + source_text + '</span>' +
+           '&nbsp;<span class="glyphicon glyphicon-user" style="color: ' + user_color + ';"></span>&nbsp;' + value;
+        } else {
+            return '<span class="glyphicon glyphicon-user" style="color: ' + user_color + ';"></span>&nbsp;' + value;
+        }
+    }
+
+    //使用天數表示方式
+    function use_daysFormatter(value, row, index) {
+        var rowHtml = "";
+        var use_days = parseInt(row["use_days"]);
+        if (use_days > 0) {
+            if (use_days >= 5) {
+                rowHtml = '<i class="fa fa-exclamation-circle" style="color:orange;" aria-hidden="true" title="呼吸器使用天數大於5天"></i>';
+            }
+            if (use_days >= 21) {
+                rowHtml = '<i class="fa fa-exclamation-triangle" style="color:red;" aria-hidden="true" title="呼吸器使用天數大於21天"></i>';
+            }
+        }
+        return rowHtml + value;
+    }
+
+
+    //病患清單狀態樣式
+    function genderFormatterAddShift(value, row, index) {
+        var htmlStr = genderFormatter(value, row, index);
+        if (row.hadShift_record) {
+            htmlStr = htmlStr + '&nbsp;<span class="glyphicon glyphicon-list-alt" title="已有交班記錄"></span>';
+        }
+        if (row.hadAlarm_msg) {
+            htmlStr = htmlStr + '&nbsp;<span class="glyphicon glyphicon-bell" title="' + row.alarm_msg + '" style="color: red;"></span>';
+        }
+
+        return htmlStr;
+    }
+
+    function searchPtFormatter(value, row, index) {
+        var source = row["source_type"];
+        var source_count = row["source_count"];
+        var source_text = '';
+        if (source == "I") source_text = '住';
+        if (source == "O") source_text = '門';
+        if (source == "E") source_text = '急';
+        if (source_text != '') {
+            return '<span class="source_style">' + source_text + '</span>' + value;
+        } else {
+            return value;
+        }
+    }
+    // 轉 顯示
+    function bed_format(value, row, index) {
+        var _value = '';
+        var show_bed_no = row.bed_no;
+        var show_new_bed_no = row.new_bed_no; 
+        if (row.is_traned && !!show_new_bed_no) {
+            _value =  "<span class='old_bed'>" + show_bed_no + "</span><br /><span class='new_bed'>" + show_new_bed_no + "</span>";
+        } else {
+            _value = value;
+        }
+        if (!!row.MDRO_MARK) {
+            _value = '<i class="fas fa-hand-paper" title="' + row.MDRO_MARK + '" style="color:#479D47"></i>&nbsp;' + _value;
+        }
+ 
+        return _value;
+    }
+    // 轉 顯示
+    function cost_code_format(value, row, index) {
+        var show_cost_code = row.cost_code;
+        var show_new_cost_code = row.new_cost_code;
+        if (row.cost_code == "82") {
+            show_cost_code = "GICU";
+        }
+        if (row.new_cost_code == "82") {
+            show_new_cost_code = "GICU";
+        }
+        if (row.is_traned && !!row.new_cost_code) {
+            return "<span class='old_bed'>" + show_cost_code + "</span><br /><span class='new_bed'>" + show_new_cost_code + "</span>";
+        } else {
+            if (value == "82") {
+                return "GICU";
+            }
+            return value;
+        }
+    }
+    //轉 顯示
+    function dept_desc_format(value, row, index) {
+        if (row.is_traned && !!row.new_dept_desc) {
+            return "<span class='old_bed'>" + row.dept_desc + "</span><br /><span class='new_bed'>" + row.new_dept_desc + "</span>";
+        } else {
+            return value;
+        }
+    }
+
+    //轉 顯示
+    function vs_doc_format(value, row, index) {
+        if (row.is_traned && !!row.new_vs_doc) {
+            return "<span class='old_bed'>" + row.vs_doc + "</span><br /><span class='new_bed'>" + row.new_vs_doc + "</span>";
+        } else {
+            return value;
+        }
+    }
+    //切帳 顯示
+    function ipd_no_format(value, row, index) {
+        if (row.is_traned && !!row.new_ipd_no && row.new_ipd_no != row.ipd_no) {
+            return "<span class='new_bed'>" + row.chart_no + "<br />切帳</span>";
+        } else {
+            return value;
+        }
+    }
+
+    function accept_rowStyle(row, index) {
+        //取得目前病患，修改row的顏色 info warning 表示為目前病患 20160719
+        var ipd_temp = $('#now_patient').attr('ipd_no');
+        var row_ipd_temp = row["ipd_no"];
+        var accept_status = row["accept_status"];//已收案
+
+        if (row.is_traned) {
+            if (ipd_temp == row_ipd_temp) {
+                return {
+                    classes: 'warning'
+                };
+            } else {
+                return {
+                    classes: 'danger'
+                }
+            }
+        } else if (accept_status == 1) {
+            if (ipd_temp == row_ipd_temp) {
+                return {
+                    classes: 'info warning'
+                };
+            } else {
+                return {
+                    classes: 'info'
+                };
+            }
+        } else {
+            return {};
+        }
+    }
+    //上傳資料表
+    function upLoad_accept_rowStyle(row, index) {
+        var datastatus = row["datastatus"];
+        var UPLOAD_STATUS = row["UPLOAD_STATUS"];
+        if (UPLOAD_STATUS == '0' && datastatus == '1') {
+            return { classes: 'info' };
+        }
+        if (UPLOAD_STATUS == '1' && datastatus == '9') {
+            return { classes: 'info danger' };
+        }
+        return {};
+    }
+    //照護取得全院清單
+    function call_join_from() {
+        var case_code = $("#case_select").val();
+        var area_code = $("#area_select").val();
+        if (area_code == 'null') {
+            return false;
+        }
+
+        hospital_list_table.bootstrapTable('showLoading');
+        case_code = typeof case_code !== 'undefined' ? case_code : "";
+        area_code = typeof area_code !== 'undefined' ? area_code : "";
+        hospital_list_table.bootstrapTable('refresh', {
+            url: '@Url.Content("~/RT/GetBedList")',
+            silent: true,
+            query: { area_code: area_code, case_code: case_code }
+        });
+    }
+
+    //搜尋病歷號
+    function search_chart_no(type_mode) {
+        var table_dom = "";
+        var chart_no_v = "";
+        if (type_mode == "C") {
+            chart_no_v = $("[name='s_chart_no']").val();
+        }
+        if (chart_no_v == "") {
+            return false;
+        }
+
+        if (type_mode == "C") {
+            table_dom = $("#hospital_list_table");
+        }
+
+        table_dom.bootstrapTable('showLoading');
+        table_dom.bootstrapTable('refresh', {
+            url: '@Url.Action("SearchPatient", "RT")',
+            silent: true,
+            query: { chart_no: chart_no_v }
+        }).on('load-success.bs.table', function (e) {
+            table_dom.bootstrapTable('hideLoading');
+        });
+    }
+    function ToPrintCare_List() {
+        var SelectPt = $('#care_table').bootstrapTable('getSelections');
+        if (SelectPt.length > 0) {
+            var select_json = convert_flat_all(SelectPt);
+            $('#care_listForm #jsonData_care_listForm').val(encodeURIComponent(JSON.stringify(select_json)));
+            isPrintSumit = true;
+            $('#care_listForm')[0].submit();
+        } else {
+            var alert_str = "請至少選擇一位病患!";
+            createAutoClosingAlert("#care_list_alert", alert_str, 2000);
+        }
+
+    }
+    function ToPrintShit_List() {
+        var SelectPt = $('#care_table').bootstrapTable('getSelections');
+        if (SelectPt.length > 0) {
+            rt_model_vm.shiftList_open();
+        } else {
+            var alert_str = "請至少選擇一位病患!";
+            createAutoClosingAlert("#care_list_alert", alert_str, 2000);
+        }
+    }
+    //列印呼吸照護清單
+    function ToPrint(type_mode) {
+        var SelectPt = "";
+        if (type_mode == "C") {
+            SelectPt = $('#care_table').bootstrapTable('getSelections');
+        }
+        if (SelectPt.length > 0) {
+            var select_json = convert_flat_all(SelectPt);
+            $('#patListForm #jsonData').val(JSON.stringify(select_json));
+            isPrintSumit = true;
+            $('#patListForm')[0].submit();
+        } else {
+            var alert_str = "請至少選擇一位病患!";
+            if (type_mode == "C") {
+                createAutoClosingAlert("#care_list_alert", alert_str, 2000);
+            } else {
+                createAutoClosingAlert("#history_list_alert", alert_str, 2000);
+            }
+        }
+    }
+
+    //交班作業
+    function ShowShift() {
+        var SelectPt = $('#care_table').bootstrapTable('getSelections');
+        if (SelectPt.length > 0) {
+            $.ajax({
+                type: 'POST',
+                data: "pList=" + JSON.stringify(SelectPt),
+                url: '@Url.Content("~/Shift/CheckList")',
+                beforeSend: function () {
+                    $("#index_loading").modal('show');
+                },
+                success: function (data) {
+                    $('#ShiftDiv').html(data);
+                },
+                complete: function () {
+                    $("#index_loading").modal('hide');
+                    $('#ShiftPtModal').modal('show');
+                }
+            });
+        }
+        else {
+            createAutoClosingAlert("#care_list_alert", "請至少選擇一位病患!", 2000);
+        }
+    } 
+    //產生符號按鈕
+    function setSymbolBtn(pSymbolId) {
+        // 產生符號按鈕
+        var add_html = "";
+        var symbol_arr = new Array('（', '）', '「', '」', '＋', '－', '±', '，', '。', '：', '；', '？', '／', '！', '、', '℃', 'cc', 'kg', 'mg', '↑', '↓', ' ∵ ', ' ∴ ' );
+        for (var i = 0; i < symbol_arr.length; i++) {
+            add_html += '<button class=\"btn btn-default">' + symbol_arr[i] + '</button>';
+        }
+        $("#" + pSymbolId).html(add_html);
+
+        // 綁定寫入符號事件
+        $("#" + pSymbolId + " > button").click(function () {
+            if (current_control != null) {
+                sel_inster_str(current_control, $(this).html());
+                is_changed = true;
+            }
+        });
+
+        // 標記目前所用到的控制項
+        $(".setSymbol").focus(function () {
+            current_control = $(this);
+        }).change(function () {
+            // 若對控制項進行變更則會改變狀態
+            is_changed = true;
+        });;
+    }
+
+    //插入文字
+    function sel_inster_str(target, str) {
+        if (target.length > 0) {
+            var str_len = str.length;
+            var obj = target[0];
+            var cursorPosition = $(target).prop("selectionStart");
+            if (document.selection) {  //for ie
+                obj.focus();
+                var sel = document.selection.createRange();
+                sel.text = str;
+            } else {  //for firefox
+                var prefix = obj.value.substring(0, obj.selectionStart);
+                var suffix = obj.value.substring(obj.selectionEnd);
+                obj.value = prefix + str + suffix;
+            }
+            obj.focus();
+            obj.setSelectionRange(cursorPosition + str_len, cursorPosition + str_len);
+        } else {
+            target.insertText(str);
+        }
+    }
+
+
+    //刪除照護病患
+    function remove_pat(type_mode) {
+        var remove_json = "";
+        var confirm_str = "";
+        if (type_mode == "C") {
+            remove_json = $("#care_table").bootstrapTable('getSelections');
+            confirm_str = "照護病患";
+        }
+        var remove_length = remove_json.length;
+        if (remove_length > 0) {
+            if (confirm("您是否確定要刪除所選的 " + remove_length + " " + confirm_str)) {
+                //刪除病患
+                var r_id_arr = new Array();
+                for (var i = 0; i < remove_length ; i++) {
+                    r_id_arr.push(remove_json[i]["r_id"]);
+                }
+                $.ajax({
+                    url: "@Url.Content("~/RT/DeleteItem")", type: "post", timeout: 10000,
+                    data: "delete_json=" + JSON.stringify(r_id_arr),
+                    success: function (data) {
+                        if (data.execute_state) {
+                            showAlert(data.ws_result, msg_stat.Success);
+                            if (type_mode == "C") {
+                                $("#care_table").bootstrapTable('remove', { field: 'r_id', values: r_id_arr });
+                            }
+                        }
+                    }, complete: function () {
+                    }
+                });
+            }
+        } else {
+            var alert_str = "請至少選擇一位病患!";
+            if (type_mode == "C") {
+                createAutoClosingAlert("#care_list_alert", alert_str, 2000);
+            } else {
+                createAutoClosingAlert("#history_list_alert", alert_str, 2000);
+            }
+        }
+    }
+    var OnModeList = '';
+    var end_pt_msg = '';
+    //結案照護病患
+    function end_pat() {
+        var end_json = $("#care_table").bootstrapTable('getSelections');
+        //console.log(JSON.stringify(end_json));
+        var end_length = end_json.length;
+        if (end_length > 0) {
+            end_pt_msg = '';
+            if (confirm("您是否確定要將所選的 " + end_length + " 位照護病患結案")) {
+                //刪除病患
+                var ipd_no_arr = new Array();
+                for (var i = 0; i < end_length ; i++) {
+                    ipd_no_arr.push(end_json[i]["ipd_no"]);
+                }
+                $.ajax({
+                    url: "@Url.Content("~/RT/EndItem")", type: "post", timeout: 10000,
+                    data: "end_json=" + JSON.stringify(ipd_no_arr),
+                    success: function (data) {
+                        var r_id_arr = new Array();
+                        for (var i = 0; i < end_length ; i++) {
+                            r_id_arr.push(end_json[i]["r_id"]);
+                        }
+                        if (data.execute_state) {
+                            //刪除病患
+                            $.ajax({
+                                url: "@Url.Content("~/RT/DeleteItem")", type: "post", timeout: 10000,
+                                data: { delete_json: JSON.stringify(r_id_arr), ipd_json: JSON.stringify(ipd_no_arr) },
+                                success: function (data) {
+                                    if (data.execute_state) {
+                                        showAlert(data.ws_result, msg_stat.Success);
+                                        care_table.bootstrapTable("refresh");
+                                    } else {
+                                        showAlert(data.error_msg, msg_stat.Danger);
+                                    }
+                                }
+                            });
+                        } else {
+                         showAlert(data.error_msg, msg_stat.Danger);
+                    }
+                },
+                complete: function () {
+                }
+            });
+        }
+        } else {
+            createAutoClosingAlert("#care_list_alert", "請至少選擇一位病患!", 2000);
+        }
+    }
+ 
+
+    // 病人清單 click
+    function select_pti(e, row, type_mode_v) {
+        //debugger;
+        var diag_date = row.diag_date
+        if (diag_date == null || diag_date == undefined)
+            diag_date = '';
+        //清除所有 warning class
+        care_table.find("tbody tr[class=warning]").removeClass("warning");
+        care_table.find("tbody tr[class='info warning']").removeClass("warning");
+        care_table.find("tbody tr").removeClass("warning");
+        $('#history_table').find("tbody tr").removeClass("warning");
+        if (e != null) {
+            $(e).removeClass("danger").addClass("warning");
+        }
+        $("#nav_tabs").show();
+        type_mode = type_mode_v;
+        system_show();
+        //console.log('Event: onClickRow, data: ' + JSON.stringify(row));
+        var json_data_set = JSON.stringify(row);
+        //console.log(json_data_set);
+        // 給介面目前所設定的病患名字
+        current_info.chart_no = row.chart_no;
+        current_info.ipd_no = row.ipd_no;
+        var tempData = null;
+        //取得最新病患資訊及設定病患Session 20160913
+        $.ajax({
+            url: "@Url.Content("~/Base/SetSession")", type: "post", timeout: 10000,async:false,
+            data: { "pChart_no": row.chart_no, "typeMode": type_mode_v, "pipd_no": row.ipd_no, "diag_date": diag_date },
+            success: function (data) {
+                tempData = data;
+                //標示資料類型
+                setPatShowData(type_mode_v,data);
+            },
+            complete: function () {
+                if (tempData.ipd_no == null || tempData.ipd_no == undefined || tempData.ipd_no == '') {
+                    showAlert('取得最新病患資料失敗!', msg_stat.Danger);
+                } else {
+                    set_mode_info();
+                    //關閉側選單
+                    $('#mybody').removeClass('nav-expanded');
+                    $("#main_content").removeClass("disabledbutton");
+                    $('#scroll_tab').show();
+                }
+            }
+        });
+        @if (user_info.authority == "medical")
+        {
+            <text>
+            //$('#nav_tabs li').hide();
+            $('#nav_tabs li[data-medicalShow="true"]').show();
+            </text>
+        }
+        else
+        {
+            <text>
+                $('#nav_tabs li').show();
+                if (type_mode_v == 'H') {
+                    $('#nav_tabs li[data-HisNotShow="true"]').hide();
+                    $('#nav_tabs').addClass("bg-info");
+                } else {
+                    $('#nav_tabs li[data-HisNotShow="true"]').show();
+                    $('#nav_tabs li[data-InquirerNotShow="true"]').show();
+                    $('#nav_tabs').removeClass("bg-info");
+                }
+        </text>
+        }
+    }
+    //設定病患顯示資訊
+    function setPatShowData(type_mode,data) {
+        if (type_mode == "H") {
+            if ($("#nav_tabs .isHistory a[data-toggle='tabajax']").length > 0) {
+                $("#nav_tabs .isHistory a[data-toggle='tabajax']").trigger("click");
+            } else {
+                $("#nav_tabs li").first().find('a').trigger("click");
+            }
+        } else {
+            //設定病人基本資料Modal
+            $("#update_patient_modal #ipd_no").val(data.ipd_no);
+            $("#update_patient_modal #body_height").val(data.body_height);
+            if ($("#nav_tabs .active").length>0) {
+                $("#nav_tabs .active a[data-toggle='tabajax']").trigger("click");
+            } else {
+                $("#nav_tabs li").first().find('a').trigger("click");
+            }
+        }
+        var diag_desc_e = data["diagnosis_code"];
+        if (diag_desc_e == undefined) {
+            diag_desc_e = "";
+        }
+
+        //標示資料類型
+        var type_mode_ico = '';
+        var type_mode_class = '';
+        if (type_mode == "H") {
+            //type_mode_class = 'history_icon';
+            type_mode_ico = '<a id="update_patient_info" href="javascript:void(0);" onclick="click_patient_info_mark();" title="點選圖示可顯示病患資料"><i class="fa fa-clock-o fa-2x fa-color" aria-hidden="true"></i></a>';
+        } else {
+            //type_mode_class = 'patient_icon';
+            type_mode_ico = '<a id="update_patient_info" href="javascript:void(0);" onclick="click_patient_info_mark();" title="點選圖示可設定病患資料"><i class="fa fa-id-card-o fa-2x fa-color" aria-hidden="true"></i></a>';
+        };
+        $('#now_pat_icon').removeClass().addClass(type_mode_class).html(type_mode_ico);
+        $('#now_pat_chart_no').html(data.chart_no);
+        $('#now_pat_bed_no').html(data.bed_no);
+        $('#now_pat_name').html(data.patient_name);
+        $('#now_pat_gender').html(data.genderCHT);
+        $('#now_pat_age').html(data.age);
+        $('#now_pat_birthday').html(data.birth_day);
+        $('#now_pat_height').html(data.body_height);
+        $('#now_pat_diag_date').html(data.diag_date);
+        $('#now_pat_left_date').html(data.pre_discharge_date);
+        $('#now_pat_vsdoc').html(data.vs_doc);
+        $('#now_pat_diagnosis').html(diag_desc_e);
+        $('#now_patient_source').html(data.showSource);
+        $('#now_patient').attr('ipd_no', data.ipd_no);
+        $('#now_patient').attr('chart_no', data.chart_no);
+        $('#now_patient').data('now_patient_data', data);
+    }
+
+    ///點選病患資料左上方圖示
+    function click_patient_info_mark() {
+        showAlert("功能尚未開放，醫院須提供基本資料維護設定!", msg_stat.Warning);
+        return false;
+        if (type_mode == 'H') {
+            $('#pat_info_modal #patInfoSaveBtn').hide();
+        } else {
+            $('#pat_info_modal #patInfoSaveBtn').show();
+        }
+        if ($('#now_patient #mode_info #span_VPN').length > 0) {
+            $('#pat_info_block #isVPN').prop('checked',true);
+        } else {
+            $('#pat_info_block #isVPN').prop('checked', false);
+        }
+        $('#pat_info_modal #pat_info_block').html($('#now_patient').html());
+        $('#pat_info_modal #pat_info_body .now_patient').addClass('now_patient_info');
+        $('#pat_info_modal').modal('show');
+    }
+
+    //導入網站方式預設動作
+    function isGuideToDo() {
+        @*type_mode = 'H';
+        var patData = JSON.parse('@(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject((IPDPatientInfo)ViewData["pat_info"])))');
+        //var patData = @((IPDPatientInfo)ViewData["pat_info"]);
+        setPatShowData('H',patData);*@
+        $("#nav_tabs").show();
+        $('#nav_tabs li[data-HisNotShow="true"]').hide();
+        //$('#nav_tabs li[data-InquirerNotShow="true"]').hide();
+    }
+
+
+    //設定病人狀態資訊(氧療、呼吸器)
+    function set_mode_info(pList) {
+        $("#mode_info").html('');
+        var info_html = "";
+        if (pList == null || pList == undefined && pList == '') {
+            pList = new Array();
+        }
+        $.ajax({
+            url: "@Url.Content("~/RT/GetPatStatus")", type: "post", timeout: 10000, data: { pList: JSON.stringify(pList) },
+            dataType: "json",async:false,
+            success: function (data) {
+                OnModeList = data;
+                for (var i = 0; i < data.length ; i++) {
+                    if (data[i].showStatus) {
+                        var label_class = '';
+                        var label_id = 'span_' + data[i].StatusCode;
+                        switch (data[i].StatusCode) {
+                            case 'INTUBE':
+                                label_class = 'tag label-warning';
+                                break;
+                            case 'MV':
+                                label_class = 'tag label-success';
+                                break;
+                            case 'O2':
+                                label_class = 'tag label-info';
+                                break;
+                            case 'DNR':
+                                label_class = 'tag label-default';
+                                break;
+                            case 'VPN':
+                                label_class = 'tag label-danger';
+                                break;
+                            case 'CPT':
+                                label_class = 'tag label-primary';
+                                break;
+                            default:
+                                break;
+                        }
+                        info_html += '<span id="' + label_id + '" class="' + label_class + '">' + data[i].StatusDesc + '</span>';
+                    }
+                }
+                $("#mode_info").append(info_html);
+            }
+        });
+    }
+
+    //日期格式
+    function showDateFormat(value, row, index) {
+        var returnVal = value;
+        if (row.UPLOAD_STATUS == '1') {
+            returnVal += '<span class="glyphicon glyphicon-ok" style="color:#5CB85C;" title="資料已上傳"></span>';
+        }
+        return returnVal;
+    }
+
+    //CXR繪製底圖
+    function ViewDrawImg(canvas_id) {
+        var $canvas = $("#" + canvas_id);
+        var ctx = $canvas[0].getContext("2d");
+        //白底
+        ctx.lineCap = "round";
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, $canvas.width(), $canvas.height());
+        //底圖
+        ctx.drawImage(cxr_empty_img, 2, 10);
+    }
+    //主治醫師 Modal
+    function ReturnVal() {
+        var item = '';
+        $('#MyPhraseModal input[type=checkbox][name=RTRecordPharse]:checked').each(function () {
+            item += this.value + '\r\n';
+        });
+        $('#MyPhraseModal').modal('hide');
+        $('#StatusDetailContent #R_Memo').val(item).focus();
+        $('#DetailContent #R_Memo').val(item).focus();
+    }
+    //顯示詳細病患清單
+    function showDeatailCareList(pList) {
+        $("#care_table2").bootstrapTable({
+            data: pList,
+            pagination: true,
+            pageList: [10, 15, 25, 50, 100],
+            pageSize: 5
+        });
+        $('#showDeatailCareListModal').modal('show');
+    }
+
+    //檢查bootstap table formatter數值異常
+    function check_warning(value, row, index, _this) {
+        //判斷無檢查參數直接回傳不處理
+        try {
+            if (typeof _this.warning_check === 'undefined')
+                return value;
+        } catch (e) {
+            return value;
+        }
+
+        _this = _this == null ? this : _this;
+        var return_text = new Array();
+        //分割符號
+        var text_split = _this.text_split;
+        var split_value = new Array();
+        if (text_split == undefined || text_split == "") {
+            //無分割符號時
+            split_value.push(value);
+        } else {
+            split_value = value.split(text_split);
+        }
+        //分割數值陣列數
+        var split_len = split_value.length;
+
+        //判斷檢查定義數量與數值數量是否相等
+        if (split_value.length == _this.warning_check.length) {
+            for (var i = 0; i < split_len; i++) {
+                var warning_class = "";
+                var input_v = split_value[i];
+                if (_this.warning_check[i].list != "") {
+                    //列舉檢查
+                    if (_this.warning_check[i].list.indexOf(input_v) !== -1) {
+                        //發現值
+                        warning_class = "warning_color";
+                    }
+                    return_text.push('<span class="' + warning_class + '">' + input_v + '</span>');
+                } else {
+                    // 判斷非數值型態直接回傳不處理
+                    if (isNaN(input_v)) {
+                    } else {
+                        if (!(_this.warning_check[i].min_v == 0 && _this.warning_check[i].max_v == 0) && !!input_v) {
+                            //極限值檢查
+                            var num = new Number(input_v);
+                            input_v = num;
+                            if (!(input_v >= _this.warning_check[i].min_v && input_v <= _this.warning_check[i].max_v)) {
+                                //超出範圍
+                                warning_class = "warning_color";
+                            }
+                        } else if (_this.warning_check[i].digit >= 0 && !!input_v) {
+                            var num = new Number(input_v);
+                            input_v = num;
+                        }
+                    }
+                    return_text.push('<span class="' + warning_class + '">' + input_v + '</span>');
+                }
+            }
+        }
+
+        return return_text.join(text_split);
+    }
+
+    //區域分配資料預處理樣式
+    function areaResponseHandler(adata) {
+        return adata.A_RESULT;
+    }
+
+    //調整前後樣式
+    function mergerFormatter(value, row, index) {
+        var info_arr = Array();
+        for (var i = 0; i < row.remark.length; i++) {
+            info_arr.push(row.remark[i].area_name + "(" + row.remark[i].dispatch_count + ")");
+        }
+        return ['<div class="tp" title="' + info_arr.join("、") + '">', value, '</div>'].join('');
+    } 
+    //欄位顯示
+    function merge_text(value, row, index) {
+        var return_arr = new Array();
+        //串接時的分隔符號
+        var join_str = "";
+        var field_arr = this.field.split("|");
+        for (var i = 0; i < field_arr.length; i++) {
+            switch (field_arr[i]) {
+                case "onmode": 
+                    //On Mode狀態表示 
+                    if (row['onIntubate.hasData']) {
+                        return_arr.push('<div class="onmode_1 onmode" ></div>');
+
+                    }
+                    if (row['onBreath.hasData']) {
+                        return_arr.push('<div class="onmode_2 onmode" ></div>');
+                    }
+
+                    if (row['onOxygen.hasData']) {
+                        return_arr.push('<div class="onmode_3 onmode" ></div>');
+                    }
+                    break; 
+                case "rt_record.memo":
+                    //備註
+                    if (eval("row['" + field_arr[i] + "']") != null) {
+                        var memo = eval("row['" + field_arr[i] + "']").replace(/\n/g, '<br/>');
+                        return_arr.push('<span data-toggle="tooltip" data-original-title="' + memo + '">' + memo + '</span>');
+                    }
+                    break;
+                case "central_message":
+                    //備註
+                    if (eval("row['" + field_arr[i] + "']") != null) {
+                        var memo = eval("row['" + field_arr[i] + "']").replace(/\n/g, '<br/>');
+                        return_arr.push('<span data-toggle="tooltip" data-original-title="' + memo + '">' + memo + '</span>');
+                    }
+                    break;
+                case "rt_record.flow":
+                    if (eval("row['" + field_arr[i] + "']") != "" && eval("row['" + field_arr[i] + "']") != null) {
+                        return_arr.push(eval("row['" + field_arr[i] + "']") + "L");
+                    }
+                    break;
+                case "rt_record.o2flow":
+                    if (eval("row['" + field_arr[i] + "']") != "" && eval("row['" + field_arr[i] + "']") != null) {
+                        return_arr.push(eval("row['" + field_arr[i] + "']") + "L");
+                    }
+                    break;
+                /*--------------------- Cxr繪圖 [下] ---------------------*/
+                case "rt_record.CXR_result_json":
+                    if (typeof row["rt_record.CxrImageBase64_str"] === "string" && row["rt_record.CxrImageBase64_str"].length > 0 && row["rt_record.CxrImageBase64_str"].trim() != "") {
+                        return_arr.push('<div><img src="' + row["rt_record.CxrImageBase64_str"] + '" width="116" height="100"></img></div>');
+                    }//if
+                    else {
+                        return_arr.push('<div>Cxr無資料</div>');
+                    }
+                    break;
+                    /*--------------------- Cxr繪圖 [上] ---------------------*/
+                case "rt_record.work_data":
+                    var arrayVaue = [];
+                    var value1 = value
+                    var _value2 = row['rt_record.organDonation'];
+                    if (!!value1) {
+                        arrayVaue.push(JSON.parse(value).join(','));
+                    }
+                    if (!!_value2) {
+                        arrayVaue.push(JSON.parse(row['rt_record.organDonation']).join(','));
+                    }
+                    if (arrayVaue.length > 0) {
+                        value = arrayVaue.join(',');
+                    }
+                    return value;
+                    break;
+                case "rt_record.use_days_how":
+                    if (eval("row['" + field_arr[i] + "']") != "" && eval("row['" + field_arr[i] + "']") != null) {
+                        return_arr.push(eval("row['" + field_arr[i] + "']") + " 天");
+                    }
+                    break;
+                default:
+                    return_arr.push(eval("row['" + field_arr[i] + "']"));
+                    join_str = "/";
+                    break;
+            }
+        }
+        return check_warning(return_arr.join(join_str), row, index, this);
+    }
+    //調整卷軸高度
+    function useScrollBtn(pxInt) {
+        //console.log(pxInt);
+        var tabContentScroll = $('.tab-content')[1];
+        var _scrollHeight = tabContentScroll.scrollHeight;
+        var _offsetHeight = tabContentScroll.offsetHeight;
+        var _scrollTop = tabContentScroll.scrollTop;
+        _scrollTop = _scrollTop + pxInt;
+        if (_scrollTop < 0) {
+            tabContentScroll.scrollTop = 0;
+        } else if (_scrollTop + _offsetHeight > _scrollHeight) {
+            tabContentScroll.scrollTop = _scrollHeight;
+        } else {
+            tabContentScroll.scrollTop = _scrollTop;
+        }
+    }
+</script>
+<!-- 交班作業 --> 
+<div id="ShiftDiv2">
+    <!-- 交班病人清單 -->
+    <div class="modal modal-wide fade modal_record" tabindex="-1" role="dialog" data-backdrop="true" id="ShiftPtModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content rcs_form">
+                <div class="modal-header col-md-12">
+                    <div class="btn-group">
+                        <label>交班人：{{UserName}}</label>
+                    </div>
+                    <div class="btn-group pull-right" style="padding-left:5px;">
+                        <button id="shift_btn" class="btn btn-success" onclick="ShiftDiv_vm.SaveShiftHandOver(this);" data-loading-text="確認中...">接班人確認</button>
+                        <button class="btn btn-warning" data-dismiss="modal">關閉</button>
+                    </div>
+                    <div id="shift_user_lab" class="pull-right">
+                        <label>接班人：</label>
+                        <select class="form-control" style = "display:inline-block;width:auto;" v-model="user_id" >
+                            <option v-for="i in Shift_UserList" v-bind:value="i.Value">{{i.Text}}</option>
+                        </select> 
+                        <label>接班人密碼：</label>
+                        <input type="password"   v-model="user_password" name="Shift_UserPwd" id="Shift_UserPwd" class="form-control" style="display:inline-block;width:160px;" />
+                    </div>
+                </div>
+                <div class="modal-body" style="overflow-x:hidden;overflow-y:auto;">
+                    <div id="check_list_alert" class="alert alert-warning" style="opacity: 500; display: none;"><span></span></div>
+                    <table id="CheckShiftPtList" data-toggle="table" class="table table-bordered table-striped table-condensed">
+                        <thead style="background-color: #5BA198; color: #FFF;">
+                            <tr>
+                                <th data-field="bed_no" data-sortable="true" data-subfield='床號' >床號</th>
+                                <th data-field="chart_no" data-subfield='病歷號碼' >病歷號碼</th>
+                                <th data-field="patient_name" data-subfield='姓名'  >姓名</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div><!-- /.modal -->  
+<script>
+    var ShiftDiv_set_vm = {
+        Shift_UserList: [],
+        UserName: '',
+        listCnt: 0,
+        check_shift_data: '',
+        b_value_2_arry: '',
+        b_value_1_arry: '',
+        user_id:'',
+        user_password:''
+    };// 預設物件
+    var ShiftDiv_vm = new Vue({
+        el: '#ShiftDiv2',
+        data: [ShiftDiv_set_vm, {}].reduce(function (r, o) {
+            Object.keys(o).forEach(function (k) {
+                r[k] = o[k];
+            });
+            return r;
+        }, {}),
+        mounted: function () {
+            //元素已掛載，el被建立
+            $('#ShiftDiv2 #CheckShiftPtList').bootstrapTable({
+                url: '@Url.Content("~/Shift/CheckListTable")',
+                method: 'post',
+                showRefresh: true,
+                silent: true, 
+                queryParams: { "PtList": JSON.stringify(this.PtList) },
+                undefinedText: '',
+                detailView: "true",
+                formatNoMatches: function () {
+                    return '無任何的交班病患資料(必須有交班暫存記錄)';
+                },
+                onLoadSuccess: function (data) { 
+                    //初始化ckedit的矩陣
+                    if (data.length <= 0) {
+                        $("#ShiftDiv2 #shift_btn").hide();
+                        $("#ShiftDiv2 #shift_user_lab").hide();
+                    } else {
+                        $("#ShiftDiv2 #shift_btn").show();
+                        $("#ShiftDiv2 #shift_user_lab").show();
+                        $('#ShiftDiv2 #ShiftPtModal').modal('show');
+                    }
+                    $("#index_loading").modal('hide');
+                },
+                onExpandRow: function (index, row, $detail) {
+                    if (Number.isInteger(ShiftDiv_vm.listCnt) && ShiftDiv_vm.listCnt != index) $("#ShiftDiv2 #CheckShiftPtList").bootstrapTable('collapseRow', ShiftDiv_vm.listCnt);
+                    ShiftDiv_vm.listCnt = index;
+                    ShiftDiv_vm.showShiftDetail(index, row, $detail);
+                }
+            });
+        },
+        methods: {
+            // Vue Instance 在初始化時可設定選項物件，其中可設定 method，執行一些動作。
+            ShowShift2: function () {   // 交班作業 
+                var SelectPt = $('#care_table').bootstrapTable('getSelections');
+                if (SelectPt.length > 0) {
+                    this.PtList = SelectPt.map(function (item) {
+                        return {
+                            ipd_no: item['ipd_no'],
+                            chart_no: item['chart_no'],
+                            bed_no: item['bed_no'],
+                            patient_name: item['patient_name'],
+
+                        };
+                    });
+                    this.$http.post('@Url.Content("~/Shift/CheckListViewData")'
+                    ).then(function (responseSuccess) {
+                        this.Shift_UserList = responseSuccess.data.UserList;
+                        this.UserName = responseSuccess.data.UserName;
+                        // 取得交班資料
+                        $("#index_loading").modal('show');
+                        $('#ShiftDiv2 #CheckShiftPtList').bootstrapTable('refreshOptions', { queryParams: { "PtList": JSON.stringify(ShiftDiv_vm.PtList) } });
+
+                   }
+                   , function (responseError) { // 1.3.3 Http 網路回傳失敗
+                      showAlert('程式發生錯誤，請洽資訊人員!' , msg_stat.Danger, 3000);
+                   });
+                }
+                else {
+                    createAutoClosingAlert("#care_list_alert", "請至少選擇一位病患!", 2000);
+                }
+            },
+            SaveShiftHandOver: function(obj) {
+                 $(obj).button('loading');
+                //Step 2 帳號密碼確認
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Content("~/Shift/CheckPwd")',
+                    data: { 'UserNo': this.user_id, 'UserPwd': this.user_password },
+                    success: function (data) { 
+                        if (data == "True") {
+                            //Step 3 執行交班作業
+                            $.ajax({
+                                type: 'POST',
+                                url: '@Url.Content("~/Shift/SaveShiftDataHandOver")',
+                                timeout: 60 * 1000,
+                                data: {
+                                    'UserNo': ShiftDiv_vm.user_id,
+                                    'UserName': ShiftDiv_vm.UserName,
+                                    'PtList': encodeURIComponent(((JSON.stringify($("#ShiftDiv2 #CheckShiftPtList").bootstrapTable('getData')))))
+                                },
+                                success: function (data) {
+                                    //debugger;
+                                    if (data == "True") {
+                                        showAlert('交班作業成功!', msg_stat.Info);
+                                        $('#ShiftDiv2 #ShiftPtModal').modal('hide');
+                                        $("#care_table").bootstrapTable('refresh');
+                                        //$("#nav_tabs .active a[data-toggle='tabajax']").trigger("click");
+                                    } else {
+                                        showAlert('交班作業失敗!', msg_stat.Warning);
+                                    }
+                                },
+                                complete: function () {
+                                    //debugger;
+                                    $(obj).button('reset');
+                                },
+                                error: function (jqXHR) {
+                                    showAlert("交班作業 Step 3 發生錯誤 (" + jqXHR.status + ")", msg_stat.Danger);
+                                    log(jqXHR);
+                                }
+                            });
+                        } else {
+                            $(obj).button('reset');
+                            showAlert('密碼錯誤!', msg_stat.Danger);
+                        }
+                    },
+                    error: function (jqXHR) {
+                        $(obj).button('reset');
+                        showAlert("交班作業 Step 2 發生錯誤 (" + jqXHR.status + ")", msg_stat.Danger);
+                        log(jqXHR);
+                    }
+                });
+            },
+            showShiftDetail: function (index, row, $detail) { 
+                $("#index_loading").modal('show');
+                this.$http.post('@Url.Content("~/Shift/GetShiftForm")', { pPatInfo_str: encodeURIComponent(JSON.stringify({ ipd_no: row.IPD_NO, chart_no: row.chart_no })) }
+                ).then(function (responseSuccess) {
+                    ShiftDiv_vm.check_shift_data = responseSuccess.data;
+                    if (!!ShiftDiv_vm.check_shift_data) {
+                        $.ajax({
+                            url: "@Url.Content("~/Shift/getShift_viewHtml")",
+                            data: { index: index, chart_no: row.chart_no },
+                            type: "post",
+                            beforeSend: function () {
+                                $("#index_loading").modal('show');
+                            },
+                            success: function (data) { 
+                                var html = [];
+                                html.push('<div>');
+                                html.push('<button class="btn btn-success pull-right" onclick="ShiftDiv_vm.SaveShiftDetail(' + index + ');" data-loading-text="暫存中...">暫存</button>');
+                                html.push('<button class="btn btn-info pull-right" onclick="ShiftDiv_vm.last_data(' + index + ');" data-loading-text="帶入中...">帶入上次入院資料</button>');
+                                html.push('<div class="btn-group btn-group-sm symbol" id="symbol_' + index + '">');
+                                html.push('</div>');
+                                html.push('</div>')
+                                $detail.each(function () {
+                                    this.innerHTML = html.join('') + data;
+                                });
+                            },
+                            complete: function () { 
+                                // create ck editor instance
+                                ShiftDiv_vm.b_value_2_arry = CKEDITOR.replace('b_value_2' + '_' + index, {
+                                    toolbar: [['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript'],
+                                            ['FontSize'], ['TextColor', 'BGColor'], ['Table', 'HorizontalRule', 'Smiley', 'SpecialChar'], ['Maximize'], ['Undo', 'Redo']],
+                                    height: 500,
+                                    on: {
+                                        focus: function (evt) {
+                                            ShiftDiv_vm.b_value_2_arry.focus();
+                                            current_control = ShiftDiv_vm.b_value_2_arry;
+                                        }
+                                    }
+                                });
+                                ShiftDiv_vm.b_value_1_arry = CKEDITOR.replace('b_value_1' + '_' + index, {
+                                    toolbar: [['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript'],
+                                            ['FontSize'], ['TextColor', 'BGColor'], ['Table', 'HorizontalRule', 'Smiley', 'SpecialChar'], ['Maximize'], ['Undo', 'Redo']],
+                                    height: 500,
+                                    on: {
+                                        focus: function (evt) {
+                                            ShiftDiv_vm.b_value_1_arry.focus();
+                                            current_control = ShiftDiv_vm.b_value_1_arry;
+                                        }
+                                    }
+                                });
+                                setTimeout(function () {
+                                    no_match = function () {
+                                        return "查無資料";
+                                    }
+                                    $(".tableTag_" + index).each(function () {
+                                        var isShowHeader = false;
+                                        if ($(this).attr('id') == 'tbl_b_' + index)
+                                            isShowHeader = true;
+                                        $(this).bootstrapTable({
+                                            showHeader: isShowHeader,
+                                            data: [],
+                                            formatNoMatches: no_match
+                                        });
+                                    });
+                                    ShiftDiv_vm.setSymbolBtn('symbol_' + index);
+                                    ShiftDiv_vm.build_shiftList_view(ShiftDiv_vm.check_shift_data, index);
+                                    $("#index_loading").modal('hide');
+                                }, 500);
+                            },
+                            error: function (jqXHR) {
+                                log(jqXHR);
+                            }
+                        });
+                    }
+
+                    $("#index_loading").modal('hide');
+                }
+                , function (responseError) { // 1.3.3 Http 網路回傳失敗
+                    showAlert('程式發生錯誤，請洽資訊人員!', msg_stat.Danger, 3000);
+                    $("#index_loading").modal('hide');
+                });
+            },
+            //暫存交班記錄
+            SaveShiftDetail: function (index) {
+                try {
+                    ShiftDiv_vm.check_shift_data.B_VALUE_1 = CKEDITOR.tools.htmlEncode(ShiftDiv_vm.b_value_1_arry.getData());
+                    ShiftDiv_vm.check_shift_data.B_VALUE_2 = CKEDITOR.tools.htmlEncode(ShiftDiv_vm.b_value_2_arry.getData());
+                    $("#index_loading").modal('show');
+                    ShiftDiv_vm.ShiftListSave(ShiftDiv_vm.check_shift_data);
+
+                } catch (e) {
+                    var jqXHR = {
+                        responseText: e,   // 要看到的錯誤原因
+                        status: 500,    // 內部伺服器錯誤的代碼 << 或你有自己想用的
+                        statusText: "暫存交班記錄失敗",    // 錯誤說明
+                    };
+                    log(jqXHR);
+                    showAlert("暫存交班記錄失敗", msg_stat.Danger);
+                }
+            },
+            //取得上次交班記錄
+            last_data: function(index) {
+                var shift_chart_no = ShiftDiv_vm.check_shift_data.chart_no;
+                var shift_IPD_NO = ShiftDiv_vm.check_shift_data.IPD_NO;
+                var shift_PAT_DATA_DATE = ShiftDiv_vm.check_shift_data.S_VALUE[6].data;  //入院日期
+                var mymessage = confirm("是否確定帶入上次入院資料?");
+                if (mymessage == true) {
+                    $.ajax({
+                        url: "@Url.Content("~/Shift/GetLastShiftDataToView")",
+                        type: "post",
+                        dataType: "json",
+                        data: { shift_chart_no: shift_chart_no, shift_IPD_NO: shift_IPD_NO, shift_PAT_DATA_DATE: shift_PAT_DATA_DATE },
+                        success: function (data) {
+                            if (data != null && data.length > 0) {
+                                ShiftDiv_vm.check_shift_data.B_VALUE_1 = data[0].B_VALUE_1;
+                                ShiftDiv_vm.check_shift_data.B_VALUE_2 = data[0].B_VALUE_2;
+                                ShiftDiv_vm.build_shiftList_view(ShiftDiv_vm.check_shift_data, index);
+                            }
+                        },
+                        error: function (jqXHR) {
+                            log(jqXHR);
+                        }
+                    });
+                }
+                else if (mymessage == false) {
+
+                }
+            },
+            // 建置交班檢視
+            build_shiftList_view:function(sd, index) {
+                try {
+                // 處理按鈕顯示
+                    setTimeout(function ()
+                    {
+                        ShiftDiv_vm.b_value_1_arry.setReadOnly(false);
+                        ShiftDiv_vm.b_value_2_arry.setReadOnly(false);
+                    },
+                        0
+                        );
+                    if (sd.B_VALUE_2 != '') {
+                        setTimeout(function ()
+                        {
+                            ShiftDiv_vm.b_value_2_arry.setData(CKEDITOR.tools.htmlDecode(sd.B_VALUE_2));
+                        },
+                        100
+                        );
+                    } else {
+                        setTimeout(function ()
+                        {
+                            ShiftDiv_vm.b_value_2_arry.setData('');
+                        },
+                        200
+                        );
+                    }
+
+                    if (sd.B_VALUE_1 != '') {
+                        setTimeout(function ()
+                        {
+                            ShiftDiv_vm.b_value_1_arry.setData(CKEDITOR.tools.htmlDecode(sd.B_VALUE_1));
+                        },
+                        100
+                        );
+                    } else {
+                        setTimeout(function ()
+                        {
+                            ShiftDiv_vm.b_value_1_arry.setData('');
+                        },
+                        200
+                        );
+                    }
+
+                    // 處理資料
+                    if (sd.SHIFT_NAME == "" && sd.SHIFT_DATE == "") {
+                        //當班資料顯示建檔資訊(因未交班)
+                        $("#ShiftDiv2 #shift_info_" + index).html("建檔人員:" + sd.CREATE_NAME + "&nbsp;建檔時間:" + sd.CREATE_DATE);
+                    } else {
+                        //歷史資料顯示交班資訊
+                        $("#ShiftDiv2 #shift_info_" + index).html("接班人員:" + sd.SHIFT_NAME + "&nbsp;交班時間:" + sd.SHIFT_DATE);
+                    }
+                    $("#ShiftDiv2 #shift_i_info_" + index).html(sd.I_VALUE);
+                    if (sd.S_VALUE != null) {
+                        $("#ShiftDiv2 #tbl_s_" + index).bootstrapTable("load", sd.S_VALUE);
+                    } else {
+                        $("#ShiftDiv2 #tbl_s_" + index).bootstrapTable("load", []);
+                    }
+                    // background
+                    if (sd.B_VALUE != null) {
+                        $("#ShiftDiv2 #tbl_b_" + index).bootstrapTable("load", sd.B_VALUE);
+                    } else {
+                        $("#ShiftDiv2 #tbl_b_" + index).bootstrapTable("load", []);
+                    }
+                    $("#ShiftDiv2 #b_value_1_" + index).val("").val(sd.B_VALUE_1);
+
+                    // assessment
+                    if (sd.A_VALUE != null) {
+
+                    } else {
+                        $('#ShiftDiv2 #tbl_b_' + index).bootstrapTable("load", []);
+                    }
+
+                } catch (e) {
+                    console.log(e);
+                }
+            },
+            //產生符號按鈕
+            setSymbolBtn:function (pSymbolId) {
+                // 產生符號按鈕
+                var add_html = "";
+                var symbol_arr = new Array('（', '）', '「', '」', '＋', '－', '±', '，', '。', '：', '；', '？', '／', '！', '、', '℃', 'cc', 'kg', 'mg', '↑', '↓', ' ∵ ', ' ∴ ' );
+                for (var i = 0; i < symbol_arr.length; i++) {
+                    add_html += '<button class=\"btn btn-default">' + symbol_arr[i] + '</button>';
+                }
+                $("#ShiftDiv2 #" + pSymbolId).html(add_html);
+
+                // 綁定寫入符號事件
+                $("#ShiftDiv2 #" + pSymbolId + " > button").click(function () {
+                    if (current_control != null) {
+                        sel_inster_str(current_control, $(this).html());
+                        is_changed = true;
+                    }
+                });
+
+                // 標記目前所用到的控制項
+                $(".setSymbol").focus(function () {
+                    current_control = $(this);
+                }).change(function () {
+                    // 若對控制項進行變更則會改變狀態
+                    is_changed = true;
+                });
+            },
+            ShiftListSave: function(sd) {
+                $.ajax({
+                    url: "@Url.Content("~/Shift/ShiftSaveData")",
+                    timeout: 10000, type: "post",
+                    dataType: "json",
+                    data: { shift_str: encodeURIComponent(JSON.stringify(sd)) },
+                    success: function (data) {
+                        showAlert(data.message, msg_stat.Success); 
+                        // 取得交班資料
+                        $("#index_loading").modal('show');
+                        $('#ShiftDiv2 #CheckShiftPtList').bootstrapTable('refreshOptions', { queryParams: { "PtList": JSON.stringify(ShiftDiv_vm.PtList) } });
+                    },
+                    error: function (jqXHR) {
+                        showAlert("暫存錯誤", msg_stat.Danger);
+                        log(jqXHR.status);
+                    }
+                });
+            }
+        },
+        computed: {
+            //當我們定義一個 computed，其相依 data 一變，computed 也會隨之更新。
+            UserName: function () {
+                return this.Shift_UserList.find(function (element) {
+                    return element == ShiftDiv_vm.user_id;
+                });
+            }
+        },
+        watch: {
+            //當事件觸發時，瀏覽器叫事件處理器work。
+
+        }
+    });
+</script>

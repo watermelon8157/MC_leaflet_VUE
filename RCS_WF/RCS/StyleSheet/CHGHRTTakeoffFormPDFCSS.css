@@ -1,0 +1,11 @@
+﻿.ALLBorder
+{
+}
+
+table, tr, td {
+    border: 0px solid black;
+    font-size: large;
+    padding-top:5px;
+    padding-bottom:5px;
+    vertical-align:middle;
+}

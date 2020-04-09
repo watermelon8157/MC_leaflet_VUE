@@ -1,0 +1,63 @@
+﻿@model RCS.Models.SuppliesViewModel
+@using RCS.Models.DB
+@{
+
+    List<RCS.Models.DB.RCS_SYS_CONSUMABLE_PACKAGE_DTL> plist = Model.package_dtl;
+    var room = 0;
+
+    if (Model != null)
+    {
+    }
+    ViewBag.Title = "_supplies_view";
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var save_text = $('#CM_name :selected').val();
+        if (save_text != "")
+        {
+            @if(plist.Count == 0)
+        {
+            @:showAlert($('#CM_name :selected').text() + '套餐，尚未維護耗材!', msg_stat.Danger);
+        }
+        }
+
+        room = '@plist.Count';
+    });
+
+</script>
+@foreach (RCS.Models.DB.RCS_SYS_CONSUMABLE_PACKAGE_DTL item in plist)
+{
+    room++;
+    Model.suplies_name.ForEach(x=>x.Selected = false);//全部不選
+    if(Model.suplies_name.Exists(x=>x.Value == item.C_ID))//找到下拉是選單有這個選項
+    {
+        //將Selected 設定為 true
+        Model.suplies_name.Find(x => x.Value == item.C_ID).Selected = true;
+    }
+<div class="removeclass@(room)">
+    <div class="panel_field">
+        <div class="col-sm-5 nopadding">
+            <div class="form-group" data-field="Y">
+                @Html.DropDownList("C_name"+room,Model.suplies_name, "請選擇耗材", new { @onchange = "checkoption($(this));", @value = item.C_ID, @class = "form-control", @style = " width: 180px;" })
+            </div>
+        </div>
+        <div class="col-sm-5 nopadding">
+            <div class="form-group" data-field="Y">
+                <input value="@item.C_QTY" type="number" name="suplies_qty@(room)" class="form-control" onkeypress='return event.charCode >= 48 && event.charCode <= 57' min="1" />
+            </div>
+        </div>
+        <div class="col-sm-2 nopadding">
+            <div class="form-group">
+                <div class="btn_area" style="display:table-cell;vertical-align:middle;">
+                    &emsp;
+                    <button class="btn btn-danger" type="button" onclick="$('.removeclass@(room)').remove(); sumSource();" style="padding:10px;">
+                        <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+            }
+

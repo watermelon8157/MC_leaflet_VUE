@@ -1,0 +1,222 @@
+﻿<#@ template language="C#" hostspecific="true" #>
+<#@ assembly name="EnvDTE" #>
+<#@ assembly name="EnvDTE80" #>
+<#@ assembly name="System.Core.dll" #>
+<#@ assembly name="System.Xml.dll" #>
+<#@ assembly name="System.Xml.Linq.dll" #>
+<#@ assembly name="Newtonsoft.Json.dll" #>
+<#@ import namespace="EnvDTE" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+<#@ import namespace="System.Xml.Linq" #>
+<#@ import namespace="Newtonsoft.Json" #>
+<#@ output extension="text" #> 
+<#
+	// browse every solution's projects
+	var visualStudio = (Host as IServiceProvider).GetService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
+	foreach(EnvDTE.Project project in visualStudio.Solution.Projects)
+	{ 
+#>
+<#
+        bool isIncludeFolderName = false;
+		// browse every project's files
+		foreach(EnvDTE.ProjectItem item in GetProjectItemsRecursively(project.ProjectItems))
+		{
+			if (item.FileCodeModel == null){ 
+			    continue;
+			} 
+            includeFile.Add(item.Name);
+#>
+<#//showString(includeFile)#>
+<#
+			foreach(EnvDTE.CodeElement elem in item.FileCodeModel.CodeElements)
+			{
+			     //EnvDTE.vsCMElement.vsCMElementNamespace == 5
+				 if (elem.Kind == EnvDTE.vsCMElement.vsCMElementNamespace){
+				     //filter by pre-define name space
+					 if (includeInterface.Count > 0)
+					{
+						string fullEnumNameSpace = elem.FullName;
+						 
+#>
+<#
+                        foreach (CodeElement innerElement in elem.Children)
+					    {
+						    //vsCMElement.vsCMElementInterface == 8
+							// filter by pre-define project name
+							if (includeFullClassNames.Count > 0)
+							{
+								if(!includeFullClassNames.Contains(innerElement.FullName))
+								{ continue;}
+							} 
+						    if (innerElement.Kind == vsCMElement.vsCMElementClass)
+						    {
+							     
+#>
+<#//showString(innerElement.FullName)#>
+<#
+                                 CodeClass idata = (CodeClass)innerElement;
+								 StringBuilder sbMain = new StringBuilder();
+								 sbMain.Append(string.Concat("{", Environment.NewLine));
+								 // format enum name
+							     string idataFullName = idata.FullName;
+								 string idataName = idata.Name; 
+								 // WriteLine(idata.Namespace);
+								bool hasInterface = false;
+							    foreach (CodeInterface ifaces in idata.ImplementedInterfaces)
+							    {
+									if(includeInterface.Contains(ifaces.Name))
+									{ 
+									 hasInterface = true;
+									  WriteLine("         ");
+									 WriteLine("# " + innerElement.FullName);
+									  WriteLine("         ");
+									}
+									else
+									{
+									 WriteLine("         " + innerElement.FullName);
+									}  
+								}
+								 if(!hasInterface)
+								 { continue;}
+								 // deal with each enum members
+								 List<string> sbDTL = new List<string>();
+								foreach (CodeElement member in idata.Members)
+							    {
+									// get Interface member
+									if(member.Kind == vsCMElement.vsCMElementProperty){
+									     CodeProperty cProp = member as  CodeProperty;
+										 CodeTypeRef cType = cProp.Type as  CodeTypeRef;
+										 switch (cType.TypeKind)
+										{
+											case EnvDTE.vsCMTypeRef.vsCMTypeRefArray:
+											    sbDTL.Add(string.Concat("  \"",member.Name,"\" : []"));
+												break;
+											case EnvDTE.vsCMTypeRef.vsCMTypeRefString:
+											case EnvDTE.vsCMTypeRef.vsCMTypeRefChar:
+											    sbDTL.Add(string.Concat("  \"",member.Name,"\" : \"\""));
+												break;
+										    case EnvDTE.vsCMTypeRef.vsCMTypeRefObject:
+											    sbDTL.Add(string.Concat("  \"",member.Name,"\" : {}"));
+												break;
+											case EnvDTE.vsCMTypeRef.vsCMTypeRefInt:
+											case EnvDTE.vsCMTypeRef.vsCMTypeRefLong:
+											case EnvDTE.vsCMTypeRef.vsCMTypeRefFloat:
+										    case EnvDTE.vsCMTypeRef.vsCMTypeRefDouble:
+											    sbDTL.Add(string.Concat("  \"",member.Name,"\" : 0"));
+												break;
+											case EnvDTE.vsCMTypeRef.vsCMTypeRefBool:
+											    sbDTL.Add(string.Concat("  \"",member.Name,"\" : false"));
+												break;
+											case EnvDTE.vsCMTypeRef.vsCMTypeRefDecimal:
+										    case EnvDTE.vsCMTypeRef.vsCMTypeRefShort:
+											case EnvDTE.vsCMTypeRef.vsCMTypeRefOther:
+											case EnvDTE.vsCMTypeRef.vsCMTypeRefVoid:
+											case EnvDTE.vsCMTypeRef.vsCMTypeRefCodeType:
+											case EnvDTE.vsCMTypeRef.vsCMTypeRefPointer:
+												break;
+										    case EnvDTE.vsCMTypeRef.vsCMTypeRefByte:
+												break;
+											case EnvDTE.vsCMTypeRef.vsCMTypeRefVariant:
+												break;
+											default:
+												break;
+										}
+#>
+<#//cType.TypeKind#>
+<#
+									}
+									if(member.Kind == vsCMElement.vsCMElementFunction){
+									    //CodeFunction value = member as CodeFunction;
+										//sbMain.Append(string.Concat("  \"",member.Name,"\" : function (){}"));
+									}
+#>
+<#//member.Name#>
+<#//member.Kind#>
+<#
+                                }
+								sbMain.Append(string.Concat(string.Join(string.Concat(",", Environment.NewLine), sbDTL), Environment.NewLine));
+								sbMain.Append(string.Concat("}", Environment.NewLine));
+								File.WriteAllText(Path.Combine(Path.GetDirectoryName(Host.TemplateFile),
+								string.Concat(innerElement.FullName,".json")),sbMain.ToString());
+								 
+#>
+<#//showString(idata.FullName)#>
+<#
+							}
+#>
+<#//showString(innerElement.Kind)#>
+<#
+                        }
+#>
+<#//showString(elem.FullName)#>
+<#				  
+					}
+				 }
+#>
+<#//showString(elem.Kind)#>
+<#//showString(EnvDTE.vsCMElement.vsCMElementNamespace)#>
+<#
+			}
+#>
+<#
+		}
+	}
+#>
+<#+
+    #region Target Filter Conditions
+
+	// JsonFileDic
+	Dictionary<string,StringBuilder> dicJSFiles = new Dictionary<string,StringBuilder>();
+
+	// target project names (empty : for all projects)
+	List<string> includeProjects = new List<string>(){
+		"RCSControllers"
+	};
+
+	// target project names (empty : for all Folder)
+	List<string> includeFolderName = new List<string>(){
+		 "Models"
+	};
+
+	// target project names (empty : for all EnvDTE.ProjectItem)
+	List<string> includeFile = new List<string>(){
+		 
+	};
+
+	// target enum name spaces (empty : for all NameSpaces)
+	List<string> includeInterface = new List<string>(){
+		 "T4Json"
+    };
+
+	// target enum full names (empty : for all Class Names)
+	List<string> includeFullClassNames = new List<string>(){
+		 
+    };
+
+    #endregion
+
+	public List<EnvDTE.ProjectItem> GetProjectItemsRecursively(EnvDTE.ProjectItems items)
+	{
+		var ret = new List<EnvDTE.ProjectItem>();
+		if (items == null) return ret;
+		foreach(EnvDTE.ProjectItem item in items)
+		{
+			ret.Add(item);
+			ret.AddRange(GetProjectItemsRecursively(item.ProjectItems));
+		}
+		return ret;
+	}
+
+	//產生Json檔案
+	void CreateJsonFile<T>(string path, T data){
+		File.WriteAllText(path, JsonConvert.SerializeObject(data));
+	}
+	string showString<T>(T data){
+		return  JsonConvert.SerializeObject(data);
+	}
+
+#>

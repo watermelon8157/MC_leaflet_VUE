@@ -1,0 +1,1293 @@
+﻿/*設計樣式*/
+body {
+    background: #EBEBEB;
+    font-family: "微軟正黑體";
+}
+
+a {
+    outline: none;
+    color: #5BA198;
+}
+
+a:hover, a:focus {
+    outline: none;
+    text-decoration: none;
+}
+
+textarea{ resize: none; }
+
+#pat_list > div > button {
+    border-bottom-style: solid;
+    border-bottom-width: 2px;
+}
+
+.pat_list > div > button:hover {
+    border-bottom-color: #f0ad4e;
+}
+
+/* scroll news */
+.maya-news-scroll ul, .maya-news-scroll li {
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    line-height: 14px;
+    list-style: none;
+}
+
+.maya-news-scroll {
+    border: 1px solid #eee;
+    height: 38px;
+    overflow: hidden;
+    position: relative;
+}
+
+.maya-news-scroll ul {
+    padding: 2px;
+}
+
+.maya-news-scroll li {
+    background: url('images/scrollnews_icon/036.gif') no-repeat 2px 0px;
+    padding: 2px 0px 2px 22px;
+    white-space: nowrap;
+}
+
+#msgbox {
+    display: none;
+    margin: 2%;
+    width: 96%;
+    position: absolute;
+    z-index: 9999;
+}
+
+.rc_table.table th {
+    background-color: #5BA198;
+    color: #FFF;
+}
+
+/* 垂直表單樣式 */
+.flip-scroll {
+    overflow: auto;
+}
+
+.flip-scroll .table table {
+    display: block;
+    position: relative;
+    width: 100%;
+    /*border-bottom: 1px;*/
+}
+
+.flip-scroll .table thead {
+    display: block;
+    float: left;
+}
+
+.flip-scroll .table tbody {
+    display: block;
+    /*width: 900px;*/
+    position: relative;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.flip-scroll .table tbody tr {
+    display: -moz-box;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: table-cell;
+}
+
+.flip-scroll .table > tbody > tr > td {
+    display: block;
+    min-height: 1.25em;
+    text-align: center;
+    border-left: 0px !important;
+    border-top: 0px !important;
+    padding: 3px !important;
+    /*border-bottom: 0 !important;*/
+    line-height: 18px;
+    height: 35px;
+    /*hide overflow 130px*/
+    max-width: 200px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+/* sort out borders */
+.flip-scroll .table > thead th {
+    height: 35px;
+}
+
+.flip-scroll .table thead tr:first-child th {
+    width: auto !important;
+}
+
+.flip-scroll .table th {
+    background-color: #5BA198;
+    color: #FFF;
+    display: block;
+    border-top: 1px solid #ddd;
+    border-left: 1px;
+}
+
+.flip-scroll .table th.list_split_block {
+    background-color: #477B75;
+    color: #FFF;
+    display: block;
+    border-top: 1px solid #ddd;
+    border-left: 1px;
+    line-height: 22px;
+}
+
+.flip-scroll .table .fixed-table-container tr th:first-child {
+    border-top: 1px solid #ddd !important;
+}
+
+/*Table-striped Color*/
+.table .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: #ECFFEE;
+}
+
+.sty-navbar {
+    background: #5BA198;
+    height: 80px;
+    top: 40px;
+}
+
+/*現在病人樣式*/
+.now_patient_source {
+    float: left;
+    width: 68px;
+    height: 68px;
+    border: 4px outset #337ab7;
+    background-color: #fff;
+    color: #353333;
+    font-size: 56px;
+    padding: 2px;
+    margin: 6px;
+    font-weight: bold;
+    border-radius: 8px;
+}
+.now_patient {
+    font-size: 34px;
+    color: #FFFFFF;
+    height: 100%;
+}
+
+div.now_patient {
+    padding-left: 82px;
+    min-height: 78px;
+    background: #5BA198;
+}
+
+.patient_list a:hover {
+    background: #DFF5F1;
+    -webkit-transition: background 200ms linear;
+    -moz-transition: background 200ms linear;
+    -ms-transition: background 200ms linear;
+    -o-transition: background 200ms linear;
+    transition: background 200ms linear;
+}
+
+.patient_list a {
+    /*background:#FFFFFF;*/
+    /*border-right: #4D8780 1px solid;*/
+    -webkit-transition: background 200ms linear;
+    -moz-transition: background 200ms linear;
+    -ms-transition: background 200ms linear;
+    -o-transition: background 200ms linear;
+    transition: background 200ms linear;
+}
+
+ul.now_patient li span.tag {
+    /*font-family: Helvetica, Arial, sans-serif;*/
+    /*font-weight:bold;*/
+    display: inline-block;
+    color: #fff;
+    position: relative;
+    padding: 0 10px;
+    border-radius: 0.25em;
+    margin: 8px 4px 0 0;
+    text-decoration: none;
+    font-size: 14px;
+    height: 20px;
+    line-height: 20px;
+    vertical-align: middle;
+}
+
+
+ul.now_patient li span.tag00 {
+    background-color: #9E6ADD;
+}
+
+ul.now_patient li span.tag01 {
+    background-color: #8FB4EE;
+}
+
+ul.now_patient li span.tag02 {
+    background-color: #84D135;
+}
+
+ul.now_patient {
+    /*white-space: nowrap;*/
+    vertical-align: middle;
+    font-size: 0;
+    display: table;
+    width: 100%;
+}
+
+ul.now_patient > li {
+    /*float:left;*/
+    /*padding:16px;*/
+    display: inline-block;
+    display: table-cell;
+    font-size: 14px;
+    box-sizing: border-box;
+    height: 40px;
+    margin: 16px 0;
+    padding: 0 16px;
+    color: #ADD0CB;
+    color: rgba(255,255,255,0.5);
+    vertical-align: middle;
+    /*max-width:328px;*/
+    text-overflow: ellipsis;
+    overflow: hidden;
+    position: relative;
+}
+
+ul.now_patient > li::before {
+    content: "";
+    height: 40px;
+    display: inline-block;
+    display: table-cell;
+    width: 1px;
+    background: #f0ad4e;
+    float: left;
+    margin: 0 16px 0 0;
+}
+
+ul.now_patient li.patient_icon::before {
+    content: "";
+    display: none;
+}
+
+ul.now_patient li.patient_icon {
+    width: 40px;
+    height: 40px;
+    background: #f0ad4e;
+    line-height: 40px;
+    padding: 10px 0;
+    box-sizing: border-box;
+    border-radius: 4px;
+    margin-right: 0;
+    display: block;
+    margin-left: 6px;
+}
+
+.patient_icon img {
+    margin: 0 auto;
+    display: block;
+}
+
+ul.now_patient li.history_icon::before {
+    content: "";
+    display: none;
+}
+
+ul.now_patient li.history_icon {
+    width: 40px;
+    height: 40px;
+    background: #2087B3;
+    line-height: 40px;
+    padding: 10px 0;
+    box-sizing: border-box;
+    border-radius: 4px;
+    margin-right: 0;
+    display: block;
+    margin-left: 6px;
+}
+
+.history_icon img {
+    margin: 0 auto;
+    display: block;
+}
+
+ul.now_patient > li > label {
+    margin-top: 0;
+    /*position:absolute;*/
+    display: block;
+    width: 100%;
+    white-space: nowrap;
+}
+
+ul.now_patient > li span {
+    white-space: nowrap;
+    font-size: 16px;
+    color: #FFF;
+    display: block;
+    /*padding:6px 0 0 0;*/
+    box-sizing: border-box;
+    max-width: 328px;
+}
+
+#pt_info_list .tag {
+    font-size: 14px;
+    padding: 0 8px;
+    margin: 0 4px 0 0;
+    height: 20px;
+    line-height: 20px;
+    vertical-align: middle;
+}
+
+#pt_info_list .tag:before {
+    content: none;
+}
+
+.tab-content {
+    /*background: #FFFFFF;*/
+    border-radius: 4px;
+    /*padding:16px;*/
+}
+
+#main_content .tab-content .tab-pane {
+    background: #FFFFFF;
+}
+
+#system_manage {
+    border-right: #4D8780 1px solid;
+    -webkit-transition: background 200ms linear;
+    -moz-transition: background 200ms linear;
+    -ms-transition: background 200ms linear;
+    -o-transition: background 200ms linear;
+    transition: background 200ms linear;
+}
+
+#system_manage:hover, #logout:hover {
+    background: #DFF5F1;
+    -webkit-transition: background 200ms linear;
+    -moz-transition: background 200ms linear;
+    -ms-transition: background 200ms linear;
+    -o-transition: background 200ms linear;
+    transition: background 200ms linear;
+}
+
+#system_manage span {
+    color: #5F5B5B;
+    -webkit-transition: background 200ms linear;
+    -moz-transition: background 200ms linear;
+    -ms-transition: background 200ms linear;
+    -o-transition: background 200ms linear;
+    transition: background 200ms linear;
+}
+
+#system_manage:hover span {
+    color: #588FE5;
+    -webkit-transition: background 200ms linear;
+    -moz-transition: background 200ms linear;
+    -ms-transition: background 200ms linear;
+    -o-transition: background 200ms linear;
+    transition: background 200ms linear;
+}
+
+#logout span {
+    color: #f2dbdb;
+    -webkit-transition: background 200ms linear;
+    -moz-transition: background 200ms linear;
+    -ms-transition: background 200ms linear;
+    -o-transition: background 200ms linear;
+    transition: background 200ms linear;
+}
+
+#logout:hover span {
+    color: #db1313;
+    -webkit-transition: background 200ms linear;
+    -moz-transition: background 200ms linear;
+    -ms-transition: background 200ms linear;
+    -o-transition: background 200ms linear;
+    transition: background 200ms linear;
+}
+
+#exam_slider_scroll {
+    -webkit-box-shadow: 0 0 5px 5px #5f5b5b;
+    box-shadow: 0 0 5px 5px #5f5b5b;
+}
+
+#slider_tab {
+    background: #42637B !important;
+}
+
+/*使Html5 datalist下拉箭頭顯示*/
+input[type=text]::-webkit-calendar-picker-indicator {
+    opacity: 1;
+}
+
+/*bootstrap modal fix*/
+.modal.modal-wide .modal-dialog {
+    width: 90%;
+}
+
+.modal-wide .modal-body {
+    overflow-y: auto;
+}
+
+.result_canvas {
+    border: 1px solid gray;
+}
+
+/*特殊符號按鈕樣式*/
+.symbol_panel {
+    margin: 4px;
+}
+
+.symbol_panel input[type="button"] {
+    font: 16px Arial, Helvetica, sans-serif;
+    padding: 5px 8px;
+    line-height: 0px;
+    height: 35px;
+    width: 35px;
+    vertical-align: top;
+}
+
+/*新INDEX*/
+.page-container {
+    /*margin-top: 50px;*/
+}
+
+.main_nav {
+    background: #36b0d5;
+    font-size: 15px;
+}
+
+.username {
+    line-height: 24px;
+    color: #FFF;
+    font-size: 19px;
+    position: absolute;
+    right: 0;
+    margin: 6px 210px 6px 0px;
+    padding-right: 10px;
+    border-right: 2px solid #f0ad4e;
+}
+
+/*病人資訊*/
+
+.main_content, sys_main_content {
+    padding: 2px 0 0 2px;
+    border-top: none;
+}
+
+.main_content {
+    border-left: 46px #5BA198 solid;
+}
+.patient_history div.now_patient {
+    background: #6F807B;
+}
+
+.patient_history div.now_patient + .main_content {
+    border-left: 47px #6F807B solid;
+}
+
+
+ul.patient_sub > li {
+    white-space: nowrap;
+    margin-bottom: 6px;
+}
+
+ul.patient_sub > li > label {
+    margin-top: 0;
+    /*position:absolute;*/
+    display: inline;
+    width: 100%;
+    white-space: nowrap;
+}
+
+ul.patient_sub > li > span {
+    white-space: nowrap;
+    font-size: 16px;
+    color: #FFF;
+    display: inline-block;
+    box-sizing: border-box;
+    margin-left: 6px;
+    max-width: 328px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    vertical-align: sub;
+}
+
+/*側欄*/
+
+.patient_nav {
+    position: absolute;
+    z-index: 999;
+    width: 100%;
+    background: #FFF;
+    max-width: 1010px;
+    /*top: 116px;*/
+    top: 0;
+    margin-top: 116px;
+    bottom: 0px;
+    transition: left 0.4s ease-in-out 0s;
+    left: -1010px;
+    overflow: auto;
+    overflow-y: scroll;
+    border-left: 44px solid #5ba198;
+}
+
+.nav-expanded .patient_nav {
+    left: 0;
+    transition: left 0.4s ease-in-out 0s;
+    box-shadow: rgba(0,0,0,0.4) 3px 3px 3px;
+}
+
+.patient_nav_tab {
+    /*top: 159px;*/
+    left: 0;
+    /*left:960px;*/
+    position: absolute;
+    z-index: 1000;
+    transition: left 0.4s ease-in-out 0s;
+}
+
+.nav-expanded .patient_nav_tab {
+    /*left: 1010px;*/
+    transition: left 0.4s ease-in-out 0s;
+}
+
+.patient_nav_tab li {
+    width: 40px;
+    background: #889993;
+    color: #fff;
+    padding: 5px;
+    margin-bottom: 5px;
+    border-radius: 0 0.5em 0.5em 0;
+    text-align: center;
+    box-shadow: rgba(0,0,0,0.4) 3px 3px 3px;
+}
+
+.patient_nav_tab li:hover, .patient_nav_tab li.patient_active {
+    background: #f0ad4e;
+}
+
+li.patient_nav_tab_history:hover, ul.now_patient li.patient_nav_tab_history, .patient_nav_tab li.history_active {
+    background: #2087B3;
+}
+
+li.user_give_nav_tab:hover, li.user_give_active {
+    background: #66B032;
+}
+
+li.patient_nav_tab_vpn_upload:hover, li.tab_vpn_active {
+    background: #c17dff;
+}
+
+
+.patient_nav_tab a span {
+    padding: 8px;
+    display: block;
+    color: #FFF;
+    text-decoration: none;
+}
+
+.patient_nav_tab li:hover {
+    box-shadow: rgba(0,0,0,0.4) 3px 3px 3px;
+}
+
+.patient_nav_content {
+    padding: 20px;
+}
+
+.col_full_width {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/*小版面 */
+
+ul.now_patient > li {
+    height: 26px;
+    margin: 7px 5px;
+    display: inline-block;
+    padding: 0;
+}
+
+ul.now_patient > li > span {
+    display: inline-block;
+    margin-left: 4px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+ul.now_patient > li::before {
+    content: "";
+    height: 20px;
+    display: inline-block;
+    width: 1px;
+    background: #f0ad4e;
+    float: left;
+    margin: 0 16px 0 0;
+}
+
+ul.now_patient > li.patient_icon {
+    width: 30px;
+    height: 20px;
+    background: #f0ad4e;
+    line-height: 20px;
+    padding: 2px 0;
+    box-sizing: border-box;
+    border-radius: 4px;
+    margin-right: 0;
+    display: inline-block;
+}
+
+ul.now_patient > li.history_icon {
+    width: 30px;
+    height: 20px;
+    background: #2087B3;
+    line-height: 20px;
+    padding: 2px 0;
+    box-sizing: border-box;
+    border-radius: 4px;
+    margin-right: 0;
+    display: inline-block;
+}
+
+ul.now_patient > li.givePower_icon {
+    height: 20px;
+    background: #66B032;
+    line-height: 20px;
+    padding: 1px 0;
+    box-sizing: border-box;
+    border-radius: 4px;
+    margin-right: 0;
+    display: inline-block;
+}
+
+.patient_icon > img, .history_icon > img {
+    height: 16px;
+}
+
+ul.now_patient > li > span > span.tag {
+    margin: 0 2px 0 0;
+}
+
+ul.patient_sub > li {
+    white-space: nowrap;
+    margin-bottom: 6px;
+    display: inline-block;
+    margin-right: 6px;
+}
+
+ul.patient_sub > li > span {
+    white-space: nowrap;
+    font-size: 16px;
+    color: #FFF;
+    display: inline-block;
+    box-sizing: border-box;
+    margin-left: 6px;
+}
+
+ul.patient_sub {
+    white-space: nowrap;
+    display: inline-block;
+}
+
+ul.now_patient > li > label {
+    margin-top: 0;
+    /*position:absolute;*/
+    display: inline;
+    white-space: nowrap;
+}
+
+.asses_item {
+    border: 1px solid #666;
+    font-size: 10px;
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+}
+
+.text_item {
+    border-bottom: 1px solid #666;
+    line-height: 22px;
+    margin-top: -3px;
+}
+
+
+/* input style */
+.text_empty {
+    border-color: red;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(255, 0, 0, .6);
+    box-shadow: inset 0px 1px 1px rgba(0,0,0,0.075), 0px 0px 8px rgba(255,0,0,0.6);
+}
+
+
+.nav > li > a {
+    padding: 8px;
+}
+
+.navbar {
+    /*height: 32px;*/
+    min-height: 0px;
+    padding: 0;
+    margin: 0;
+    border-radius: 0;
+}
+
+.navbar-collapse-plus {
+    padding: 0 15px 0 0;
+}
+
+/*Status Page use*/
+ul.show_head {
+    overflow: auto;
+}
+
+ul.show_head li {
+    float: left;
+    margin-right: 4px;
+    line-height: 30px;
+    padding: 0px 6px;
+    /*background: #4B77BE;*/
+    border-radius: 6px;
+    color: black;
+    display: inline;
+}
+
+#tab_rt_shift {
+    overflow-x: hidden;
+}
+
+.patient_nav_expanded {
+    box-shadow: rgba(0,0,0,0.4) 3px 3px 3px;
+}
+ul.patient_sub > li > label{
+    font-size:18px;
+}
+
+ul.patient_sub > li > span{
+    font-size:18px;
+}
+
+ul.now_patient > li > label{
+    font-size:18px;
+}
+
+ul.now_patient > li > span{
+    font-size:18px;
+}
+
+.dt-picker-device {
+    width: 100px;
+    height: 27px;
+    display: inline-block;
+    vertical-align:middle;
+}
+
+
+/*radio checkbox 分區塊，好分辨 20160725*/
+.radio-area {
+    line-height: 1.2;
+    background-color: rgba(0, 0, 0, 0.05);
+    border: 1px solid #bbb;
+    border-radius: 5px;
+    padding: 4px 4px;
+    color: #454545;
+    margin: 4px;
+}
+
+#index_cover, #index_loading {
+    display: none;
+    position: fixed;
+}
+
+#index_cover {
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    z-index: 90000;
+    background: #666666;
+    opacity: 0.6;
+}
+
+#index_loading {
+    margin-left: -200px;
+    left: 50%;
+    top: 50%;
+    z-index: 99999;
+}
+
+
+/**
+* 2016-05-11 Joe Shen
+* 新增呼吸記錄單樣式
+* ===================  呼吸記錄單樣式開始 ====================
+*/
+#rt_record_panel .modal-dialog {
+    width: 960px;
+}
+
+#rt_record_panel .modal-body {
+    padding: 0.5em 0;
+    margin: 0;
+}
+
+#rt_record_panel .modal-header {
+    padding: 0.5em 1em;
+}
+
+#rt_record_panel .panel {
+    margin: 2px;
+}
+
+#rt_record_panel .modal-body .panel-body {
+    padding: 0;
+    margin: 0px;
+}
+
+#rt_record_panel .panel-body .form-control, 
+#rt_record_panel .panel-body .input-group-addon {
+    border-color: #5BA198;
+}
+#rt_record_panel .panel-body .input-vabg {
+    border-color: #EFA843;
+}
+
+#rt_record_panel .panel-body .input-group-addon:not(:first-child):not(:last-child) {
+    background-color: transparent;
+    border: none;
+    min-width: 18px;
+}
+
+#rt_record_panel .panel-body .input-group-addon:first-child {
+    min-width: 165px;
+    background-color: #5BA198;
+    color: #FFFFFF;
+    text-align: left;
+    padding: 0.2em 0.5em;
+}
+
+#rt_record_panel .panel-body .input-vabg:first-child {
+    background-color: #EFA843;
+}
+
+#rt_record_panel .panel-body .input-group .form-control, 
+#rt_record_panel .panel-body .input-group-addon {
+    border-radius: 0;
+}
+
+#rt_record_panel .input-group-sm .form-control, #rt_record_panel .input-group span {
+    margin: 0px;
+    line-height: 10px;
+    padding: 0 0.5em;
+    height: 22px;
+}
+
+#rt_record_panel .panel-body textarea.form-control {
+    resize: none;
+    border-radius: 0;
+}
+
+#rt_record_panel .modal-body .panel-body > div[class*=col] {
+    padding: 2px;
+}
+
+#rt_record_panel #plugin_data_panel .panel-body > div.row {
+    padding: 0;
+    margin: 0;
+}
+
+#rt_record_panel #plugin_data_panel .panel-body > div.row .form-control {
+    padding: 0px;
+    height: 22px;
+    border-radius: 0;
+    /*min-width: 95px;*/
+    width: 100%;
+}
+#rt_record_panel #plugin_data_panel .panel-body > div.row select {
+    width: 100%;
+}
+#rt_record_panel #plugin_data_panel .panel-body > div.row > div > label {
+    /*padding: 0 0.3em;*/
+    margin: 0px;
+}
+
+#rt_record_panel #plugin_data_panel .panel-body > div.row > div[class*=col] {
+    padding: 2px;
+}
+
+#rt_record_panel #plugin_data_panel .panel-body > div.row > div:nth-child(2n+1) {
+    color: #FFFFFF;
+    background-color: #5BA198;
+    height: 22px;
+    margin: 2px 0;
+    padding: 0.2em 0.3em;
+}
+
+#rt_record_panel #plugin_data_panel .panel-body > div.row > .weaning_ul > li > div:first-child {
+    color: #FFFFFF;
+    background-color: #5BA198;
+    height: 22px;
+    margin: 2px 0;
+    padding: 0.2em 0.3em;
+}
+
+
+#rt_record_panel .panel > div.panel-body {
+    min-height: 50px;
+}
+
+#rt_record_panel .modal-body div[class*=col] {
+    padding: 0px;
+    margin: 0;
+}
+
+#rt_record_panel .bootstrap-datetimepicker-widget .row div[class*=col] {
+    padding: 0 15px;
+}
+
+#rt_record_panel .bootstrap-datetimepicker-widget table td span {
+    height: 54px;
+    width: 54px;
+    line-height: 54px;
+    margin: 2px 1.5px;
+    border-radius: 4px;
+}
+
+#rt_record_panel .row.activite {
+    border: 3px solid;
+    border-radius: 0.3em;
+}
+
+#rt_record_panel .row.activite.intubete_panel {
+    border-color: #EFA843;
+}
+
+#rt_record_panel .row.activite.breath_panel {
+    border-color: #489E48;
+}
+
+#rt_record_panel .row.activite.oxygen_panel {
+    border-color: #2A6496;
+}
+
+#rt_record_panel .dt-picker {
+    line-height: 1.5;
+    border-radius: 0;
+    padding: 0;
+}
+
+/*#rt_record_panel .gcs select.form-control {
+    width: 36px;
+    padding: 0 2px;
+}*/
+
+/** ===================  呼吸記錄單樣式結尾 ==================== */
+
+.fieldset-style {
+    display: none; 
+    border-top: 1px solid #975e1c;
+}
+
+.legend-title {
+    background-color: #d18122;
+    border-bottom: 1px solid  #d18122;
+    border-top: 1px solid  #975e1c;
+    color: #fff;
+    box-shadow: 0px 4px 6px 1px rgba(148,117,80,0.8);
+    white-space: nowrap;
+    padding: 5px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    text-align: center;
+    width: 160px;
+    position: relative;
+    top: 16px
+}
+
+/*門急住 照護清單樣式*/
+.source_style{
+    border:2px solid #bbb;
+    border-radius:3px;
+}
+/*=========== central monitor ===========*/
+.bodybg{
+	background: #EBEBEB;
+	font-family: Arial, "华文黑体", "STHeiti", "儷黑 Pro", "LiHei Pro", "微軟正黑體", "Microsoft JhengHei", "標楷體", DFKai-SB, sans-serif;
+}
+
+.patient-block{
+	border: #5BA198 1px solid;
+	height: 121px;
+	background-color: #fff;
+	margin-bottom: 10px;
+}
+.patient-info {
+	/* display: inline-block; */
+}
+.patient-alert{
+	padding-left: 140px;
+    height: 120px;
+	width: 100%;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+.patient-info{
+	width: 140px;
+	height: 120px;
+	background-color: #5ba198;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	padding: 4px;
+	float: left;
+}
+.patient-info ul{
+	padding: 4px;
+}
+.patient-info ul li{
+	color: #fff;
+	font-size: 14px;
+	height: 24px;
+	margin-bottom: 4px;
+	line-height: 25px;
+}
+.pat-icon{
+	padding-left: 28px;
+}
+.icon01{
+	background: url('../images/icon-01.png') left no-repeat;
+}
+.icon02{
+	background: url('../images/icon-02.png') left no-repeat;
+}
+.icon03{
+	background: url('../images/icon-03.png') left no-repeat;
+}
+.icon04{
+	background: url('../images/icon-04.png') left no-repeat;
+}
+.alert-main {
+	display: block;
+	font-weight: bold;
+	color: #31625D;
+	font-size: 14px;
+    padding: 4px 0 0 6px;
+    border-top: 1px solid #5ba198;
+}
+.new-alert{
+	background: #EDCCCC;
+	color: #ED1C24;
+}
+.patient-alert span{
+	display: inline-block;
+	text-align: right;
+    width: 140px;
+	margin-right: 12px;
+}
+.my-progress{
+	height: 5px;
+	background-color: #CCCCCC;
+	margin-bottom: 0;
+}
+.my-progress .progress-bar{
+	background-color: #5BA198;
+}
+.patient-alert > ul{
+    height: 46px;
+}
+.patient-alert > ul > li{
+	border-bottom: 1px solid #CCC;
+	padding: 2px;
+	color: #999;
+    white-space: nowrap;
+}
+.patient-alert > ul > li.alert-now{
+	color: #ED1C24;
+	background: #FFF;
+    display: none;
+}
+span.patient-alert-end {
+    color: #b3b3b3;
+    width: auto;
+}
+
+@media (max-width: 988px) {
+    .modal-open .modal {
+        overflow-x: auto;
+    }
+}
+/*參考修改 collapse 樣式 768px https://stackoverflow.com/questions/22329606/bootstrap-navbar-collapse-media-query-on-custom-width */
+@media (max-width: 768px) {
+    .navbar-header {
+        float: none;
+    }
+    .navbar-left,.navbar-right {
+        float: none !important;
+    }
+    .navbar-toggle {
+        display: block;
+    }
+    .navbar-collapse {
+        border-top: 1px solid transparent;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+    .navbar-fixed-top {
+        top: 0;
+        border-width: 0 0 1px;
+    }
+    .navbar-collapse.collapse {
+        display: none!important;
+    }
+    .navbar-nav {
+        float: none!important;
+        margin-top: 7.5px;
+    }
+    .navbar-nav>li {
+        float: none;
+    }
+    .navbar-nav>li>a {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+    .collapse.in{
+        display:block !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar-collapse-plus {
+        padding: 0 30px;
+    }
+    .navbar-collapse-plus a {
+        border-radius: 5px;
+    }
+    ul.now_patient > li > label, ul.now_patient > li > span {
+        font-size: 14px;
+    }
+    
+    .now_patient_source {
+        width: 48px;
+        height: 48px;
+        border: 4px outset #73925d;
+        font-size: 36px;
+        padding: 2px;
+        margin: 6px;
+    }
+    
+    div.now_patient {
+        padding-left: 0px;
+        /*height: 50px;*/
+        overflow-y: auto;
+    }
+    .username {
+        position: static;
+        margin: 4px 0 0 20px;
+        padding-right: 20px;
+        padding-top: 2px;
+    }
+}
+
+
+ul.now_patient_info > li {
+    color: #000000;
+}
+
+ul.now_patient_info > li span {
+    color: #000000;
+}
+    /*已經有交班記錄註記圖示*/
+.source_style{
+    border:2px solid #bbb;
+    border-radius:3px;
+}
+
+.ntoolbar {
+    padding-top: 0.5em;
+    height: 50px;
+}
+
+.ntoolbar button {
+    padding: 0.2em 0.8em;
+    min-width: 120px;
+}
+
+.panel-side{
+    position:relative;
+}
+.panel-leftheading
+{
+    width: 27px;
+    padding: 11px 5px;
+    border-right: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+    border-top-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    float: left;
+    height: 100%;
+    position: absolute;
+}
+.panel-rightbody
+{
+    /*float: left;*/
+    margin-left: 30px;
+    /*padding: 5px;*/
+}
+
+
+.fieldsetOrgStyle {
+    border: 0;
+    padding: 10px;
+    box-shadow: 0px 0px 1px #5ba198;
+    position: relative;
+}
+.legendOrgStyle {
+    width: 50%;
+    background:#ffffff;
+    padding: 5px 10px;
+    border-bottom: 0px;
+}
+/* CHeckBox工具 https://bootsnipp.com/snippets/featured/badgebox-css-checkbox-badge */
+/* Hiding the checkbox, but allowing it to be focused */
+.badgebox
+{
+    opacity: 0;
+}
+
+.badgebox + .badge
+{
+    /* Move the check mark away when unchecked */
+    text-indent: -999999px;
+    /* Makes the badge's width stay the same checked and unchecked */
+	width: 27px;
+}
+
+.badgebox:focus + .badge
+{
+    /* Set something to make the badge looks focused */
+    /* This really depends on the application, in my case it was: */
+    
+    /* Adding a light border */
+    box-shadow: inset 0px 0px 5px;
+    /* Taking the difference out of the padding */
+}
+
+.badgebox:checked + .badge
+{
+    /* Move the check mark back when checked */
+	text-indent: 0;
+}
+
+ .pointer {
+        cursor: pointer;
+    }
+
+ .checkbox-vertical{
+     vertical-align:baseline;
+ }
+ 
+ 

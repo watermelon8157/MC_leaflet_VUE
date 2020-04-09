@@ -1,0 +1,290 @@
+﻿@model RESPONSE_MSG
+@using RCS_Data;
+@using Newtonsoft.Json;
+
+<style>
+    #fix-scroll .central_message {
+        height: 36px;
+    }
+    .TYPE3 td {
+        background-color: #f8e2e2;
+    }
+
+    .TYPE1 td {
+        background-color: #dbecfc;
+    }
+
+    .TYPE2 td {
+        background-color: rgb(218, 238, 188);
+    }
+
+    .warning_color {
+        color: red;
+    }
+
+    .selectedRow > td {
+        background-color: #ffdf61 !important;
+    }
+
+    /*Change the tooltip size*/
+    div.tooltip-inner {
+        max-width: none;
+        white-space: nowrap;
+    }
+</style>
+<script>
+    var status_table;
+
+    $(document).ready(function () {
+        //判斷小白機的資料問題
+        @if (Model!= null && Model.status != RESPONSE_STATUS.SUCCESS && !string.IsNullOrWhiteSpace(Model.message))
+        {
+            <text>
+             showAlert('@(Html.Raw(Model.message))', msg_stat.Danger);
+            </text>
+        }
+        $("#index_loading").modal('show');
+        // 自動調整編輯介面的高度
+        $(window).resize(function () {
+            var height = $(this).outerHeight();
+            if (height <= 300)
+                height = 450;
+            $("#StatusDetailContent").outerHeight(height - 150);
+        }).trigger("resize");
+
+        status_table = $('#fix-scroll').bootstrapTable({
+            url: "@Url.Content("~/RT/FormStatusData")",
+            method: 'post',
+            //queryParams:{"before_day":4},
+            pagination: true,
+            clickToSelect: true,
+            toolbar: "#status_toolbar",
+            pageSize: 6,
+            pageList: [6],
+            flat: true
+        }).on('click-row.bs.table', function (e, row, $element) {
+            openRecordView('rt_record_form_div', '@Url.Content("~/RTRecord/openRTRecordFormView")', convert_flat_obj(row));
+        }).on('load-success.bs.table', function (e, data) {
+            for (var item in data) {
+                if (item != 'remove') {
+                    var str = data[item].central_message_txt;
+                    if (str != null && str != undefined && str != '') {
+                        var obj = str.split(',');
+                        if (obj.length > 2) {
+                            $('#fix-scroll .central_message').css('height', 36 + 18 * obj.length - 2 + 'px');
+                        }
+                    }
+                }
+            }
+        }).on('reset-view.bs.table', function () {
+            $('#tooltipDIV').html('');
+            $("[data-toggle='tooltip']").tooltip({ html: true, placement: "top", container: '#tooltipDIV' });
+            $('#fix-scroll .central_message').css('height', $('#fix-scroll .central_message').css('height'));
+        }).ready($("#fix-scroll").prev(".fixed-table-loading").css('top', '0px'));
+
+        
+
+    // 關閉編輯視窗移除選擇的顏色
+    $('#StatusModal').unbind('hidden.bs.modal').bind('hidden.bs.modal', function (e) {
+        $("#fix-scroll").find(".selectedRow").each(function () {
+            $(this).removeClass("selectedRow")
+        });
+    });
+
+    $("#tab_rt_status .extra_function button").click(function () {
+
+        switch ($(this).attr("id")) {
+            case "pre_page":
+                $("#fix-scroll").hide('slide', { direction: 'right', easing: "easeOutQuint" }, 300, function () {
+                    status_table.bootstrapTable("prevPage");
+                    $("#fix-scroll").show('slide', { direction: 'left', easing: "easeOutQuint" }, 300);
+                });
+                status_table.bootstrapTable("getOptions").pageNumber;
+                break;
+            case "next_page":
+                $("#fix-scroll").hide('slide', { direction: 'left', easing: "easeOutQuint" }, 300, function () {
+                    status_table.bootstrapTable("nextPage");
+                    $("#fix-scroll").show('slide', { direction: 'right', easing: "easeOutQuint" }, 300);
+                });
+                status_table.bootstrapTable("getOptions").pageNumber;
+                break;
+            case "fullscreen_view":
+
+                if (document.fullscreenElement ||
+                   document.webkitFullscreenElement ||
+                   document.mozFullScreenElement ||
+                   document.msFullscreenElement
+                 ) {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.mozCancelFullScreen) {
+                        document.mozCancelFullScreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
+                    }
+                    $("#tab_rt_status .flip-scroll").css({
+                        "background-color": "",
+                        "font-size": "1em"
+                    });
+
+                } else {
+                    element = $("#tab_rt_status .flip-scroll").get(0);
+                    if (element.requestFullscreen) {
+                        element.requestFullscreen();
+                    } else if (element.mozRequestFullScreen) {
+                        element.mozRequestFullScreen();
+                    } else if (element.webkitRequestFullscreen) {
+                        element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+                    } else if (element.msRequestFullscreen) {
+                        element.msRequestFullscreen();
+                    }
+                    $("#tab_rt_status .flip-scroll").css({
+                        "background-color": "#FFFFFF",
+                        "font-size": "0.9em"
+                    });
+                }
+                break;
+        }
+        return false;
+    });
+
+    $("#save_type_choose").change(function () {
+        switch ($(this).val()) {
+            case "%":
+                status_table.bootstrapTable("filterBy", "");
+                break;
+            case "1":
+                status_table.bootstrapTable("filterBy", { 'rt_record.save_type': ["0", "1", "2", "5", "6"] });
+                break;
+            case "3":
+                status_table.bootstrapTable("filterBy", { 'rt_record.save_type': "3" });
+                break;
+        }
+        $('#fix-scroll .central_message').css('height', $('#fix-scroll .central_message').css('height'));
+    }).trigger("change");
+        //預載呼吸記錄單
+    $("#index_loading").modal('hide');
+ 
+    });
+
+    function rowStyle(row, index) {
+        switch (row['rt_record.save_type']) {
+            case "3":
+                return {
+                    classes: 'TYPE3'
+                };
+                break;
+            case "1":
+                return {
+                    classes: 'TYPE2'
+                };
+                break;
+            default:
+                return {
+                    classes: 'TYPE1'
+                };
+                break;
+        }
+    }
+
+
+</script>
+<section class="flip-scroll" id="savetypeset">
+
+    <div id="status_toolbar" class="extra_function">
+        <ul class="show_head">
+            <li>
+                <div class="input-group" style="width: 160px; height:34px;">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-tags"></span>&nbsp;分類</span>
+                    <select id="save_type_choose" class="form-control" style=" height: 34px;">
+                        <option value="%">全部</option>
+                        <option value="1" selected>一般</option>
+                        <option value="3">警告</option>
+                    </select>
+                </div>
+            </li>
+            <li>
+                <button class="btn btn-default" id="pre_page" title="上一頁"><span class="glyphicon glyphicon-arrow-left"></span>&nbsp;上一頁</button>
+                <button class="btn btn-default" id="next_page" title="下一頁"><span class="glyphicon glyphicon-arrow-right"></span>&nbsp;下一頁</button>
+                @if (RCS.Controllers.BaseController.funSetting.fullScreenSwitch)
+                {<button class="btn btn-default" id="fullscreen_view" title="全畫面顯示"><span class="glyphicon glyphicon-zoom-in"></span>&nbsp;全螢幕</button>}
+            </li>
+            <li style="background: #dbecfc; height:34px;">一般(其它)</li>
+            <li style="background: rgb(218, 238, 188); height:34px;">一般(手動輸入)</li>
+            <li style="background: #f8e2e2; height:34px;">警告</li>
+        </ul>
+    </div>
+    <table class="table table-hover table-bordered table-striped table-condensed" id="fix-scroll" data-row-style="rowStyle" data-pagination-V-Align="both">
+        <thead>
+            <tr>
+                <th data-field="RECORDDATE" data-formatter="merge_text" data-sortable="true">記&emsp;錄&emsp;時&emsp;間</th>
+                <th data-field="rt_record.device" data-formatter="merge_text">Type Of Ventilator</th>
+                <th data-field="rt_record.mode|rt_record.device_o2" data-formatter="merge_text">Mode Of Ventilation/O2 Device</th>
+                <th data-field="rt_record.vt_set|rt_record.exp_tv" data-formatter="merge_text">Tidal Volume Set / Total</th>
+                <th data-field="rt_record.vr_set|rt_record.vr" data-formatter="merge_text">Ventilation Rate Set / Total</th>
+                <th data-field="rt_record.flow|rt_record.flow_pattern" data-formatter="merge_text">Flow / Pattern</th>
+                <th data-field="rt_record.mv_set|rt_record.mv" data-formatter="merge_text">MV Set / Total</th>
+                <th data-field="rt_record.insp_time|rt_record.ie_ratio|rt_record.thigh|rt_record.tlow" data-formatter="merge_text">Insp T / I:E (Thigh / Tlow)</th>
+                <th data-field="rt_record.ipap|rt_record.epap|rt_record.phigh|rt_record.plow" data-formatter="merge_text">IPAP / EPAP (Phigh / Plow)</th>
+                <th data-field="rt_record.pressure_ps|rt_record.pressure_pc" data-formatter="merge_text">P.S / P.C</th>
+                <th data-field="rt_record.pressure_peak|rt_record.pressure_plateau" data-formatter="merge_text">Peak / Plateau</th>
+                <th data-field="rt_record.pressure_mean|rt_record.pressure_peep" data-formatter="merge_text">Mean / PEEP</th>
+                <th data-field="rt_record.RM|rt_record.optimal_peep" data-formatter="merge_text">RM / Optimal PEEP</th>
+                <th data-field="rt_record.fio2_set|rt_record.fio2_measured" data-formatter="merge_text" data-warning_check='[{"digit":1,"min_v":21,"max_v":55,"list":""}]'>FiO<sub class="sub">2</sub>（%）/ FiO<sub class="sub">2</sub> Analyzer measure</th>
+                <th class="list_split_block" data-field="rt_record.o2flow" data-formatter="merge_text">O<sub>2</sub> flow (LPM)</th>
+                <th class="list_split_block" data-field="rt_record.pressure_sensitivity|rt_record.sensitivity_flow" data-formatter="merge_text">Sensitivity (Pr cmH<sub class="sub">2</sub>O / F lpm)</th>
+                <th class="list_split_block" data-field="rt_record.resistance|rt_record.Compliance" data-formatter="merge_text">Raw / C</th>
+                <th data-field="rt_record.low_mv_alarm|rt_record.paw_alarm" data-formatter="merge_text">Min, MV alarm / Pr. Alarm</th>
+                <th data-field="rt_record.abg_time" data-formatter="merge_text">ABG time</th>
+                <th data-field="rt_record.abg_ph" data-formatter="merge_text">pH</th>
+                <th data-field="rt_record.abg_paco2" data-formatter="merge_text">PaCO<sub class="sub">2</sub></th>
+                <th data-field="rt_record.abg_pao2" data-formatter="merge_text">PaO<sub class="sub">2</sub></th> 
+                <th data-field="rt_record.abg_hco3|rt_record.abg_be" data-formatter="merge_text">HCO<sub class="sub">3</sub> / BE</th> 
+                <th data-field="rt_record.abg_sao2|rt_record.spo2" data-formatter="merge_text">SaO<sub class="sub">2</sub> / SpO<sub class="sub">2</sub>（%）</th> 
+                <th data-field="rt_record.vt_value|rt_record.rsi_srr" data-formatter="merge_text">VT (ml) / RR（bpm）</th> 
+                <th data-field="rt_record.rsbi" data-formatter="merge_text">RSBI</th> 
+                <th data-field="rt_record.pi_max|rt_record.pe_max" data-formatter="merge_text">P I/E max (cmH2O)</th> 
+                <th data-field="rt_record.cuff_leak_ml" data-formatter="merge_text">Cuff-leak test (ml)</th> 
+                <th data-field="rt_record.ecmo" data-formatter="merge_text">ECMO type</th> 
+                <th data-field="rt_record.ecmo_pump_speed|rt_record.ecmo_pump_speed_lmin" data-formatter="merge_text">Pump speed (RPM) / (L/min)</th> 
+                <th data-field="rt_record.blood_flow" data-formatter="merge_text">Blood Flow (L/min)</th> 
+                <th data-field="rt_record.gas_flow" data-formatter="merge_text">Gas Flow (L/min)</th>  
+                <th data-field="rt_record.ecmo_fio2|rt_record.ecmo_svo2" data-formatter="merge_text">FiO<sub>2</sub> / SvO<sub>2</sub> (%)</th>
+                <th data-field="rt_record.no_set|rt_record.no" data-formatter="merge_text">NO set / mea.(ppm)</th>
+                <th data-field="rt_record.other_no2|rt_record.ecmo_co" data-formatter="merge_text">NO2 mea. (ppm) / C.O.</th>
+                <th data-field="rt_record.et_size|rt_record.et_mark" data-formatter="merge_text">ET size / mark</th>
+                <th data-field="rt_record.cuff" data-formatter="merge_text">Cuff pressure (cmH2O) ml</th> 
+                <th data-field="rt_record.breath_sound" data-formatter="merge_text">Breath sound</th>
+                <th data-field="rt_record.pulse|rt_record.vital_signs_temp" data-formatter="merge_text">PR / Temp</th>
+                <th data-field="rt_record.bps|rt_record.bpd" data-formatter="merge_text">BP（S/D）（mmHg）</th>
+                <th data-field="rt_record.gcse|rt_record.gcsv|rt_record.gcsm" data-formatter="merge_text">Con's level (E.V.M.)</th>
+                <th data-field="rt_record.water_collecting_cup|rt_record.fixed_tripod" data-formatter="merge_text">集水杯 / 固定腳架</th>
+                <th data-field="central_message" data-formatter="merge_text" data-class="central_message">警示訊息</th>
+            <tr>
+        </thead>
+    </table>
+</section>
+
+<!-- 呼吸治療記錄單 -->
+<div class="modal fade modal_record" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" id="StatusModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content rcs_form">
+            <div class="modal-header">
+                <div class="btn-group">
+                    <h4 class="modal-title">呼吸治療記錄單</h4>
+                </div>
+                <div class="btn-group pull-right">
+                    <button class="btn btn-success" id="save" data-method="getData" onclick="record_detail_save();" data-loading-text="儲存中...">儲存</button>
+                    <button class="btn btn-warning" data-dismiss="modal">關閉</button>
+                </div>
+            </div>
+            <div class="modal-body" id="StatusDetailContent" style="overflow-x:hidden; overflow-y:scroll;">
+            </div>
+        </div>
+    </div>
+</div>
+<div id="tooltipDIV">
+
+</div>

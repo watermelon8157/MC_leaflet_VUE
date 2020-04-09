@@ -1,0 +1,124 @@
+﻿@{
+    var json = ViewData["chartValue"];
+}
+<style>
+    .chart_container {
+        box-sizing: border-box;
+        width: 98%;
+        height: 450px;
+        padding: 20px 15px 15px 15px;
+        margin: 15px auto 30px auto;
+        border: 1px solid #ddd;
+        background: #fff;
+        background: linear-gradient(#f6f6f6 0, #fff 50px);
+        background: -o-linear-gradient(#f6f6f6 0, #fff 50px);
+        background: -ms-linear-gradient(#f6f6f6 0, #fff 50px);
+        background: -moz-linear-gradient(#f6f6f6 0, #fff 50px);
+        background: -webkit-linear-gradient(#f6f6f6 0, #fff 50px);
+        box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+        -o-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        -ms-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        -moz-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        -webkit-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+
+    .chart_placeholder {
+        width: 100%;
+        height: 100%;
+        font-size: 14px;
+        line-height: 1.2em;
+    }
+</style>
+<script type="text/javascript">
+    var datasets = JSON.parse('@Html.Raw(json)');
+    var choiceContainer = $("#choices");
+
+    $(function () {
+        // set color
+        var i = 0;
+        $.each(datasets, function (key, val) {
+            val.color = i;
+            ++i;
+        });
+        // insert checkboxes
+        $.each(datasets, function (key, val) {
+            choiceContainer.append("<br/><input type='checkbox' name='" + key +
+                "' checked='checked' id='id" + key + "'></input>" +
+                "<label for='id" + key + "'>"
+                + val.label + "</label>");
+        });
+        // tooltip
+        $("<div id='tooltip'></div>").css({
+            position: "absolute",
+            display: "none",
+            border: "1px solid #A3E6CA",
+            padding: "2px",
+            "background-color": "#B5F5DA",
+            opacity: 0.80
+        }).appendTo("#chart_content");
+
+        // tooltip_action
+        $("#chart_placeholder").unbind("plothover").bind("plothover", function (event, pos, item) {
+            if (item) {
+                var x = moment.unix(item.datapoint[0]/1000).format("YYYY/MM/DD HH:mm"),
+                    y = item.datapoint[1].toFixed(1);
+
+                $("#tooltip").html(item.series.label + "<br/>時間:" + x + "<br/>數值:" + y)
+                    .css({ top: item.pageY + 5, left: item.pageX + 5 })
+                    .fadeIn(200);
+            } else {
+                $("#tooltip").hide();
+            }
+        });
+
+        //綁定CHECKBOX觸發
+        choiceContainer.find("input").unbind("click").bind("click", plotAccordingToChoices);
+        $("#enablePosition").unbind("click").bind("click", plotAccordingToChoices);
+
+        function plotAccordingToChoices() {
+            var data = [];
+
+            choiceContainer.find("input:checked").each(function () {
+                var key = $(this).attr("name");
+                if (key && datasets[key]) {
+                    data.push(datasets[key]);
+                }
+            });
+
+            if (data.length > 0) {
+                var plot = $.plot("#chart_placeholder", data, {
+                    series: {
+                        lines: {
+                            show: true
+                        },
+                        points: {
+                            show: $("#enablePosition").prop("checked")
+                        }
+                    },
+                    grid: {
+                        hoverable: true
+                    },
+                    colors: ["#0067A6", "#00ABD8", "#008972", "#EFC028", "#F2572D", "#FF1877"],
+                    yaxis: {
+                        //min: 0
+                    },
+                    xaxis: {
+                        timeformat: "%m/%d %H:%S",
+                        mode: "time",
+                        timezone: "browser",
+                        minTickSize: [1, "hour"],
+                        min: (new Date($('#datetime_start').val())).getTime(),
+                        max: (new Date($('#datetime_end').val())).getTime()
+                    }
+                });
+            }
+        }
+
+        plotAccordingToChoices();
+
+    });
+</script>
+<div class="chart_container">
+        <div id="chart_placeholder" class="chart_placeholder" style="float:left; width:90%;"></div>
+        <p id="choices" style="float:right; width:10%;"><br /><input id="enablePosition" type="checkbox" checked="checked" />顯示 Point</p>
+</div>

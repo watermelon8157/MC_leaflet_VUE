@@ -1,0 +1,149 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <!-- title -->
+    <title>呼吸治療資訊管理系統 - 背景管理程式</title>
+    <!-- meta -->
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="keywords" content="呼吸治療,管理系統" />
+    <meta name="author" content="Mayaminer co.,ltd." />
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta http-equiv="expires" content="-1" />
+
+    <!-- jQuery & define js -->
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-1.11.3.min.js")"></script>
+
+    <!-- jQuery UI & UI plus-in -->
+    <link rel="Stylesheet" type="text/css" href="@Url.Content("~/StyleSheet/jquery-ui.min.css")" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/StyleSheet/jquery-ui.structure.min.css")" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/StyleSheet/jquery-ui.theme.min.css")" />
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-ui.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-ui-sliderAccess.js")"></script>
+
+    <!-- Bootstrap 3 http://getbootstrap.com/ -->
+    <script type="text/javascript" src="@Url.Content("~/Scripts/bootstrap.min.js")"></script>
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/StyleSheet/bootstrap.css")" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/StyleSheet/bootstrap-theme.css")" />
+
+    <!-- Bootstrap Table -->
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/StyleSheet/bootstrap-table.css")" />
+    <script type="text/javascript" src="@Url.Content("~/Scripts/bootstrap-table.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/bootstrap-table-flatJSON.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/locales/bootstrap-table-zh-TW.js")" charset="UTF-8"></script>
+
+
+    <!-- CKEditor http://ckeditor.com/ -->
+    <script type="text/javascript" src="@Url.Content("~/Scripts/ckeditor/ckeditor.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/ckeditor/config.js")"></script>
+
+    <style type="text/css">
+        body {
+            padding: 1.5em;
+        }
+    </style>
+    <script type="text/javascript">
+
+        var responseText;
+
+        //Main Global
+        $(document).ready(function () {
+
+            responseText = CKEDITOR.replace("responseText", {
+                removePlugins: 'toolbar,elementspath',
+                readOnly: true,
+                height: 650
+            });
+
+            var km_table = $("#log_table").bootstrapTable({
+                url: "@Url.Content("~/Main/LogData")",
+                pagination: true,
+                method: "post",
+                clickToSelect: true,
+                singleSelect: true,
+                onClickRow: function (row, $element) {
+                    setTimeout(function () {
+                        $("#log_id").html("").html(row.log_id);
+                        $("#status").html("").html(row.status);
+                        $("#statusText").html("").html(row.statusText);
+                        $("#log_date").html("").html(row.log_date);
+
+                        var content = $("<div>" + CKEDITOR.tools.htmlDecode(row.responseText) + "</div>");
+                        content.find("style").remove();
+
+                        responseText.setData(content.html());
+                    }, 300);
+                    $("#log_panel").modal("show");
+                },
+                pageSize: 12,
+                trimOnSearch: true,
+                cache: false,
+                pageList: [5, 10, 25, 50, 100],
+                search: true,
+                toolbar: "#log_toolbar",
+                toolbarAlign: "left",
+                showRefresh: true
+            });
+
+        });
+
+    </script>
+</head>
+<body>
+
+    <!-- log table -->
+    <table class="table" id="log_table">
+        <thead>
+            <tr>
+                <th data-field="log_id" data-align="center" data-halign="center" data-sortable="true">記錄編號</th>
+                <th data-field="readyState" data-align="center" data-halign="center" data-sortable="true">準備狀態</th>
+                <th data-field="status" data-align="center" data-halign="center" data-sortable="true">狀態代碼</th>
+                <th data-field="statusText" data-align="center" data-halign="center" data-sortable="true">狀態描述</th>
+                <th data-field="log_date" data-align="center" data-halign="center" data-sortable="true">記錄時間</th>
+            </tr>
+        </thead>
+    </table>
+
+
+    <!-- log viewer -->
+    <div class="modal modal-vcenter fade" role="dialog" id="log_panel" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-edit-panel" style="width: 90%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" style="color:black;">記錄檢視</h4>
+                </div>
+                <div class="modal-body" id="preview_body">
+                    <form id="km_form">
+                        <div class="row">
+                            <div class="col-md-3">
+                                編號： <label id="log_id"></label>
+                            </div>
+                            <div class="col-md-3">
+                                狀態代碼： <label id="status"></label>
+                            </div>
+                            <div class="col-md-3">
+                                狀態描述： <label id="statusText"></label>
+                            </div>
+                            <div class="col-md-3">
+                                記錄時間： <label id="log_date"></label>
+                            </div>
+                            <div class="col-md-12">
+                                <textarea id="responseText"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning" data-dismiss="modal">
+                        <span class=" glyphicon glyphicon-remove">
+                        </span>&nbsp;關閉
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

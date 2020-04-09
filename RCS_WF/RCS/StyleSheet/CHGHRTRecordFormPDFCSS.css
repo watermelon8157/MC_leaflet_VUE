@@ -1,0 +1,56 @@
+.ALLBorder,.TBBorder,.TRBorder,.TLBorder,.topBorder,.TRBBorder{
+    border-top:1px solid;
+}
+.LBRBorder,.ALLBorder,.LRBorder,.LBBorder,.TLBorder,.leftBorder{
+    border-left:1px solid;
+}
+.LBRBorder,.ALLBorder,.TBBorder,.LBBorder,.BRBorder,.bottomBorder,.TRBBorder{
+    border-bottom:1px solid;
+}
+.LBRBorder,.ALLBorder,.LRBorder,.TRBorder,.BRBorder,.rightBorder,.TRBBorder{
+    border-right:1px solid;
+}
+
+.sourceWidth{
+    width:15px;
+}
+.mainTableCollapse{
+    border-collapse: collapse;
+}
+.mainTable{
+    width:100%;height:100%;border-collapse: collapse;
+}
+.tilteSize{
+    font-size:25px;
+}
+.tilteFontBold{
+    font-weight:bold;
+}
+.tilteSizeSub{
+    font-size:20px;
+}
+.tilteborder{
+    border: 1px solid;
+}
+
+.borderNote,.noteFont{
+    font-size: 12px;
+}
+
+.TableRow tr td {
+    padding: 10px 10px 10px 10px;
+}
+
+.rowDataStyle{
+    width:12%;
+}
+.rowOneWidth{
+    width: 20px;
+}
+.sub{
+    font-size: 6px;
+}
+
+.memoStyle{
+    height:20px;
+}

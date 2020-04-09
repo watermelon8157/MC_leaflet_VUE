@@ -1,0 +1,139 @@
+﻿@{
+    ViewBag.Title = "WebServiceRecode";
+    Dictionary<string, string> List = (Dictionary<string, string>)ViewData["WebServiceList"];
+    string jsonList = (string)Newtonsoft.Json.JsonConvert.SerializeObject(List);
+}
+
+<div style="padding: 0 10vw 0 10vw;">
+    <button type="button" class="navbar-toggle tp" onclick="uploadWS(this);" data-loading-text="刪除中..." style="float: left; color: #e21818; display: block; ">
+        <span class="glyphicon glyphicon-open" aria-hidden="true" style="display: block;">
+            <span class="icon-text">手動上傳</span>
+        </span>
+    </button>
+    <table id="WebServiceDt" style="background-color:#FFF" data-toggle="table" class="table table-bordered table-striped table-condensed">
+        <thead style="background-color: #5BA198; color: #FFF;">
+            <tr>
+                <th data-field="state" data-checkbox="true" data-formatter="resetchk"></th>
+                <th data-field="WSFUNCTION" data-sortable="true" data-formatter="ReSetFunction">功能</th>
+                <th data-field="create_user_name" data-sortable="true" data-formatter="ReSetOP">上傳人員</th>
+                <th data-field="create_date" data-sortable="true">最後上傳時間</th>
+                <th data-field="REMESSAGE" data-sortable="true">回傳訊息</th>
+                <th data-field="FLAG" data-sortable="true" data-formatter="ReSetFLAG">狀態</th>
+                <th data-field="cnt" data-sortable="true">失敗次數</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+<script>
+    $(document).ready(function () {
+
+        var WebServiceTable = $("#WebServiceDt").bootstrapTable({
+                                url:  '@Url.Content("~/SystemManage/getWSList")',
+                                method: 'post',
+                                search: true,
+                                pageSize: 6,
+                                pagination: true,
+                                showRefresh: true,
+                            });
+        refreshWS();
+        //var WebServiceTableTemp = WebServiceTable.bootstrapTable("filterBy", { WSFUNCTION: 'ws_putRT_CHESTHOME' });
+        //WebServiceTableTemp = WebServiceTableTemp.bootstrapTable("filterBy", { FLAG: '2' });
+        //WebServiceTable.bootstrapTable("filterBy", {});
+    });
+
+    function refreshWS() {
+        $("#WebServiceDt").bootstrapTable('refresh', {
+            url: '@Url.Content("~/SystemManage/getWSList")'
+        });
+    }
+
+    function uploadWS(obj) {
+        if (checkItem()) {
+            if (confirm('確認上傳?')) {
+                $(obj).button('loading');
+                $.ajax({
+                    url: '@Url.Content("~/SystemManage/DataUpLoad")',
+                    type: 'post',
+                    data: { cont: JSON.stringify($("#WebServiceDt").bootstrapTable('getSelections')) },
+                    success: function (data) {
+                        $("#WebServiceDt").bootstrapTable('refresh', {
+                            url: '@Url.Content("~/SystemManage/getWSList")'
+                        });
+                    },
+                    error: function (a, b, c) {
+                        alert(a + ' ' + c);
+                    }
+                });
+                $(obj).button('reset');
+            } 
+        } else {
+            showAlert('請勾選上傳項目!', msg_stat.Warning);
+        }
+    }
+
+    function checkItem() {
+        var hasItem = false;
+        var $table = $('#WebServiceDt').find('.bs-checkbox');
+        $table.each(function () {
+            //
+            var $check = $(this).find('input[type="checkbox"]');
+            if ($check[0].checked) {
+                hasItem = true;
+            }
+        });
+        return hasItem;
+    }
+    function resetchk(value, row, index) {
+        if (row.FLAG == '3' || row.FLAG == '1') {
+            return {
+                disabled: true
+            };
+        }
+        return value;
+    }
+    function ReSetOP(value, row, index) {
+        var str = '';
+        if (value == 'WS')
+            str = '自動上傳';
+        else
+            str = value;
+        return str;
+    }
+
+    function ReSetFunction(value, row, index) {
+        var str = '';
+        if (value == 'ws_putEMR_CHESTSHT')
+            str = 'CPT記錄表';
+        else if (value == 'ws_putRT_CHESTHOME')
+            str = 'CPT評估表';
+        else if (value == 'ws_putRT_ASSESS')
+            str = '呼吸患者評估單';
+        else if(value == 'ws_putRTMID3')
+            str = '呼吸患照護記錄單資料';
+        else if (value == 'ws_putSetResp')
+            str = '呼吸患照護記錄單';
+        else if (value == 'ws_putOXYGEN_CURE')
+            str = '寫入氧氣治療日期記錄';
+        else if (value == 'ws_putUseResp')
+            str = '寫入呼吸器日期記錄';
+        else
+            str = value;
+        return str;
+    }
+
+    function ReSetFLAG(value, row, index) {
+        var str = '';
+        if (value == '0')
+            str = '失敗記錄';
+        else if (value == '1')
+            str = '成功';
+        else if (value == '2')
+            str = '失敗';
+        else if (value == '3')
+            str = '處理中';
+        return str;
+        //return (value != null) ? value.replace(/\n/g, '<br/>') : '';
+    }
+
+
+</script>

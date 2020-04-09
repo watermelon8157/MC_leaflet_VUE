@@ -1,0 +1,1602 @@
+﻿@using System.Reflection;
+@{
+    Layout = null;
+    ViewBag.Title = "Index";
+    RCS_Data.MeasuresForm model = (RCS_Data.MeasuresForm)ViewData["Data"];
+    string urlStr = Url.Content("~/StyleSheet/iTextSharpCSS.css");
+}
+<link rel='Stylesheet' type='text/css' href='@urlStr' />
+<div class="MeasuresForm">
+    <div class="modal-header col-xs-12">
+        <div class="btn-group col-xs-6">
+            <h1 class="modal-title">醫療輔具評估報告</h1>
+        </div>
+        <div class="btn-group pull-right">
+            @*<button class="btn btn-default" onclick="show_MeasuresForm()">瀏覽</button>*@
+            <button class="btn btn-warning" onclick="export_MeasuresForm()">列印</button>
+            <button id="save_MeasuresForm_btn" class="btn btn-success" onclick="save_MeasuresForm($(this))" data-loading-text="儲存中...">儲存</button>
+            <button class="btn btn-danger" onclick="refreshMeasuresForm();">關閉</button>
+        </div>
+        <div class="col-xs-8">
+            醫療輔具項目名稱：『雙相陽壓呼吸輔助器（Bi-PAP）』、『單相陽壓呼吸輔助器（C-PAP）』、『氧氣製造機』
+        </div>
+    </div>
+    <div class="modal-body" style="height:850px;overflow-y:auto;">
+        <form name="MeasuresForm" id="MeasuresForm" class="form-inline">
+            @Html.Hidden("tempid", model.tempid)
+            <div class="panel panel-default">
+                <div class="panel-heading" style="cursor: pointer;" onclick="$('#MeasuresForm #block1').slideToggle('slow');">一、基本資料</div>
+                <div id="block1" class="panel-body">
+                    <table style="width:100%;margin-bottom:4px;" class="MeasuresForm_table">
+                        <tr>
+                            <td style="width: 140px;">1.姓名:</td>
+                            <td style="width: 200px;">
+                                @Html.TextBox("name", null, new { @style = "width:120px;", @class = "form-control" })
+                            </td>
+                            <td style="width: 120px;">2.性別</td>
+                            <td>
+                                <label>@Html.RadioButton("sex", "1") 男 </label>
+                                <label>@Html.RadioButton("sex", "2") 女 </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3.身分證字號:</td>
+                            <td>
+                                @Html.TextBox("id_num", null, new { @style = "width:140px;", @class = "form-control", @maxlength = "10" })
+                            </td>
+                            <td>4.生日</td>
+                            <td>
+                                <input type="text" id="birth" name="birth" class="date form-control" dt-format="dt" dt-sidebyside="true" style="width: 140px;" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>5.戶籍地:</td>
+                            <td colspan="3">
+                                @Html.Hidden("county_1")
+                                @Html.Hidden("district_1")
+                                <span id="twzipcode1"></span>
+                                @Html.Hidden("ad1")
+                                @Html.TextBox("li_1", null, new { @style = "width:80px;", @class = "form-control" }) 村(里)
+                                @Html.TextBox("rd_1", null, new { @style = "width:80px;", @class = "form-control" }) 路(街)
+                                @Html.TextBox("dan_1", null, new { @style = "width:80px;", @class = "form-control" }) 段
+                                @Html.TextBox("ln_1", null, new { @style = "width:80px;", @class = "form-control" }) 巷
+                                @Html.TextBox("aly_1", null, new { @style = "width:80px;", @class = "form-control" }) 弄
+                                @Html.TextBox("no_1", null, new { @style = "width:80px;", @class = "form-control" }) 號
+                                @Html.TextBox("f_1", null, new { @style = "width:80px;", @class = "form-control" }) 樓
+                            </td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2">6.聯絡地址:</td>
+                            <td colspan="3">
+                                <label><input type="checkbox" name="chkAd" id="chkAd" value="1" onclick="sameAd();" /> 同戶籍地(下列免填)</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                @Html.Hidden("county_2")
+                                @Html.Hidden("district_2")
+                                <span id="twzipcode2"></span>
+                                @Html.Hidden("ad2")
+                                @Html.TextBox("li_2", null, new { @style = "width:80px;", @class = "form-control" }) 村(里)
+                                @Html.TextBox("rd_2", null, new { @style = "width:80px;", @class = "form-control" }) 路(街)
+                                @Html.TextBox("dan_2", null, new { @style = "width:80px;", @class = "form-control" }) 段
+                                @Html.TextBox("ln_2", null, new { @style = "width:80px;", @class = "form-control" }) 巷
+                                @Html.TextBox("aly_2", null, new { @style = "width:80px;", @class = "form-control" }) 弄
+                                @Html.TextBox("no_2", null, new { @style = "width:80px;", @class = "form-control" }) 號
+                                @Html.TextBox("f_2", null, new { @style = "width:80px;", @class = "form-control" }) 樓
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>7.障礙證明類別:</td>
+                            <td colspan="3" class="singleChk">
+                                <label><input type="checkbox" name="isObstacle" value="0" /> 無</label>
+                                <label><input type="checkbox" name="isObstacle" value="1" /> 有</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="singleChk">
+                                7-1.是否領有身心障礙手冊/證明：
+                                <label><input type="checkbox" name="hasManual" value="0" /> 無</label>
+                                <label><input type="checkbox" name="hasManual" value="1" /> 有</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">7-2.(舊制)身心障礙手冊類別：</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" id="oldManualBlok">
+                                @Html.Hidden("oldManual")
+                                @Html.Hidden("oldManual_1")
+                                @Html.Hidden("oldManual_2")
+                                @Html.Hidden("oldManual_txt")
+                                <div class="text_indent groupChk">
+                                    <label><input type="checkbox" data="oldManual" value="1" class="firstChk" /> 肢體障礙：</label>
+                                    <span class="singleChk">
+                                        <label><input type="checkbox" data="oldManual_2" value="1" /> 上肢(手)</label>
+                                        <label><input type="checkbox" data="oldManual_2" value="1" /> 下肢(腳)</label>
+                                        <label><input type="checkbox" data="oldManual_2" value="1" /> 軀幹</label>
+                                        <label><input type="checkbox" data="oldManual_2" value="1" /> 四肢</label>
+                                    </span>
+
+                                </div>
+                                <div class="text_indent">
+                                    <label><input type="checkbox" data="oldManual" value="1" /> 視覺障礙</label>
+                                    <label><input type="checkbox" data="oldManual" value="1" /> 聽覺機能障礙</label>
+                                    <label><input type="checkbox" data="oldManual" value="1" /> 平衡機能障礙</label>
+                                    <label><input type="checkbox" data="oldManual" value="1" /> 聲音或語言機能障礙</label>
+                                </div>
+                                <div class="text_indent">
+                                    <label><input type="checkbox" data="oldManual" value="1" /> 智能障礙</label>
+                                    <label><input type="checkbox" data="oldManual" value="1" /> 重要器官失去功能</label>
+                                    <label><input type="checkbox" data="oldManual" value="1" /> 顏面損傷者</label>
+                                    <label><input type="checkbox" data="oldManual" value="1" /> 植物人</label>
+                                    <label><input type="checkbox" data="oldManual" value="1" /> 失智症</label>
+                                </div>
+                                <div class="text_indent">
+                                    <label><input type="checkbox" data="oldManual" value="1" /> 自閉症</label>
+                                    <label><input type="checkbox" data="oldManual" value="1" /> 慢性精神病患者</label>
+                                    <label><input type="checkbox" data="oldManual" value="1" /> 頑性(難治型)癲癇症</label>
+                                </div>
+                                <div class="text_indent groupChk">
+                                    <label><input type="checkbox" data="oldManual" value="1" class="firstChk" /> 多重障礙者(須註明障礙類別與等級)：</label>
+                                    @Html.TextBox("oldManual_txt1", null, new { @style = "width:600px;", @class = "form-control", @data = "oldManual_txt" })
+                                </div>
+                                <div class="text_indent">
+                                    <label><input type="checkbox" data="oldManual" value="1" /> 經中央衛生主管機關認定，因罕見疾病而致身心功能障礙</label>
+                                </div>
+                                <div class="text_indent groupChk">
+                                    <label><input type="checkbox" data="oldManual" value="1" class="firstChk" /> 其他經中央主管機關認定之身心障礙類別：</label>
+                                    <span class="singleChk">
+                                        <label><input type="checkbox" data="oldManual_1" value="1" /> 染色體異常</label>
+                                        <label><input type="checkbox" data="oldManual_1" value="1" /> 先天代謝異常</label>
+                                        <label><input type="checkbox" data="oldManual_1" value="1" /> 其他先天缺陷</label>
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">7-3.(新制)身心障礙分類系統：</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" id="newManualblok">
+                                @Html.Hidden("newManual")
+                                @Html.Hidden("newManual_txt")
+                                <div class="text_indent">
+                                    <label><input type="checkbox" data="newManual" value="1" /> 神經系統構造及精神、心智功能</label>
+                                    <label><input type="checkbox" data="newManual" value="1" /> 眼、耳及相關構造與感官功能</label>
+                                </div>
+                                <div class="text_indent">
+                                    <label><input type="checkbox" data="newManual" value="1" /> 涉及聲音與言語構造及其功能</label>
+                                    <label><input type="checkbox" data="newManual" value="1" /> 循環、造血、免疫與呼吸系統構造及其功能</label>
+                                </div>
+                                <div class="text_indent">
+                                    <label><input type="checkbox" data="newManual" value="1" /> 消化、新陳代謝與內分泌系統相關構造及其功能</label>
+                                    <label><input type="checkbox" data="newManual" value="1" /> 泌尿與生殖系統相關構造及其功能</label>
+                                </div>
+                                <div class="text_indent">
+                                    <label><input type="checkbox" data="newManual" value="1" /> 神經、肌肉、骨骼之移動相關構造及其功能</label>
+                                    <label><input type="checkbox" data="newManual" value="1" /> 皮膚與相關構造及其功能</label>
+                                </div>
+                                <div class="text_indent groupChk">
+                                    <label><input type="checkbox" data="newManual" value="1" class="firstChk" /> 分類:</label>
+                                    第 @Html.TextBox("newManual_txt1", null, new { @style = "width:40px;", @class = "form-control", @data = "newManual_txt" })類,
+                                    ICD診斷號碼: @Html.TextBox("newManual_txt2", null, new { @style = "width:40px;", @class = "form-control", @data = "newManual_txt" })
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>8.障礙等級：</td>
+                            <td colspan="3" class="singleChk">
+                                <label><input type="checkbox" name="obstacleLevel" value="0" /> 輕度</label>
+                                <label><input type="checkbox" name="obstacleLevel" value="1" /> 中度</label>
+                                <label><input type="checkbox" name="obstacleLevel" value="2" /> 重度</label>
+                                <label><input type="checkbox" name="obstacleLevel" value="3" /> 極重度</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>9.居住情況：</td>
+                            <td colspan="3" class="singleChk" id="AdSituationblok">
+                                @Html.Hidden("AdSituation_text")
+                                <label><input type="checkbox" name="AdSituation" value="0" /> 獨居</label>
+                                <label><input type="checkbox" name="AdSituation" value="1" /> 與親友同住</label>
+                                <div class="groupChk">
+                                    <label><input type="checkbox" name="AdSituation" value="2" class="firstChk" /> 安置機構</label>
+                                    @Html.TextBox("AdSituation_text2", null, new { @style = "width:600px;", @class = "form-control", @data = "AdSituation_text" })
+                                </div>
+                                <div class="groupChk">
+                                    <label><input type="checkbox" name="AdSituation" value="3" class="firstChk" /> 其他</label>
+                                    @Html.TextBox("AdSituation_text3", null, new { @style = "width:600px;", @class = "form-control", @data = "AdSituation_text" })
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>10.聯絡人姓名：</td>
+                            <td colspan="3">
+                                @Html.TextBox("contactMan", null, new { @style = "width:120px;", @class = "form-control" })
+                                與身心障礙者關係：
+                                @Html.TextBox("withRelationship", null, new { @style = "width:140px;", @class = "form-control" })
+                                聯絡電話：
+                                @Html.TextBox("contactPhone", null, new { @style = "width:140px;", @class = "form-control" })
+                                行動電話：
+                                @Html.TextBox("contactCellPhone", null, new { @style = "width:140px;", @class = "form-control" })
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="panel-heading" style="cursor: pointer;" onclick="$('#MeasuresForm #block2').slideToggle('slow');">二、使用評估</div>
+                <div id="block2" class="panel-body">
+                    <div>
+                        1.請求評估需求（評估所需器材）
+                        @Html.Hidden("assessType")
+                    </div>
+                    <div id="assessTypeblok">
+                        <div>
+                            <label>
+                                <input type="checkbox" data="assessType" value="1" />
+                                非侵襲性雙相陽壓呼吸輔助器（Bi-PAP）：請填寫第2,3項
+                            </label>
+                        </div>
+                        <div>
+                            <label>
+                                <input type="checkbox" data="assessType" value="1" />
+                                非侵襲性單相陽壓呼吸輔助器（C-PAP）：請填寫第4項
+                            </label>
+                        </div>
+                        <div>
+                            <label>
+                                <input type="checkbox" data="assessType" value="1" />
+                                氧氣製造機：請填寫第5項
+                            </label>
+                        </div>
+                    </div>
+                    <div>
+                        2.非侵襲性雙相陽壓呼吸器使用原因評估（申請雙相陽壓呼吸輔助器者必填此項）
+                    </div>
+                    <div>
+                        <table style="width:100%;" class="MeasuresForm_DataTable">
+                            <tr id="breatheWeakblok">
+                                <td style="width: 50%;">
+                                    <div>
+                                        呼吸衰竭
+                                        @Html.Hidden("breatheWeak")
+                                        @Html.Hidden("breatheWeak_1")
+                                        @Html.Hidden("breatheWeak_txt")
+                                    </div>
+                                    <div>
+                                        <label>
+                                            <input type="checkbox" data="breatheWeak" value="1" />
+                                            未補償之高碳酸血症
+                                        </label>
+                                    </div>
+                                    <div class="groupChk">
+                                        <label>
+                                            <input type="checkbox" data="breatheWeak" value="1" />
+                                            低血氧
+                                        </label>
+                                        ，其他低血氧之臨床徵象
+                                        <label>
+                                            <input type="checkbox" data="breatheWeak_1" value="0" />
+                                            肺部塌陷
+                                        </label>
+                                        <label>
+                                            <input type="checkbox" data="breatheWeak_1" value="1" />
+                                            呼吸肌肉無力
+                                        </label>
+                                    </div>
+                                    <div class="groupChk">
+                                        <label>
+                                            <input type="checkbox" data="breatheWeak" value="1" />
+                                            肺功能報告
+                                        </label>
+                                        FVC @Html.TextBox("breatheWeak_txtFVC", null, new { @style = "width:80px;", @class = "form-control", @data = "breatheWeak_txt" })
+                                        FEV1 @Html.TextBox("breatheWeak_txtFEV1", null, new { @style = "width:80px;", @class = "form-control", @data = "breatheWeak_txt" })
+                                        FEV1/FVC @Html.TextBox("breatheWeak_txtFEV1FVC", null, new { @style = "width:80px;", @class = "form-control", @data = "breatheWeak_txt" })
+                                    </div>
+                                </td>
+                                <td style="width: 50%;">
+                                    <div>
+                                        <label>
+                                            <input type="checkbox" data="breatheWeak" value="1" />
+                                            困難脫離呼吸器
+                                        </label>
+                                    </div>
+                                    <div>
+                                        連續使用機械通氣天數
+                                        @Html.TextBox("breatheWeak_txtDay", null, new { @style = "width:80px;", @class = "form-control", @data = "breatheWeak_txt" })天
+                                    </div>
+                                    <div>
+                                        <label>
+                                            <input type="checkbox" data="breatheWeak" value="1" />
+                                            不穩定的中樞呼吸驅動力
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <label>
+                                            <input type="checkbox" data="breatheWeak" value="1" />
+                                            日間清醒時PaCO2>45mmHg (慢性阻塞性肺疾PaCO2>50mmHg)且睡眠中至少連續五分鐘SpO2< 90% 或夜間三分之ㄧ以上睡眠時間 SpO2< 90%
+                                        </label>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div>
+                        3.呼吸系統評估（申請雙相陽壓呼吸輔助器者必填此項）
+                    </div>
+                    <div>
+                        <table style="width:100%;" class="MeasuresForm_DataTable">
+                            <tr>
+                                <td colspan="2">
+                                    評估日期：民國
+                                    @Html.TextBox("yyy", null, new { @style = "width:80px;", @class = "form-control" }) 年
+                                    @Html.TextBox("mm", null, new { @style = "width:80px;", @class = "form-control" }) 月
+                                    @Html.TextBox("dd", null, new { @style = "width:80px;", @class = "form-control" }) 日
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:180px;">
+                                    身體評估
+                                </td>
+                                <td>
+                                    身高
+                                    @Html.TextBox("height", null, new { @style = "width:80px;", @class = "form-control" }) 公分
+                                    體重
+                                    @Html.TextBox("weight", null, new { @style = "width:80px;", @class = "form-control" }) 公斤
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>初次使用呼吸器前動脈血氣體分析</td>
+                                <td>
+                                    <div style="position: relative;">
+                                        抽取時間：
+                                        <input type="text" id="DrawDate_1" name="DrawDate_1" class="date form-control" dt-format="dt" dt-sidebyside="true" style="width: 140px;" />
+                                        (年 / 月 / 日)
+                                    </div>
+                                    <div>動脈血抽取之氧氣濃度： @Html.TextBox("O2density_1", null, new { @style = "width:80px;", @class = "form-control" })  </div>
+                                    <div>
+                                        酸鹼值(pH) @Html.TextBox("ph_1", null, new { @style = "width:80px;", @class = "form-control" })
+                                        動脈二氧化碳分壓(PaCO2) @Html.TextBox("PaCO2_1", null, new { @style = "width:80px;", @class = "form-control" }) mmHg
+                                    </div>
+                                    <div>
+                                        動脈氣分壓(PaO2) @Html.TextBox("PaO2_1", null, new { @style = "width:80px;", @class = "form-control" }) mmHg,
+                                    </div>
+                                    <div>
+                                        碳酸氫根離子濃度(HCO3-) @Html.TextBox("HCO3_1", null, new { @style = "width:80px;", @class = "form-control" })
+                                        mmol/L動脈氧氣飽和濃度(SaO2) @Html.TextBox("SaO2_1", null, new { @style = "width:80px;", @class = "form-control" }) %
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    動脈血氣體分析
+                                </td>
+                                <td>
+                                    <div class="singleChk">
+                                        <label><input type="checkbox" name="gasAnalysis" value="0" /> 無</label>
+                                        <label><input type="checkbox" name="gasAnalysis" value="1" /> 有</label>
+                                        ，請繼續填寫以下欄位
+                                    </div>
+                                    <div style="position:relative;">
+                                        抽取時間：
+                                        <input type="text" id="gasDrawDate" name="gasDrawDate" class="date form-control" dt-format="dt" dt-sidebyside="true" style="width: 140px;" />
+                                        (年 / 月 / 日)
+                                    </div>
+                                    <div>
+                                        動脈血抽取之機械通氣模式設定及氧氣濃度
+                                        @Html.Hidden("invasive")
+                                        @Html.Hidden("invasive_mode")
+                                        @Html.Hidden("invasive_O2density")
+                                    </div>
+                                    <div class="singleChk" id="invasiveblok">
+                                        <div class="groupChk">
+                                            <label><input type="checkbox" data="invasive" value="1" class="firstChk" /> 侵襲性正壓呼吸器</label>
+                                            (模式：@Html.TextBox("mode1", null, new { @style = "width:80px;", @class = "form-control", @data = "invasive_mode" })
+                                            氧氣濃度：@Html.TextBox("O2density1", null, new { @style = "width:80px;", @class = "form-control", @data = "invasive_O2density" }))
+                                        </div>
+                                        <div class="groupChk">
+                                            <label><input type="checkbox" data="invasive" value="1" class="firstChk" /> 非侵襲性正壓呼吸器</label>
+                                            (模式：@Html.TextBox("mode0", null, new { @style = "width:80px;", @class = "form-control", @data = "invasive_mode" })
+                                            氧氣濃度：@Html.TextBox("O2density0", null, new { @style = "width:80px;", @class = "form-control", @data = "invasive_O2density" }))
+                                        </div>
+                                    </div>
+                                    <div>
+                                        酸鹼值(pH) @Html.TextBox("gas_ph", null, new { @style = "width:80px;" })
+                                        動脈二氧化碳分壓(PaCO2) @Html.TextBox("gas_PaCO2", null, new { @style = "width:80px;", @class = "form-control" }) mmHg
+                                    </div>
+                                    <div>
+                                        動脈氣分壓(PaO2) @Html.TextBox("gas_PaO2", null, new { @style = "width:80px;", @class = "form-control" }) mmHg,
+                                    </div>
+                                    <div>
+                                        碳酸氫根離子濃度(HCO3-) @Html.TextBox("gas_HCO3", null, new { @style = "width:80px;", @class = "form-control" })
+                                        mmol/L動脈氧氣飽和濃度(SaO2) @Html.TextBox("gas_SaO2", null, new { @style = "width:80px;", @class = "form-control" }) %
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>理學檢查</td>
+                                <td>
+                                    <div class="singleChk">
+                                        呼吸音：
+                                        <label><input type="checkbox" name="breathVoice" value="0" /> 正常</label>
+                                        <label><input type="checkbox" name="breathVoice" value="1" /> 囉音</label>
+                                        <label><input type="checkbox" name="breathVoice" value="2" /> 喘鳴音</label>
+                                        <label><input type="checkbox" name="breathVoice" value="3" /> 呼吸音減弱</label>
+                                        <span class="groupChk">
+                                            <label><input type="checkbox" name="breathVoice" value="4" class="firstChk" /> 其他 </label>
+                                            @Html.TextBox("breathVoice_txt", null, new { @style = "width:600px;", @class = "form-control" })
+                                        </span>
+                                    </div>
+                                    <div class="singleChk">
+                                        呼吸型態：
+                                        <label><input type="checkbox" name="breathingStatus" value="0" /> 正常呼吸</label>
+                                        <label><input type="checkbox" name="breathingStatus" value="1" /> 淺快</label>
+                                        <label><input type="checkbox" name="breathingStatus" value="2" /> 深快</label>
+                                        <label><input type="checkbox" name="breathingStatus" value="3" /> 使用頸部呼吸輔助肌</label>
+                                        <label><input type="checkbox" name="breathingStatus" value="4" /> 異常胸腹運動</label>
+                                        <span class="groupChk">
+                                            <label><input type="checkbox" name="breathingStatus" value="5" class="firstChk" /> 其他 </label>
+                                            @Html.TextBox("breathingStatus_txt", null, new { @style = "width:400px;", @class = "form-control" })
+                                        </span>
+                                    </div>
+                                    <div class="singleChk">
+                                        咳嗽能力：
+                                        <label><input type="checkbox" name="cough" value="0" /> 功能良好</label>
+                                        <label><input type="checkbox" name="cough" value="1" /> 功能不佳</label>
+                                        <label><input type="checkbox" name="cough" value="2" /> 無咳嗽功能</label>
+                                    </div>
+                                    <div class="singleChk">
+                                        痰液清除方式：
+                                        <label><input type="checkbox" name="phlegm" value="0" /> 自咳</label>
+                                        <label><input type="checkbox" name="phlegm" value="1" /> 需協助抽吸</label>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div>
+                        4.非侵襲性單相陽壓呼吸器使用原因評估（申請單相陽壓呼吸輔助器者必填此項）
+                    </div>
+                    <div>
+                        <table style="width:100%;" class="MeasuresForm_DataTable">
+                            <tr>
+                                <td id="MachineItemblok">
+                                    @Html.Hidden("MachineItem")
+                                    @Html.Hidden("MachineItem_txt")
+                                    <div>
+                                        <label><input type="checkbox" data="MachineItem" value="1" /> (Apnea-hypopnea index AHI ) ≧每小時40次，或每日累積重度缺氧時間（Sp02≦85%）超過1小時（含）以上</label>
+                                    </div>
+                                    <div>
+                                        <label><input type="checkbox" data="MachineItem" value="1" /> 心臟衰竭</label>
+                                    </div>
+                                    <div>
+                                        <label><input type="checkbox" data="MachineItem" value="1" /> 其他呼吸衰竭</label>
+                                    </div>
+                                    <div class="groupChk">
+                                        <label><input type="checkbox" data="MachineItem" value="1" class="firstChk" /> 睡眠檢查報告參數填寫</label>
+                                        AHI:@Html.TextBox("MachineItem_txt1", null, new { @style = "width:60px;", @class = "form-control", @data = "MachineItem_txt" })
+                                        SPO2:@Html.TextBox("MachineItem_txt2", null, new { @style = "width:60px;", @class = "form-control", @data = "MachineItem_txt" })
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div>
+                        5.需使用氧氣之評估（申請氧氣製造機者必填）
+                    </div>
+                    <div>
+                        <table style="width:100%;" class="MeasuresForm_DataTable">
+                            <tr>
+                                <td id="O2assessblok">
+                                    @Html.Hidden("O2assess")
+                                    @Html.Hidden("O2assess_1")
+                                    @Html.Hidden("O2assess_txt")
+                                    <div>
+                                        當疾病已經治療穩定，且未使用氧氣治療時
+                                    </div>
+                                    <div>
+                                        <div>
+                                            <label><input type="checkbox" data="O2assess" value="1" /> 休息時PaO2≦ 55 mmHg 或 SpO2≦88 ％</label>
+                                        </div>
+                                    </div>
+                                    <div class="groupChk">
+                                        <div>
+                                            <label><input type="checkbox" data="O2assess" value="1" class="firstChk" /> 休息時PaO2 < 60 mmHg或SpO2 ≦ 89 ％</label>
+                                            ，但合併有下列情形者：
+                                        </div>
+                                        <div class="text_indent">
+                                            <label><input type="checkbox" data="O2assess_1" value="0" /> 心肺症或心衰竭</label>
+                                        </div>
+                                        <div class="text_indent">
+                                            <label><input type="checkbox" data="O2assess_1" value="1" /> 運動時或睡眠中PaO2< 60mmHg，SpO2< 89% </label>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="groupChk">
+                                            <label><input type="checkbox" data="O2assess" value="1" class="firstChk" /> 肺功能報告</label>
+                                            <div class="text_indent">
+                                                FVC : @Html.TextBox("O2assess_txtFVC", null, new { @style = "width:80px;", @class = "form-control", @data = "O2assess_txt" }) % PRED.
+                                            </div>
+                                            <div class="text_indent">
+                                                FEV1: @Html.TextBox("O2assess_txtFEV1", null, new { @style = "width:80px;", @class = "form-control", @data = "O2assess_txt" }) % PRED.
+                                            </div>
+                                            <div class="text_indent">
+                                                FEV1/FVC: @Html.TextBox("O2assess_txtFEV1FVC", null, new { @style = "width:80px;", @class = "form-control", @data = "O2assess_txt" }) %
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="panel-heading" style="cursor: pointer;" onclick="$('#MeasuresForm #block3').slideToggle('slow');">三、規格配置</div>
+                <div id="block3" class="panel-body">
+                    <table style="width:100%;" class="MeasuresForm_table">
+                        <tr>
+                            <td style="border: 1px solid; padding: 10px 10px 10px 10px;width:140px; ">配置選項</td>
+                            <td style="border: 1px solid; padding: 10px 10px 10px 10px; " class="3">
+                                配置日期:
+                                @Html.TextBox("yyy_3", null, new { @style = "width:80px;", @class = "form-control" }) 年
+                                @Html.TextBox("mm_3", null, new { @style = "width:80px;", @class = "form-control" }) 月
+                                @Html.TextBox("dd_3", null, new { @style = "width:80px;", @class = "form-control" }) 日
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid; padding: 10px 10px 10px 10px; " colspan="4" id="Machineblok">
+                                @Html.Hidden("Machine")
+                                <span>
+                                    <label>
+                                        <input type="checkbox" data="Machine" value="1" />
+                                        雙相陽壓呼吸輔助器
+                                    </label>
+                                </span>
+                                <span>
+                                    <label>
+                                        <input type="checkbox" data="Machine" value="1" />
+                                        單相陽壓呼吸輔助器
+                                    </label>
+                                </span>
+                                <span>
+                                    <label>
+                                        <input type="checkbox" data="Machine" value="1" />
+                                        氧氣製造機
+                                    </label>
+                                </span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="panel-heading" style="cursor: pointer;" onclick="$('#MeasuresForm #block4').slideToggle('slow');">四、總結</div>
+                <div id="block4" class="panel-body">
+                    <div class="singleChk">
+                        1.氧氣製造機之建議：
+                        <span>
+                            <label>
+                                <input type="checkbox" name="O2machine_4" value="1" />
+                                建議使用
+                            </label>
+                        </span>
+                        <span class="groupChk">
+                            <label>
+                                <input type="checkbox" name="O2machine_4" value="0" class="firstChk" />
+                                不建議使用
+                            </label>
+                            ，理由：@Html.TextBox("O2machine_txt_4", null, new { @style = "width:600px;", @class = "form-control" })
+                        </span>
+                    </div>
+                    <div class="text_indent singleChk">
+                        雙相陽壓呼吸輔助器之建議：
+                        <span>
+                            <label>
+                                <input type="checkbox" name="duplexBreathMachine_4" value="1" />
+                                建議使用
+                            </label>
+                        </span>
+                        <span class="groupChk">
+                            <label>
+                                <input type="checkbox" name="duplexBreathMachine_4" value="0" class="firstChk" />
+                                不建議使用
+                            </label>
+                            ，理由：@Html.TextBox("duplexBreathMachine_txt_4", null, new { @style = "width:600px;", @class = "form-control" })
+                        </span>
+                    </div>
+                    <div class="text_indent singleChk">
+                        單相陽壓呼吸輔助器之建議：
+                        <span>
+                            <label>
+                                <input type="checkbox" name="simplexBreathMachine_4" value="1" />
+                                建議使用
+                            </label>
+                        </span>
+                        <span class="groupChk">
+                            <label>
+                                <input type="checkbox" name="simplexBreathMachine_4" value="0" class="firstChk" />
+                                不建議使用
+                            </label>
+                            ，理由：@Html.TextBox("simplexBreathMachine_txt_4", null, new { @style = "width:600px;", @class = "form-control" })
+                        </span>
+                    </div>
+                    <div class="singleChk">
+                        2.使用訓練：
+                        <span>
+                            <label>
+                                <input type="checkbox" name="useTraining" value="1" />
+                                需要
+                            </label>
+                        </span>
+                        <span>
+                            <label>
+                                <input type="checkbox" name="useTraining" value="0" />
+                                不需要
+                            </label>
+                        </span>
+                    </div>
+                    <div>
+                        3.建議事項：
+                        @Html.TextBox("suggest", null, new { @style = "width:600px;", @class = "form-control" })
+                    </div>
+                    <div class="singleChk">
+                        4.是否需要安排追蹤時間：
+                        <span>
+                            <label>
+                                <input type="checkbox" name="track" value="1" />
+                                需要
+                            </label>
+                        </span>
+                        <span>
+                            <label>
+                                <input type="checkbox" name="track" value="0" />
+                                不需要
+                            </label>
+                        </span>
+                    </div>
+                    <div style="position:relative">
+                        評估單位：@Html.TextBox("assess", null, new { @style = "width:80px;", @class = "form-control" })
+                        評估人員：@Html.TextBox("assess_person", null, new { @style = "width:80px;", @class = "form-control" })
+                        職稱：@Html.TextBox("job", null, new { @style = "width:80px;", @class = "form-control" })
+                        評估日期：<input type="text" id="assess_date" name="assess_date" class="date form-control" dt-format="dt" dt-sidebyside="true" style="width: 140px;" />
+                    </div>
+                </div>
+                <div class="panel-heading" style="cursor: pointer;" onclick="$('#MeasuresForm #block5').slideToggle('slow');">五、檢核與追蹤記錄</div>
+                <div id="block5" class="panel-body">
+                    <div class="singleChk">
+                        1.醫療輔具採購結果是否符合原處方醫療輔具：
+                        <div class="text_indent">
+                            <label>
+                                <input type="checkbox" name="medical_tool_5" value="0" />
+                                完全符合
+                            </label>
+                        </div>
+                        <div class="text_indent">
+                            <label>
+                                <input type="checkbox" name="medical_tool_5" value="1" />
+                                功能、形式與原處方符合，部分規格及零配件略有出入，但大致符合
+                            </label>
+                        </div>
+                        <div class="text_indent">
+                            <label>
+                                <input type="checkbox" name="medical_tool_5" value="2" />
+                                功能、形式或規格與原處方有顯著差異，不符原處方精神
+                            </label>
+                        </div>
+                        <div class="text_indent groupChk">
+                            <label>
+                                <input type="checkbox" name="medical_tool_5" value="3" class="firstChk" />
+                                其他:
+                            </label>
+                            @Html.TextBox("medical_tool_txt_5", null, new { @style = "width:600px;", @class = "form-control", @dt_format = "dt", @dt_sidebyside = "true" })
+                        </div>
+                    </div>
+                    <div class="singleChk">
+                        2.修改、調整與使用訓練：
+                        <div class="text_indent">
+                            <label>
+                                <input type="checkbox" name="useTraining_5" value="0" />
+                                無須修改及調整
+                            </label>
+                        </div>
+                        <div class="text_indent">
+                            <label>
+                                <input type="checkbox" name="useTraining_5" value="1" />
+                                經修改調整後以符合使用需求
+                            </label>
+                        </div>
+                        <div class="text_indent">
+                            <label>
+                                <input type="checkbox" name="useTraining_5" value="2" />
+                                建議配合使用訓練以期能安全操作
+                            </label>
+                        </div>
+                    </div>
+                    <div style="position:relative">
+                        檢核單位：@Html.TextBox("check", null, new { @style = "width:80px;", @class = "form-control" })
+                        檢核人員：@Html.TextBox("check_person", null, new { @style = "width:80px;", @class = "form-control" })
+                        職稱：@Html.TextBox("check_job", null, new { @style = "width:80px;", @class = "form-control" })
+                        檢核日期：<input type="text" id="check_date" name="check_date" class="date form-control" dt-format="dt" dt-sidebyside="true" style="width: 140px;" />
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<form id="pdfForm" action="@(Url.Content("~/MeasuresForm/DownloadPdf"))" method="post" target="TheNewWindow">
+    <input type="hidden" id="HtmlStr" name="HtmlStr" />
+</form>
+<style>
+    .text_indent {
+        text-indent: 24px;
+    }
+
+    .panel-body div {
+        padding-bottom: 8px;
+    }
+
+    .MeasuresForm_table tr td {
+        padding-bottom: 8px;
+    }
+
+        .MeasuresForm_table tr td div {
+            padding-bottom: 8px;
+        }
+
+            .MeasuresForm_table tr td div label {
+                padding-right: 10px;
+            }
+
+    .MeasuresForm_DataTable > .table > tbody > tr > td {
+        border: 1px solid;
+        padding: 10px 10px 10px 10px;
+    }
+
+        .MeasuresForm_DataTable > .table > tbody > tr > td > div {
+            padding: 10px 10px 10px 10px;
+        }
+</style>
+<script>
+    var win;
+    $(document).ready(function () {
+
+        var model = null;
+        @if (model != null)
+        {
+			@:model = '@(Newtonsoft.Json.JsonConvert.SerializeObject(model))';
+        }
+        if (model != null) {
+            $('#twzipcode1,#twzipcode2').twzipcode({
+                // 依序套用至縣市、鄉鎮市區及郵遞區號框
+                'css': ['county form-control', 'district form-control', 'zipcode form-control'], 'zipcodeIntoDistrict': true
+            });
+            $('#twzipcode1').twzipcode('set', {
+                'county': '@(model.county_1)',
+                'district': '@(model.district_1)'
+            });
+
+            $('#twzipcode2').twzipcode('set', {
+                'county': '@(model.county_2)',
+                'district': '@(model.district_2)'
+            });
+        }
+        else {
+            $('#twzipcode1, #twzipcode2').twzipcode({
+                // 依序套用至縣市、鄉鎮市區及郵遞區號框
+                'css': ['county form-control', 'district form-control', 'zipcode form-control'], 'zipcodeIntoDistrict': true
+            });
+        }
+
+        //maya_datetimepicker("#MeasuresForm .date");
+        
+        $("#MeasuresForm .date").each(function () {
+            var dt_option = {
+                format: 'YYYY-MM-DD',
+                locale: moment.locale('zh-tw'),
+                dayViewHeaderFormat: 'YYYY MMM',
+                sideBySide: false,
+                ignoreReadonly: true,
+                widgetParent: null,
+                toolbarPlacement: 'bottom',
+                showClose: true,
+                showTodayButton: true,
+                showClear: true,
+                keepOpen: false,
+                useCurrent: false,
+                debug: false,
+                widgetPositioning: {
+                    horizontal: 'auto',
+                    vertical: 'auto'
+                }
+            };
+            $(this).datetimepicker(dt_option);
+
+        });
+
+        setRule();
+        @if (model != null){
+            PropertyInfo[] props = null;
+            props = model.GetType().GetProperties();
+            foreach (var pi in props)
+            {
+                string name = pi.Name;
+                object value = pi.GetValue(model, null);
+                if (value != null && value.ToString() != "")
+                {
+                    @Html.Raw("setValue('" + name + "','" + value+"');")
+                }
+            }
+        }
+
+    });
+    function setValue(pId, pVal) {
+        var item = $("input[name~='" + pId + "']");
+        //
+        switch (pId) {
+            case 'oldManual':
+                var $item = $('#oldManualBlok').find('input:checkbox');
+                setObj($item, pVal, 'checkbox', 'oldManual');
+                break;
+            case 'oldManual_1':
+                var $item = $('#oldManualBlok').find('input:checkbox');
+                setObj($item, pVal, 'checkbox', 'oldManual_1');
+                break;
+            case 'oldManual_2':
+                var $item = $('#oldManualBlok').find('input:checkbox');
+                setObj($item, pVal, 'checkbox', 'oldManual_2');
+                break;
+            case 'oldManual_txt':
+                var $item = $('#oldManualBlok').find('input:text');
+                setObj($item, pVal, 'text', null);
+                break;
+            case 'newManual':
+                var $item = $('#newManualblok').find('input:checkbox');
+                setObj($item, pVal, 'checkbox', null);
+            case 'newManual_txt':
+                var $item = $('#newManualblok').find('input:text');
+                setObj($item, pVal, 'text', null);
+                break;
+            case 'AdSituation_text':
+                var $item = $('#AdSituationblok').find('input:text');
+                setObj($item, pVal, 'text', null);
+                break;
+            case 'assessType':
+                //
+                var $item = $('#assessTypeblok').find('input:checkbox');
+                setObj($item, pVal, 'checkbox', null);
+                break;
+            case 'breatheWeak':
+                var $item = $('#breatheWeakblok').find('input:checkbox');
+                setObj($item, pVal, 'checkbox', 'breatheWeak');
+                break;
+            case 'breatheWeak_1':
+                var $item = $('#oldManualBlok').find('input:checkbox');
+                setObj($item, pVal, 'checkbox', 'breatheWeak_1');
+                break;
+            case 'breatheWeak_txt':
+                var $item = $('#breatheWeakblok').find('input:text');
+                setObj($item, pVal, 'text', null);
+                break;
+            case 'MachineItem':
+                var $item = $('#MachineItemblok').find('input:checkbox');
+                setObj($item, pVal, 'checkbox', null);
+                break;
+            case 'MachineItem_txt':
+                var $item = $('#MachineItemblok').find('input:text');
+                setObj($item, pVal, 'text', null);
+                break;
+            case 'O2assess':
+                //
+                var $item = $('#O2assessblok').find('input:checkbox');
+                setObj($item, pVal, 'checkbox', 'O2assess');
+                break;
+            case 'O2assess_1':
+                //
+                var $item = $('#O2assessblok').find('input:checkbox');
+                setObj($item, pVal, 'checkbox', 'O2assess_1');
+                break;
+            case 'O2assess_txt':
+                var $item = $('#O2assessblok').find('input:text');
+                setObj($item, pVal, 'text', null);
+                break;
+            case 'Machine':
+                var $item = $('#Machineblok').find('input:checkbox');
+                setObj($item, pVal, 'checkbox', null);
+                break;
+            case 'invasive':
+                var $item = $('#invasiveblok').find('input:checkbox');
+                setObj($item, pVal, 'checkbox', null);
+                break;
+            case 'invasive_mode':
+                //
+                var $item = $('#invasiveblok').find('input:text');
+                setObj($item, pVal, 'text', 'invasive_mode');
+                break;
+            case 'invasive_O2density':
+                //
+                var $item = $('#invasiveblok').find('input:text');
+                setObj($item, pVal, 'text', 'invasive_O2density');
+                break;
+            default:
+                var $type = item[0].type;
+                switch ($type) {
+                    case 'text':
+                        //
+                        $('#' + pId).val(pVal);
+                        break;
+                    case 'checkbox':
+                        item.each(function () {
+                            var chk = $(this);
+                            if (chk[0].value == pVal) {
+                                chk[0].checked = true;
+                            }
+                        });
+                        break;
+                    case 'radio':
+                        item.each(function () {
+                            var radio = $(this);
+                            if (radio[0].value == pVal) {
+                                radio[0].checked = true;
+                            }
+                        });
+                        break;
+                    default:
+                        break;
+                }
+                //$('#'+pId).val(pVal);
+                break
+        }
+    }
+
+    function setObj(pItem, pVal, pType, pData) {
+        //
+        var str_array = pVal.split(',');
+        var cnt = 0;
+        switch (pType) {
+            case 'text':
+                pItem.each(function () {
+                    //
+                    var $val = str_array[cnt];
+                    if (pData != null) {
+                        var data = $(this).attr('data');
+                        if (data == pData) {
+                            if ($val != null && $val != '') {
+                                $(this).val($val);
+                            }
+                            cnt = cnt + 1;
+                        }
+                    } else {
+                        if ($val != null && $val != '') {
+                            $(this).val($val);
+                        }
+                        cnt = cnt + 1;
+                    }
+                });
+                break;
+            case 'checkbox':
+                pItem.each(function () {
+                    //
+                    var $val = str_array[cnt];
+                    if (pData != null) {
+                        //
+                        var data = $(this).attr('data');
+                        if (data == pData) {
+                            if ($val == pItem[0].value) {
+                                $(this)[0].checked = true;
+                            }
+                            cnt = cnt + 1;
+                        }
+
+                    } else {
+                        if ($val == pItem[0].value) {
+                            $(this)[0].checked = true;
+                        }
+                        cnt = cnt + 1;
+                    }
+                });
+                break;
+            default:
+                break;
+
+        }
+    }
+    function setRule() {
+        setSingleChk();
+        setGroupChk();
+        setData();
+    }
+    function setData() {
+
+    }
+    function setSingleChk() {
+        var block = $('.singleChk');
+        block.each(function () {
+            var $block = $(this);
+            var group = $block.find('.groupChk');
+            var chk = $(this).find('input:checkbox');
+            chk.each(function () {
+                var item = $(this);
+                var setChkDefault = function (pChk, chked) {
+                    //
+                    pChk.each(function () {
+                        //
+                        var $item = $(this);
+                        $item[0].checked = false;
+                    });
+                    chked[0].checked = true;
+                };
+                item.click(function () {
+                    //
+                    if (item[0].checked) {
+                        //
+                        group.each(function () {
+                            //
+                            var chk1 = $(this).find('input:checkbox').first();
+                            var chk = $(this).find('input:checkbox').not('.firstChk');
+                            var txt = $(this).find('input:text');
+                            chk1.each(function () {
+                                //debugger
+                                var gItem = $(this);
+                                if (item[0].value != gItem[0].value) {
+                                    txt.each(function () {
+                                        $(this).val('');
+                                    });
+                                    chk.each(function () {
+                                        var $chk = $(this);
+                                        $chk[0].checked = false;
+                                    });
+                                }
+                            });
+                        });
+
+                        setChkDefault(chk, item);
+                    }
+                });
+            });
+            group.each(function () {
+                var $group = $(this);
+                var txt = $(this).find('input:text');
+                txt.each(function () {
+                    var item = $(this);
+                    item.keyup(function () {
+                        //
+                        var val = $(this).val();
+                        chk.each(function () {
+                            $(this)[0].checked = false;
+                        });
+                        group.not($group).each(function () {
+                            var $txt = $(this).find('input:text');
+                            $txt.each(function () {
+                                $(this).val('');
+                            });
+                        });
+                        $(this).val(val);
+                    });
+                });
+            });
+        });
+    }
+    function setGroupChk() {
+        var group = $('.groupChk');
+        group.each(function () {
+            //
+            var chk1 = $(this).find('input:checkbox').first();
+            var chk = $(this).find('input:checkbox').not('.firstChk');
+            var txt = $(this).find('input:text');
+            chk1.each(function () {
+                var item = $(this);
+                item.click(function () {
+                    //
+                    var $chk = $(this);
+                    if (!chk1[0].checked) {
+                        txt.each(function () {
+                            $(this).val('');
+                        });
+                        chk.each(function () {
+                            var $chk = $(this);
+                            $chk[0].checked = false;
+                        });
+                    }
+                });
+            });
+            chk.each(function () {
+                var item = $(this);
+                item.click(function () {
+                    //
+                    var $chk = $(this);
+
+                    if ($chk[0].checked) {
+                        chk1[0].checked = true;
+                        chk.each(function () {
+                            var chkitem = $(this);
+                            if (chkitem[0].checked) {
+                                noChk = false;
+                            }
+                        });
+                    } else {
+                        //
+                        var noChk = true;
+                        chk.each(function () {
+                            var chkitem = $(this);
+                            if (chkitem[0].checked) {
+                                noChk = false;
+                            }
+                        });
+                        if (noChk) {
+                            chk1[0].checked = false;
+                        }
+                    }
+                });
+            });
+            txt.each(function () {
+                var item = $(this);
+                item.keyup(function () {
+                    //
+                    var $txt = $(this);
+                    if ($txt[0].value != '') {
+                        chk1[0].checked = true;
+                    } else {
+                        chk1[0].checked = false;
+                    }
+                });
+            });
+        });
+    }
+    //列印PDF
+    function export_MeasuresForm() {
+        if (win != undefined) {
+            win.close();
+        }
+        win = window.open('_blank', 'TheNewWindow');
+        $.ajax({
+            url: '@Url.Content("~/MeasuresForm/showMeasuresForm")',
+            type: 'POST',
+            data: { tempid: $('#tempid').val() },
+            success: function (data) {
+                $("#pdfForm #HtmlStr").val(data);
+                //pdfForm
+                document.getElementById('pdfForm').submit();
+            },
+            error: function (jqXHR) {
+                log(jqXHR)
+            }
+        });
+    }
+    function show_MeasuresForm() {
+        window.open('@Url.Content("~/MeasuresForm/showMeasuresForm2")');
+    }
+    //存檔表單
+    function save_MeasuresForm(btn) {
+        btn.button('loading');
+        saveDataSet();
+        $.ajax({
+            url: '@Url.Content("~/MeasuresForm/save_MeasuresForm")',
+            type: 'post',
+            data: $('#MeasuresForm').serialize(),
+            success: function (data) {
+                if (data.success) {
+                    showAlert(data.msg, msg_stat.Success, 1000);
+                    refreshMeasuresForm();
+                }
+                else {
+                    showAlert(data.msg, msg_stat.Warning, 1000);
+                }
+            },
+            error: function (jqXHR) {
+                log(jqXHR);
+            },
+            complete: function () {
+                btn.button('reset');
+                $(main_modal).modal('hide');
+            }
+        });
+    }
+    function saveDataSet() {
+        //setAd();
+        setTwzipcode();
+        setOldManual();
+        setnewManual();
+        setAdSituationblok();
+        setAssessType();
+        setbreatheWeakblok();
+        setMachineItem();
+        setO2assessblok();
+        setMachineblok();
+        setinvasiveblok();
+    }
+    //設定地址
+    function setTwzipcode() {
+        //
+        var county1 = $('#twzipcode1').find('select[name="county"]')[0].value;
+        var district1 = $('#twzipcode1').find('select[name="district"]')[0].value;
+        var county2 = $('#twzipcode2').find('select[name="county"]')[0].value;
+        var district2 = $('#twzipcode2').find('select[name="district"]')[0].value;
+        $('input[name="county_1"]').val(county1);
+        $('input[name="district_1"]').val(district1);
+        $('input[name="county_2"]').val(county2);
+        $('input[name="district_2"]').val(district2);
+    }
+    //設定地址
+    function setAd() {
+        //
+        var ad1 = bindAd('twzipcode1', '1');//設定地址1
+        var ad2 = bindAd('twzipcode2', '2');//設定地址2
+        $('#ad1').val(ad1);
+        $('#ad2').val(ad2);
+    }
+    function bindAd(pId, type) {
+        //
+        var val = '';
+        var county = $('#' + pId).find('select[name="county"]')[0].value;
+        var district = $('#' + pId).find('select[name="district"]')[0].value;
+        var li = document.getElementsByName('li_' + type)[0].value;
+        var rd = document.getElementsByName('rd_' + type)[0].value;
+        var dan = document.getElementsByName('dan_' + type)[0].value;
+        var ln = document.getElementsByName('ln_' + type)[0].value;
+        var aly = document.getElementsByName('aly_' + type)[0].value;
+        var no = document.getElementsByName('no_' + type)[0].value;
+        var f = document.getElementsByName('f_' + type)[0].value;
+        if (checkVal(county)) { val = val + county }
+        if (checkVal(district)) { val = val + district }
+        if (checkVal(li)) { val = val + li + '村(里)' }
+        if (checkVal(rd)) { val = val + rd + ' 路(街)' }
+        if (checkVal(dan)) { val = val + dan + '段' }
+        if (checkVal(ln)) { val = val + ln + '巷' }
+        if (checkVal(aly)) { val = val + aly + '弄' }
+        if (checkVal(no)) { val = val + no + '號' }
+        if (checkVal(f)) { val = val + f + '樓' }
+
+        return val;
+    }
+    //設定(舊制)身心障礙手冊類別
+    function setOldManual() {
+        var val1 = '';
+        var val2 = '';
+        var val4 = '';
+        var val3 = '';
+        var block = $('#oldManualBlok').find('input:checkbox');
+        var block2 = $('#oldManualBlok').find('input:text');
+        block.each(function () {
+            //debugger
+            var item = $(this);
+            var type = $(this).attr('data');
+            switch (type) {
+                case 'oldManual':
+                    if (item[0].checked) {
+                        val1 = val1 + item[0].value + ',';
+                    } else {
+                        val1 = val1 + '0,';
+                    }
+                    break;
+                case 'oldManual_1':
+                    if (item[0].checked) {
+                        val2 = val2 + item[0].value + ',';
+                    } else {
+                        val2 = val2 + '0,';
+                    }
+                    break;
+                case 'oldManual_2':
+                    if (item[0].checked) {
+                        val4 = val4 + item[0].value + ',';
+                    } else {
+                        val4 = val4 + '0,';
+                    }
+                    break;
+                default:
+                    break;
+            }
+        });
+        block2.each(function () {
+            var item = $(this);
+            var type = $(this).attr('data');
+            switch (type) {
+                case 'oldManual_txt':
+                    val3 = val3 + item[0].value + ',';
+                    break;
+                default:
+                    break;
+            }
+        });
+        $('#oldManual').val(val1);
+        $('#oldManual_1').val(val2);
+        $('#oldManual_2').val(val4);
+        $('#oldManual_txt').val(val3);
+    }
+    //設定(新制)身心障礙分類系統
+    function setnewManual() {
+        var val1 = '';
+        var val2 = '';
+        var block = $('#newManualblok').find('input:checkbox');
+        var block2 = $('#newManualblok').find('input:text');
+        block.each(function () {
+            //debugger
+            var item = $(this);
+            var type = $(this).attr('data');
+            switch (type) {
+                case 'newManual':
+                    if (item[0].checked) {
+                        val1 = val1 + item[0].value + ',';
+                    } else {
+                        val1 = val1 + '0,';
+                    }
+                    break;
+                default:
+                    break;
+            }
+        });
+        block2.each(function () {
+            var item = $(this);
+            var type = $(this).attr('data');
+            switch (type) {
+                case 'newManual_txt':
+                    val2 = val2 + item[0].value + ',';
+                    break;
+                default:
+                    break;
+            }
+        });
+        $('#newManual').val(val1);
+        $('#newManual_txt').val(val2);
+    }
+    //設定居住情況
+    function setAdSituationblok() {
+        var val1 = '';
+        var block = $('#AdSituationblok').find('input:text');
+        block.each(function () {
+            //debugger
+            var item = $(this);
+            var type = $(this).attr('data');
+            switch (type) {
+                case 'AdSituation_text':
+                    val1 = val1 + item[0].value + ',';
+                    break;
+                default:
+                    break;
+            }
+        });
+        $('#AdSituation_text').val(val1);
+    }
+    //設定請求評估需求
+    function setAssessType() {
+        var val1 = '';
+        var block = $('#assessTypeblok').find('input:checkbox');
+        block.each(function () {
+            //debugger
+            var item = $(this);
+            var type = $(this).attr('data');
+            switch (type) {
+                case 'assessType':
+                    if (item[0].checked) {
+                        val1 = val1 + item[0].value + ',';
+                    } else {
+                        val1 = val1 + '0,';
+                    }
+                    break;
+                default:
+                    break;
+            }
+        });
+        $('#assessType').val(val1);
+    }
+    //設定呼吸衰竭
+    function setbreatheWeakblok() {
+        var val1 = '';
+        var val2 = '';
+        var val3 = '';
+        var block = $('#breatheWeakblok').find('input:checkbox');
+        var block2 = $('#breatheWeakblok').find('input:text');
+        block.each(function () {
+            //debugger
+            var item = $(this);
+            var type = $(this).attr('data');
+            switch (type) {
+                case 'breatheWeak':
+                    if (item[0].checked) {
+                        val1 = val1 + item[0].value + ',';
+                    } else {
+                        val1 = val1 + '0,';
+                    }
+                    break;
+                case 'breatheWeak_1':
+                    if (item[0].checked) {
+                        val2 = val2 + item[0].value + ',';
+                    } else {
+                        val2 = val2 + '0,';
+                    }
+                    break;
+                default:
+                    break;
+            }
+        });
+        block2.each(function () {
+            var item = $(this);
+            var type = $(this).attr('data');
+            switch (type) {
+                case 'breatheWeak_txt':
+                    val3 = val3 + item[0].value + ',';
+                    break;
+                default:
+                    break;
+            }
+        });
+        $('#breatheWeak').val(val1);
+        $('#breatheWeak_1').val(val2);
+        $('#breatheWeak_txt').val(val3);
+    }
+    //設定 非侵襲性單相陽壓呼吸器使用原因評估
+    function setMachineItem() {
+        var val1 = '';
+        var val2 = '';
+        var block = $('#MachineItemblok').find('input:checkbox');
+        var block2 = $('#MachineItemblok').find('input:text');
+        block.each(function () {
+            //debugger
+            var item = $(this);
+            var type = $(this).attr('data');
+            switch (type) {
+                case 'MachineItem':
+                    if (item[0].checked) {
+                        val1 = val1 + item[0].value + ',';
+                    } else {
+                        val1 = val1 + '0,';
+                    }
+                    break;
+                default:
+                    break;
+            }
+        });
+        block2.each(function () {
+            //debugger
+            var item = $(this);
+            var type = $(this).attr('data');
+            switch (type) {
+                case 'MachineItem_txt':
+                    val2 = val2 + item[0].value + ',';
+                    break;
+                default:
+                    break;
+            }
+        });
+        $('#MachineItem').val(val1);
+        $('#MachineItem_txt').val(val2);
+    }
+    //設定 需使用氧氣之評估
+    function setO2assessblok() {
+        var val1 = '';
+        var val2 = '';
+        var val3 = '';
+        var block = $('#O2assessblok').find('input:checkbox');
+        var block2 = $('#O2assessblok').find('input:text');
+        block.each(function () {
+            //debugger
+            var item = $(this);
+            var type = $(this).attr('data');
+            switch (type) {
+                case 'O2assess':
+                    if (item[0].checked) {
+                        val1 = val1 + item[0].value + ',';
+                    } else {
+                        val1 = val1 + '0,';
+                    }
+                    break;
+                case 'O2assess_1':
+                    if (item[0].checked) {
+                        val2 = val2 + item[0].value + ',';
+                    } else {
+                        val2 = val2 + '0,';
+                    }
+                    break;
+                default:
+                    break;
+            }
+        });
+        block2.each(function () {
+            var item = $(this);
+            var type = $(this).attr('data');
+            switch (type) {
+                case 'O2assess_txt':
+                    val3 = val3 + item[0].value + ',';
+                    break;
+                default:
+                    break;
+            }
+        });
+        $('#O2assess').val(val1);
+        $('#O2assess_1').val(val2);
+        $('#O2assess_txt').val(val3);
+    }
+    //設定配置選項
+    function setMachineblok() {
+        var val1 = '';
+        var block = $('#Machineblok').find('input:checkbox');
+        block.each(function () {
+            //debugger
+            var item = $(this);
+            var type = $(this).attr('data');
+            switch (type) {
+                case 'Machine':
+                    if (item[0].checked) {
+                        val1 = val1 + item[0].value + ',';
+                    } else {
+                        val1 = val1 + '0,';
+                    }
+                    break;
+                default:
+                    break;
+            }
+        });
+        $('#Machine').val(val1);
+    }
+    function setinvasiveblok() {
+        var val1 = '';
+        var val2 = '';
+        var val3 = '';
+        var block = $('#invasiveblok').find('input:checkbox');
+        var block2 = $('#invasiveblok').find('input:text');
+        block.each(function () {
+            //debugger
+            var item = $(this);
+            var type = $(this).attr('data');
+            switch (type) {
+                case 'invasive':
+                    if (item[0].checked) {
+                        val1 = val1 + item[0].value + ',';
+                    } else {
+                        val1 = val1 + '0,';
+                    }
+                    break;
+                default:
+                    break;
+            }
+        });
+        block2.each(function () {
+            var item = $(this);
+            var type = $(this).attr('data');
+            switch (type) {
+                case 'invasive_mode':
+                    val2 = val2 + item[0].value + ',';
+                    break;
+                case 'invasive_O2density':
+                    val3 = val3 + item[0].value + ',';
+                    break;
+                default:
+                    break;
+            }
+        });
+        $('#invasive').val(val1);
+        $('#invasive_mode').val(val2);
+        $('#invasive_O2density').val(val3);
+    }
+    function checkVal(pVal) {
+        if (pVal != null && pVal != undefined && pVal != '') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    //同戶籍地
+    function sameAd() {
+        if ($('#chkAd')[0].checked) {
+            var county = $('#twzipcode1').find('select[name="county"]')[0].value;
+            var district = $('#twzipcode1').find('select[name="district"]')[0].value;
+            var li = document.getElementsByName('li_1')[0].value;
+            var rd = document.getElementsByName('rd_1')[0].value;
+            var dan = document.getElementsByName('dan_1')[0].value;
+            var ln = document.getElementsByName('ln_1')[0].value;
+            var aly = document.getElementsByName('aly_1')[0].value;
+            var no = document.getElementsByName('no_1')[0].value;
+            var f = document.getElementsByName('f_1')[0].value;
+            $('#twzipcode2').twzipcode('set', {
+                'county': county,
+                'district': district
+            });
+            $('#li_2').val(li);
+            $('#rd_2').val(rd);
+            $('#dan_2').val(dan);
+            $('#ln_2').val(ln);
+            $('#aly_2').val(aly);
+            $('#no_2').val(no);
+            $('#f_2').val(f);
+        }
+    }
+    function close_MeasuresForm() {
+        window.close();
+    }
+</script>

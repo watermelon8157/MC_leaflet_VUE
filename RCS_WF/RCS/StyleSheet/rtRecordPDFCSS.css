@@ -1,0 +1,67 @@
+.mainTable{
+    width:100%;height:100%;border-collapse: collapse;
+}
+.mainHeight{
+    height: 900px;
+}
+.TableRow tr td{
+   padding:10px 10px 10px 10px;
+}.borderNote{
+    width: 20px;
+}
+.rowOneWidth{
+    width: 30px;
+}
+.borderNote,.noteFont{
+    font-size: 12px;
+}
+.memoStyle{
+    height:60px;
+}
+.mode_memoStyle{
+}
+.VentilationModeStyle{
+    height:50px;
+}
+.memoRowStyle{
+    font-size: 8px;
+}
+.sub{
+    font-size: 6px;
+}
+.ALLBorder,.TBBorder,.TRBorder,.TLBorder,.topBorder{
+    border-top:1px solid;
+}
+.LBRBorder,.ALLBorder,.LRBorder,.LBBorder,.TLBorder,.leftBorder{
+    border-left:1px solid;
+}
+.LBRBorder,.ALLBorder,.TBBorder,.LBBorder,.BRBorder,.bottomBorder{
+    border-bottom:1px solid;
+}
+.LBRBorder,.ALLBorder,.LRBorder,.TRBorder,.BRBorder,.rightBorder{
+    border-right:1px solid;
+}
+.titleTwoRowWidth{
+    width: 80px;
+}
+.titleThiRowWidth{
+    width: 120px;
+}
+.rowDataStyle{
+    width:13%;
+}
+.borderLeftBlack{
+    border-left:1px solid;
+}
+.borderTopBlack{
+    border-top :1px solid;
+}
+.showSize1{
+    font-size:12px;
+}
+.showSize2{
+    font-size:10px;
+}
+.divCenter{
+    text-align:center;
+}
