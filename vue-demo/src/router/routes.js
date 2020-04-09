@@ -10,11 +10,7 @@ import HospEvacuation from '@/components/HospEvacuation'
 import PatList from '@/components/PatList'
 import moment from 'moment'
 const webTitle = 'MC-'
-const isDev = process.env.NODE_ENV === 'development'
-let _redirect = '/Login'
-if (isDev) {
-  _redirect = '/MC/Form/' + moment().format('YYYYMMDDHHmmss')
-}
+let _redirect = '/MC/Form/' + moment().format('YYYYMMDDHHmmss')
 export default [
   {
     path: '*',
