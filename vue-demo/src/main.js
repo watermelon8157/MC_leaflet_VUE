@@ -6,6 +6,7 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import store from '@/store/install' // store
+import Controllers from '@/controllers/install'
 import moment from '@/moment/install' // moment
 import 'leaflet/dist/leaflet.css'
 import { Icon } from 'leaflet'
@@ -16,6 +17,7 @@ import 'tailwindcss/dist/base.min.css'
 import 'tailwindcss/dist/components.min.css'
 import 'tailwindcss/dist/utilities.min.css'
 Vue.use(store)
+Vue.use(Controllers)
 Vue.use(moment)
 Vue.use(Antd)
 delete Icon.Default.prototype._getIconUrl

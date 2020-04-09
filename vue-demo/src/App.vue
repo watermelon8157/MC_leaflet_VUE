@@ -79,6 +79,13 @@ export default {
       visible: false
     }
   },
+  mounted () {
+    this.$api.MC.HelloWord().then((result) => {
+      console.log(result)
+    }).catch((err) => {
+      console.log(err)
+    })
+  },
   methods: {
     handleClick (e) {
       var vuethis = this
