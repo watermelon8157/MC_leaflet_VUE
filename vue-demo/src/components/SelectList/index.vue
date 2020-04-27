@@ -13,15 +13,15 @@
           <a-table
             :columns="columns"
             :rowClassName="RowClassName"
-            :rowKey="record => record.char_no"
+            :rowKey="record => record.PATIENT_ID"
             :dataSource="data"
             :loading="loading"
             size="small"
             :customRow="clickCustomRow"
           >
-            <template slot="char_no" slot-scope="text,record">{{text}}</template>
-            <template slot="pat_name" slot-scope="text,record">{{text}}</template>
-            <template slot="injury_classification" slot-scope="text,record">
+            <template slot="PATIENT_ID" slot-scope="text,record">{{text}}</template>
+            <template slot="PATIENT_NAME" slot-scope="text,record">{{text}}</template>
+            <template slot="TRIAGE" slot-scope="text,record">
               <div
                 :class="{'text-red-500' : text === 'Severe' ,
               'text-blue-500' : text === 'Moderate' ,
@@ -47,18 +47,18 @@ import Mixin from '@/mixin'
 const columns = [
   {
     title: '病歷編號',
-    dataIndex: 'char_no',
-    scopedSlots: { customRender: 'char_no' }
+    dataIndex: 'PATIENT_ID',
+    scopedSlots: { customRender: 'PATIENT_ID' }
   },
   {
     title: '姓名',
-    dataIndex: 'pat_name',
-    scopedSlots: { customRender: 'pat_name' }
+    dataIndex: 'PATIENT_NAME',
+    scopedSlots: { customRender: 'PATIENT_NAME' }
   },
   {
     title: '傷勢',
-    dataIndex: 'injury_classification',
-    scopedSlots: { customRender: 'injury_classification' }
+    dataIndex: 'TRIAGE',
+    scopedSlots: { customRender: 'TRIAGE' }
   }
 ]
 export default {
@@ -77,7 +77,7 @@ export default {
     data () {
       var vuethis = this
       let temp = Object.assign(vuethis.patList, {})
-      temp = temp.sort((a, b) => (a.injury_classification > b.injury_classification) ? 1 : -1)
+      temp = temp.sort((a, b) => (a.TRIAGE > b.TRIAGE) ? 1 : -1)
       temp = temp.reverse()
       return temp
     },
@@ -88,7 +88,7 @@ export default {
   methods: {
     RowClassName (record, index) {
       var vuethis = this
-      if (record.char_no === vuethis.model.char_no) {
+      if (record.PATIENT_ID === vuethis.model.PATIENT_ID) {
         return 'bg-yellow-200'
       }
       return ''
@@ -106,7 +106,7 @@ export default {
     },
     emitSelectPatData () {
       this.$store.commit('SpinLoading', true)
-      if (this.model.char_no) {
+      if (this.model.PATIENT_ID) {
         this.$store.commit('SetSelctPatList', this.model)
         this.$refs.map.onClose()
         this.model = this.SetNewModel()

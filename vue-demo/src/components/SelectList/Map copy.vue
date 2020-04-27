@@ -41,18 +41,18 @@ import Mixin from '@/mixin'
 const columns = [
   {
     title: '病歷編號',
-    dataIndex: 'char_no',
-    scopedSlots: { customRender: 'char_no' }
+    dataIndex: 'PATIENT_ID',
+    scopedSlots: { customRender: 'PATIENT_ID' }
   },
   {
     title: '姓名',
-    dataIndex: 'pat_name',
-    scopedSlots: { customRender: 'pat_name' }
+    dataIndex: 'PATIENT_NAME',
+    scopedSlots: { customRender: 'PATIENT_NAME' }
   },
   {
     title: '傷勢',
-    dataIndex: 'injury_classification',
-    scopedSlots: { customRender: 'injury_classification' }
+    dataIndex: 'TRIAGE',
+    scopedSlots: { customRender: 'TRIAGE' }
   }
 ]
 export default {
@@ -108,7 +108,7 @@ export default {
     data () {
       var vuethis = this
       let temp = Object.assign(vuethis.patList, {})
-      temp = temp.sort((a, b) => (a.injury_classification > b.injury_classification) ? 1 : -1)
+      temp = temp.sort((a, b) => (a.TRIAGE > b.TRIAGE) ? 1 : -1)
       temp = temp.reverse()
       return temp
     },
@@ -144,7 +144,7 @@ export default {
   methods: {
     RowClassName (record, index) {
       var vuethis = this
-      if (record.char_no === vuethis.model.char_no) {
+      if (record.PATIENT_ID === vuethis.model.PATIENT_ID) {
         return 'bg-yellow-200'
       }
       return ''

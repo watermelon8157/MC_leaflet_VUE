@@ -31,7 +31,7 @@ body {
     <a-layout id="components-layout-demo-top" class="layout">
       <a-layout-header class="bg-blue-400">
         <div class="logo text-white" />
-        {{titleName}}
+        {{titleName}}(事件代碼:{{site_id}})
       </a-layout-header>
       <a-layout-content class="container">
         <div class="m-2">
@@ -57,31 +57,91 @@ body {
         <a-menu-item key="HospAdmission">醫院收治狀況</a-menu-item>
         <a-menu-item key="HospEvacuation">醫院後送狀況</a-menu-item>
         <a-menu-item key="PatList">病患清單</a-menu-item>
-        <a-menu-item key="VueLeaflet">地圖測試</a-menu-item>
       </a-menu>
     </a-drawer>
+    <a-modal title="登入" :visible="visibleLogin" :closable="false" :footer="null">
+      <loginform v-on:emitLogin="Loginform" :loginDrawer="true"></loginform>
+      <a-alert v-if="visibleLoginAlert" type="error" message="登入驗證失敗，請重新登入!" banner closable />
+    </a-modal>
     <Spin class="z-50"></Spin>
   </a-layout>
 </template>
 
 <script>
+import Loginform from '@/components/Shared/Loginform'
 import Spin from '@/components/Shared/Spin'
 import Mixin from '@/mixin'
 export default {
   mixins: [Mixin],
   components: {
-    Spin
+    Spin, Loginform
   },
   name: 'App',
   data () {
     return {
+      visibleLoginAlert: false,
+      visibleLogin: false,
       titleName: document.title,
       visible: false
     }
   },
+  created () {
+    this.$nextTick(function () {
+      var vuethis = this
+      vuethis.spinning = true
+      if (vuethis.$auth.TokenExist()) {
+        vuethis.$api.MC.JwtAuthCheck().then((result) => {
+          if (vuethis.$store.state.Basic.loadFirst) {
+            vuethis.$store.commit({
+              type: 'Basic/SetLoadFirst'
+            })
+          }
+          vuethis.$api.MC.GetPatList().then((result) => {
+            vuethis.$store.commit({
+              type: 'Basic/SetPatListnow',
+              data: result.data
+            })
+            setTimeout(() => {
+              vuethis.spinning = false
+            }, 500)
+          }).catch((err) => {
+            console.log(err)
+            this.error(err)
+            setTimeout(() => {
+              vuethis.spinning = false
+            }, 500)
+          })
+        }).catch((err) => {
+          console.log(err)
+          vuethis.visibleLoginAlert = true
+          vuethis.ShowLoginAlert()
+          setTimeout(() => {
+            vuethis.spinning = false
+          }, 500)
+        })
+      } else {
+        vuethis.visibleLoginAlert = true
+        vuethis.ShowLoginAlert()
+      }
+    })
+  },
   mounted () {
   },
   methods: {
+    Loginform () {
+      location.reload()
+    },
+    ShowLoginAlert () {
+      var vuethis = this
+      vuethis.visibleLogin = true
+      vuethis.$auth.clearToken()
+      setTimeout(() => {
+        vuethis.visibleLoginAlert = false
+      }, 3000)
+      setTimeout(() => {
+        vuethis.$store.commit('SpinLoading', false)
+      }, 500)
+    },
     handleClick (e) {
       var vuethis = this
       // vuethis.$store.commit('SpinLoading', true)

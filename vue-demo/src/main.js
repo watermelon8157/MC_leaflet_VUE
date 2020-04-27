@@ -16,10 +16,15 @@ import 'ant-design-vue/dist/antd.css'
 import 'tailwindcss/dist/base.min.css'
 import 'tailwindcss/dist/components.min.css'
 import 'tailwindcss/dist/utilities.min.css'
+import lodash from '@/lodash/install'
+import auth from '@/auth/install' //
+
 Vue.use(store)
+Vue.use(auth)
 Vue.use(Controllers)
 Vue.use(moment)
 Vue.use(Antd)
+Vue.use(lodash)
 delete Icon.Default.prototype._getIconUrl
 Icon.Default.mergeOptions({
   iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),

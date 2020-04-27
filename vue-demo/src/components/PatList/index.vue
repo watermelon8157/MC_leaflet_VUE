@@ -5,7 +5,7 @@
     {{patList}}
     <a-table
     :columns="columns"
-    :rowKey="record => record.char_no"
+    :rowKey="record => record.PATIENT_ID"
     :dataSource="patList"
   >
   </a-table>
@@ -17,12 +17,12 @@ const columns = [
   {
     title: '病歷號',
     dataIndex: 'name',
-    scopedSlots: { customRender: 'char_no' }
+    scopedSlots: { customRender: 'PATIENT_ID' }
   },
   {
     title: '病患姓名',
-    dataIndex: 'pat_name',
-    scopedSlots: { customRender: 'pat_name' }
+    dataIndex: 'PATIENT_NAME',
+    scopedSlots: { customRender: 'PATIENT_NAME' }
   },
   {
     title: '年齡',
@@ -31,8 +31,8 @@ const columns = [
   },
   {
     title: '傷勢',
-    dataIndex: 'injury_classification',
-    scopedSlots: { customRender: 'injury_classification' }
+    dataIndex: 'TRIAGE',
+    scopedSlots: { customRender: 'TRIAGE' }
   },
   {
     title: '救護車',

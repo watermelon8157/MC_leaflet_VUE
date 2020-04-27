@@ -52,10 +52,10 @@
         <a-tag class="font-extrabold bg-orange-500 text-white">Medium</a-tag>
         <a-tag class="font-extrabold bg-yellow-500 text-white">Ceneral</a-tag>
         <a-tag class="font-extrabold bg-green-500 text-white">Non-ECRH</a-tag>
-        <span v-if="model.pat_name" class="m-2">
+        <span v-if="model.PATIENT_NAME" class="m-2">
           (
           病患
-          <span class="m-1 p-2 bg-yellow-200">{{model.pat_name}}</span>)
+          <span class="m-1 p-2 bg-yellow-200">{{model.PATIENT_NAME}}</span>)
         </span>
       </span>
 

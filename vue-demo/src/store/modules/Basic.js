@@ -8,9 +8,21 @@ export default {
   namespaced: true,
   state: {
     windowWidth: document.documentElement.clientWidth,
-    windowHeight: document.documentElement.clientHeight
+    windowHeight: document.documentElement.clientHeight,
+    loadFirst: true,
+    PatListAll: [],
+    PatListnow: []
   },
   mutations: {
+    SetPatListnow (state, payload) {
+      state.PatListnow = payload.data
+    },
+    SetPatListAll (state, payload) {
+      state.PatListAll = payload.data
+    },
+    SetLoadFirst (state) {
+      state.loadFirst = false
+    },
     SetWindowWidth (state, payload) {
       state.windowWidth = payload.windowWidth
     },

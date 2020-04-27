@@ -23,7 +23,7 @@ const store = {
     SetSelctPatList (state, payload) {
       for (let index = 0; index < state.patList.length; index++) {
         const element = state.patList[index]
-        if (element.char_no === payload.char_no) {
+        if (element.PATIENT_ID === payload.PATIENT_ID) {
           state.patList.splice(index, 1)
         }
       }

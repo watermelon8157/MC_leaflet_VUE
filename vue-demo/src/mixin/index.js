@@ -1,4 +1,5 @@
 import Alert from '@/components/Shared/Alert'
+import DB_MC_PATIENT_INFO from '@/RCS_Data.Models.DB.DB_MC_PATIENT_INFO.json'
 const hospList = [
   {
     hosp_desc: '0401180014國立台灣大學醫學院附設醫院本院',
@@ -5053,6 +5054,7 @@ export default {
   },
   data () {
     return {
+      data: Object.assign(DB_MC_PATIENT_INFO, {}),
       hospList,
       windowHeight: 0,
       windowWidth: 0
@@ -5069,6 +5071,12 @@ export default {
     })
   },
   computed: {
+    site_id () {
+      if (this.$auth.getSiteID()) {
+        return this.$auth.getSiteID()
+      }
+      return ''
+    },
     selectPatList () {
       return this.$store.state.selectPatList
     },
@@ -5094,6 +5102,43 @@ export default {
     }
   },
   methods: {
+    error (err) {
+      if (typeof err === 'string') {
+        this.$notification.error({
+          message: err
+        })
+      } else {
+        this.$notification.error({
+          message: err.data
+        })
+      }
+    },
+    info (pVal) {
+      if (typeof pVal === 'string') {
+        this.$notification.info({
+          message: pVal
+        })
+      }
+    },
+    FlattenObject (ob) {
+      var toReturn = {}
+
+      for (var i in ob) {
+        if (!ob.hasOwnProperty(i)) continue
+
+        if (typeof ob[i] === 'object' && ob[i] !== null) {
+          var flatObject = this.FlattenObject(ob[i])
+          for (var x in flatObject) {
+            if (!flatObject.hasOwnProperty(x)) continue
+
+            toReturn[i + '.' + x] = flatObject[x]
+          }
+        } else {
+          toReturn[i] = ob[i]
+        }
+      }
+      return toReturn
+    },
     handleScroll () {
       this.scrolled = window.scrollY > 0
     },
@@ -5114,17 +5159,18 @@ export default {
       })
     },
     SetNewModel () {
-      return {
-        datastatus: '0',
-        char_no: '',
-        pat_name: '',
-        sex: '',
-        ageType: '',
-        injury_classification: '',
-        nation_type: '',
-        start_date: this.$moment().format('YYYY-MM-DD HH:mm:ss'),
-        amb_id: ''
-      }
+      return JSON.parse(JSON.stringify(DB_MC_PATIENT_INFO))
+      //   return {
+      //     datastatus: '0',
+      //     PATIENT_ID: '',
+      //     PATIENT_NAME: '',
+      //     sex: '',
+      //     ageType: '',
+      //     TRIAGE: '',
+      //     nation_type: '',
+      //     start_date: this.$moment().format('YYYY-MM-DD HH:mm:ss'),
+      //     amb_id: ''
+      //   }
     },
     moment (dateString, format) {
       var _dateString = !!dateString
