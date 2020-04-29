@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Web.Http; 
 using RCS_Data;
 using RCS_Data.Models.DB;
+using RCSData.Models;
 
 namespace RCS.Controllers.WEBAPI
 {
@@ -49,6 +50,48 @@ namespace RCS.Controllers.WEBAPI
 
             return "儲存成功!";
         }
+        /// <summary>
+        /// 登入驗證
+        /// </summary>
+        /// <param name="form">登入資料</param>
+        /// <returns></returns>
+        [JwtAuthActionFilterAttribute(notVerification = true)]
+        public object Login(Login_Form_Body form)
+        {
+            if (!string.IsNullOrWhiteSpace(form.site_id) )
+            {
 
+                return new
+                {
+                    Result = true,
+                    token = JwtAuthActionFilterAttribute.EncodeToken(new PAYLOAD()
+                    {
+                        site_id = form.site_id,
+                        user_name = "aaaa",
+                        user_id = "aaaa"
+                    })
+                }; 
+            }
+            else
+            {
+                this.throwHttpResponseException("請輸入帳號或密碼!!");
+            }
+            this.throwHttpResponseException("帳號或密碼錯誤!!");
+            return false;
+        }
+
+        /// <summary>
+        /// 程式發生錯誤，回拋錯誤訊息給使用者
+        /// </summary>
+        /// <param name="msg"></param>
+        [JwtAuthActionFilterAttribute(notVerification = true)]
+        protected void throwHttpResponseException(string msg)
+        {
+            var resp = new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.NotFound)
+            {
+                Content = new System.Net.Http.StringContent(string.Format(msg))
+            };
+            throw new System.Web.Http.HttpResponseException(resp);
+        }
     }
 }

@@ -129,7 +129,7 @@ export default {
   },
   methods: {
     Loginform () {
-      location.reload()
+
     },
     ShowLoginAlert () {
       var vuethis = this

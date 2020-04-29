@@ -83,7 +83,7 @@ namespace RCS.Controllers.WEBAPI
 
             }
 
-            result.last_record_id = rtCptReq.CPTReqData(form.pat_info).record_id;
+            result.last_record_id = rtCptReq.CPTReqDataLastRecord_id(form.pat_info);
 
             return result;
         }
@@ -126,7 +126,7 @@ namespace RCS.Controllers.WEBAPI
             List<RTCptReq> Result = new List<RTCptReq>();
 
             IPDPatientInfo pat_info = form.pat_info;
-            rm = rtCptReq.RtCptReqList(ref Result, form.sDate, form.eDate, pat_info);
+            rm = rtCptReq.RtCptReqListByDate(ref Result, form.sDate, form.eDate, pat_info);
 
 
             return Result;

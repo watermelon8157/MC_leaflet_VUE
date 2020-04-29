@@ -59,6 +59,7 @@ export default {
     // 將資料存到sessionStorage
     // dev 模式用token
     sessionStorage.setItem('Authorization', 'Bearer ' + token)
+    console.log(sessionStorage.getItem('Authorization'))
   },
   // 設定token 開發模式下固定使用
   setPatientInfo (Info) {

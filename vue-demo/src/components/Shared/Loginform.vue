@@ -53,11 +53,9 @@ export default {
     Login () {
       this.$api.MC.LoginForm({ site_id: this.site_id })
         .then(result => {
-          if (result.ok) {
-            this.$auth.setToken(result.data.token)
-            this.disabled = false
-            this.$emit('emitLogin')
-          }
+          this.$auth.setToken(result.data.token)
+          this.disabled = false
+          this.$emit('emitLogin')
         })
         .catch(err => {
           this.$notification.error({

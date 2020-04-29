@@ -253,6 +253,23 @@ namespace RCS_Data
             }
             return rm;
         }
+
+        /// <summary>
+        /// 取得共用顯示 Json資料
+        /// List<DB_RCS_RT_RECORD_JSON> pList = dbLin.Select_JSONData<DB_RCS_RT_RECORD_JSON>("record_id");
+        /// </summary>
+        /// <param name="record_id"></param>
+        /// <returns></returns>
+        public List<DB_RCS_RT_RECORD_JSON> Select_JSONDataList(List<string> record_idList)
+        {
+            string sql = "";
+            Dapper.DynamicParameters dp = new DynamicParameters();
+            dp.Add("RECORD_ID", record_idList);
+            sql = string.Concat("SELECT * FROM ", DB_TABLE_NAME.DB_RCS_RT_RECORD_JSON, " WHERE RECORD_ID in @RECORD_ID");
+            List<DB_RCS_RT_RECORD_JSON> _list = this.DBA.getSqlDataTable<DB_RCS_RT_RECORD_JSON>(sql, dp);
+            return _list;
+        }
+
         /// <summary>
         /// 取得共用顯示 Json資料
         /// List<DB_RCS_RT_RECORD_JSON> pList = dbLin.Select_JSONData<DB_RCS_RT_RECORD_JSON>("record_id");

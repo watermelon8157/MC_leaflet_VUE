@@ -454,6 +454,42 @@ namespace RCS_Data.Controllers
             pList = this.DBLink.DBA.getSqlDataTable<DB_RCS_RT_CASE>(query, dp);
             return pList;
         }
+
+        protected string saveCxrJSON(string jsonStr,ref RESPONSE_MSG rm)
+        {
+            string addJsonKey = "";
+            //cxrJSON判斷
+            if (!string.IsNullOrWhiteSpace(jsonStr))
+            {
+                 addJsonKey = this.DBLink.GetFixedStrSerialNumber();
+
+                List<DB_RCS_RT_RECORD_JSON> addKeyData = new List<DB_RCS_RT_RECORD_JSON>();
+
+                addKeyData.Add(new DB_RCS_RT_RECORD_JSON
+                {
+                    RECORD_ID = addJsonKey,
+                    ITEM_NAME = "CXR資料",
+                    JSON_VALUE = jsonStr 
+                });
+
+
+                RESPONSE_MSG checkJson = this.DBLink.Insert_JSONData(addJsonKey, addKeyData);
+
+
+                if (checkJson.status == RESPONSE_STATUS.ERROR)
+                {
+                    LogTool.SaveLogMessage(this.DBLink.DBA.lastError, "CPTAssess_Save");
+                    rm.message = "儲存失敗!";
+                    rm.status = RESPONSE_STATUS.ERROR;
+                } 
+            }
+            else
+            {
+                addJsonKey = "";
+            }
+
+            return addJsonKey;
+        }
     }
 
     

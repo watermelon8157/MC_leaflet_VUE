@@ -257,7 +257,7 @@ namespace RCS.Controllers
                 {
                     idList = record_id.Split(',').ToList();
 
-                    var getData = RtCptReq.RtCptReqListByID(idList);
+                    var getData = RtCptReq.RtCptReqListByID<RTCptReq>(idList);
 
                     // detail
                     List<RTCptReq> data = getData;
