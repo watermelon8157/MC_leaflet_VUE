@@ -12,7 +12,7 @@ using System.Web.Routing;
 using System.Reflection;
 using RCS.Models;
 using RCSData.Models;
-using RCS_Data.Models.ViewModels;
+
 
 namespace RCS
 {
@@ -38,70 +38,16 @@ namespace RCS
 
         /// <summary> 比對病床、科別、護理站資訊更新清單 </summary>
         public static List<IPDPatientInfo> ipd_list { get; set; }
-
-        /// <summary>  上傳清單 </summary>
-        public static Queue<UPLOADSTAYBYUPLOADLIST> uploadList { get; set; }
+         
 
 
         /// <summary> 上傳者清單 </summary>
         public static List<UserInfo> userList { get; set; }
-        /// <summary> 比對病床、科別、護理站資訊更新清單 </summary>
-        public static Upload_to_hosp UploadToHospThread { get; set; }
+        /// <summary> 比對病床、科別、護理站資訊更新清單 </summary> 
 
-        /// <summary>
-        /// 從醫院取得最新的病患清單比對
-        /// </summary>
-        /// <param name="state"></param>
-        private static void get_ptlist_from_hosp(object state)
-        {
-            string actionName = "get_ptlist_from_hosp";
+      
 
-            try
-            {
-                if (first_time)
-                {
-                    MvcApplication.ipd_list.Clear();
-                    first_time = false;
-                    new RCS.Models.UpdateIPDPatientInfo().RunThread();
-                }
-                else
-                {
-                    //對應院內資料
-                    new RCS.Models.UpdateIPDPatientInfo().RunThread();
-                }
-
-
-            }
-            catch (Exception ex)
-            {
-                LogTool.SaveLogMessage(ex, actionName, MvcApplication.csName);
-            }
-
-        }
-          
-
-        /// <param name="state"></param>
-        private static void Upload_to_hosp(object state)
-        {
-            string actionName = "Upload_to_hosp";
-
-            try
-            {
-                if (MvcApplication.UploadToHospThread == null)
-                {
-                    MvcApplication.UploadToHospThread = new Upload_to_hosp();
-                }
-                if (!MvcApplication.UploadToHospThread.IsAlive)
-                {
-                    MvcApplication.UploadToHospThread.Start();
-                } 
-            }
-            catch (Exception ex)
-            {
-                LogTool.SaveLogMessage(ex, actionName, MvcApplication.csName);
-            }
-
-        }
+         
 
 
         protected void Application_Start()
@@ -111,8 +57,7 @@ namespace RCS
             GlobalConfiguration.Configure(WebApiConfig.Register);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
-
-            MvcApplication.uploadList = new Queue<UPLOADSTAYBYUPLOADLIST>();
+             
             MvcApplication.ipd_list = new List<IPDPatientInfo>();
             MvcApplication.userList = new List<UserInfo>();
             MvcApplication.first_time = true;
@@ -120,14 +65,10 @@ namespace RCS
             MvcApplication.first_upload_hl7 = true;
             if (!RCS.Controllers.BaseController.isDebuggerMode)
             {
-                //設定病人資料同步的 Schedule 開啟後五秒執行起來，每十分鐘跑一次
-                TimerCallback tc = new TimerCallback(get_ptlist_from_hosp);
-                timer_get_ptlist = new Timer(tc, null, 5000, 10 * 60 * 1000);
-
-                //設定病人資料同步的 Schedule 開啟後五秒執行起來，每十分鐘跑一次
-                TimerCallback tc2 = new TimerCallback(Upload_to_hosp);
-                timer_upload = new Timer(tc2, null, 5000, 10 * 60 * 1000);
-
+                ////設定病人資料同步的 Schedule 開啟後五秒執行起來，每十分鐘跑一次
+                //TimerCallback tc = new TimerCallback(get_ptlist_from_hosp);
+                //timer_get_ptlist = new Timer(tc, null, 5000, 10 * 60 * 1000);
+ 
             }
 
 
@@ -140,11 +81,7 @@ namespace RCS
         /// IIS 停止時會記錄停止原因
         /// </summary>
         protected void Application_End()
-        {
-            if (MvcApplication.uploadList != null  )
-            {
-                MvcApplication.uploadList.Clear();
-            }
+        { 
             if (MvcApplication.ipd_list != null)
             {
                 MvcApplication.ipd_list.Clear();

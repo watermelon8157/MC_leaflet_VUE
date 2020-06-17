@@ -1,14 +1,18 @@
 <template>
-  <div>
-    <a-card title="Patient List">
-      <a-table :columns="columns" :dataSource="data" :pagination="false" bordered>
-        <template slot="Last_name" slot-scope="text, record">
-          <a-icon
-            type="user"
-            class="p-2 pb-2"
-            :class="{'text-red-500': record.Gender === '女','text-blue-500': record.Gender === '男'}"
-          />
-          {{text}}
+  <div class="bg-white">
+    <a-card title="傷患清單">
+      <a-table
+        class="table-striped"
+        :columns="columns"
+        :dataSource="data"
+        :pagination="false"
+        bordered
+      >
+        <template slot="event" slot-scope="text, record">
+          1111
+        </template>
+        <template slot="Triage" slot-scope="text, record">
+          Severe
         </template>
       </a-table>
     </a-card>
@@ -18,49 +22,47 @@
 <script>
 const columns = [
   {
-    title: 'Date',
+    title: '事件',
+    dataIndex: 'event',
+    scopedSlots: { customRender: 'event' }
+  },
+  {
+    title: '傷勢',
+    dataIndex: 'Triage',
+    scopedSlots: { customRender: 'Triage' }
+  },
+  {
+    title: '日期',
     dataIndex: 'Date',
     scopedSlots: { customRender: 'Date' }
   },
   {
-    title: 'Departure',
+    title: '出發時間',
     className: 'Departure',
     dataIndex: 'Departure'
   },
   {
-    title: 'Arrival',
+    title: '抵達時間',
     dataIndex: 'Arrival'
   },
   {
-    title: 'Gender',
+    title: '性別',
     dataIndex: 'Gender'
   },
   {
-    title: 'Age',
+    title: '年齡',
     dataIndex: 'Age'
   },
   {
-    title: 'Last name',
+    title: '姓名',
     dataIndex: 'Last_name'
   },
   {
-    title: 'Triage',
-    dataIndex: 'Triage'
-  },
-  {
-    title: 'Sever',
-    dataIndex: 'Sever'
-  },
-  {
-    title: 'Minor',
-    dataIndex: 'Minor'
-  },
-  {
-    title: '119 code',
+    title: '救護車代碼',
     dataIndex: 'code119'
   },
   {
-    title: 'Hospital',
+    title: '醫院',
     dataIndex: 'Hospital'
   }
 ]

@@ -45,9 +45,7 @@ export default {
   },
 
   computed: {
-    now () {
-      return this.$moment().format('YYYYMMDDHHmmss')
-    }
+
   },
   methods: {
     Login () {

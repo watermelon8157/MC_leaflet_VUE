@@ -1,30 +1,13 @@
 ﻿using Com.Mayaminer;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using RCS.Models;
-using RCS.Models.DB;
 using RCS_Data;
 using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using System.Xml.Linq;
-using System.Data;
-using mayaminer.com.library;
 using RCSData.Models;
-using System.Text;
 
-namespace RCS.Controllers {
+namespace RCS.Controllers
+{
     public class MainController : BaseController {
-
-        private Main MainModel;
-        public MainController()
-        {
-            MainModel = new Main();
-        }
-
+         
         /// <summary>
         /// 登入畫面
         /// </summary>
@@ -243,87 +226,7 @@ namespace RCS.Controllers {
             return new EmptyResult();
         }
 
-        #region 前端log
-
-        /// <summary>
-        /// 記錄前端錯誤訊息
-        /// </summary>
-        /// <param name="jqxhr"></param>
-        /// <returns></returns>
-        public EmptyResult Log(JQXHR jqxhr)
-        {
-            try
-            {
-                SQLProvider SQL = new SQLProvider();
-                string log_id = SQL.GetFixedStrSerialNumber();
-                DataTable dt = MainModel.getSystemLog("WHERE 1<>1");
-                DataRow dr = dt.NewRow();
-                dr["LOG_ID"] = log_id;
-                dr["READYSTATE"] = jqxhr.readyState;
-                dr["RESPONSETEXT"] = jqxhr.responseText.Replace("--", "––").Replace("'", "、");
-                dr["STATUS"] = jqxhr.status;
-                dr["STATUSTEXT"] = jqxhr.statusText;
-                dr["LOG_DATE"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                dt.Rows.Add(dr);
-
-
-                this.DBA.BeginTrans();
-                mayaminer.com.jxDB.dbResultMessage rc = this.DBA.UpdateResult(dt, GetTableName.RCS_SYS_LOG.ToString());
-                if (rc.State != mayaminer.com.jxDB.enmDBResultState.Success)
-                {
-                    LogTool.SaveLogMessage(this.DBA.LastError, "Log");
-                    this.DBA.Rollback();
-                }
-                else
-                    this.DBA.Commit();
-            }
-            catch (Exception e)
-            {
-                LogTool.SaveLogMessage(e, "Log");
-            }
-            return new EmptyResult();
-        }
-
-        public ActionResult LogViewer()
-        {
-            return View(true);
-        }
-
-        public string LogData()
-        {
-            List<RCS_SYS_LOG> log_list = new List<RCS_SYS_LOG>();
-            try
-            {
-                DataTable dt = MainModel.getSystemLog("WHERE 1=1");
-                log_list = dt.ToList<RCS_SYS_LOG>();
-            }
-            catch (Exception ex)
-            {
-                LogTool.SaveLogMessage(ex, "LogData");
-            }
-            return JsonConvert.SerializeObject(log_list);
-        }
-
-        #endregion
-
-        [HttpPost]
-        public ActionResult DupLogCheck()
-        {
-            RESPONSE_MSG rm = new RESPONSE_MSG();
-            rm.status = RESPONSE_STATUS.ERROR;
-            rm.status = RESPONSE_STATUS.SUCCESS;
-            if (Request["user_id"] != null)
-            {
-                string user_id = Request["user_id"];
-                UserInfo oldui = (UserInfo)Session["user_info"];
-                if (oldui != null && oldui.user_id != user_id)
-                {
-                    rm.message = "前一登入者尚未或未正常登出，如繼續登入作業將覆蓋前一登入者。";
-                    rm.status = RESPONSE_STATUS.DUPLICATE;
-                    return Content(rm.get_json());
-                }
-            }
-            return Content(rm.get_json());
-        }
+  
+         
     }
 }

@@ -13,7 +13,7 @@
         >
           <a-input value="HT-1234" />
         </a-form-item>
-        <a-table :columns="columns" :dataSource="data">
+        <a-table class="table-striped" :columns="columns" :dataSource="data">
           <template slot="operation" slot-scope="text, record, index">
             <a-checkbox></a-checkbox>
           </template>

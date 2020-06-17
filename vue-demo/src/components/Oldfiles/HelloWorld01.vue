@@ -1,6 +1,6 @@
 <template>
   <div
-    class="wrapper h-screen bg-gray-300"
+    class="wrapper bg-gray-300"
     :style="{background: 'url('+BG+')','background-size': 'cover'}"
   >
     <a-card title="Exercise Plans" class="mt-20">

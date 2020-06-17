@@ -6,7 +6,7 @@
   </div>
 </template>
 <script>
-import Chart from '@/components/ChartHosp'
+import Chart from '@/components/ChartHospcopy.vue'
 import Mixin from '@/mixin'
 export default {
   mixins: [Mixin],

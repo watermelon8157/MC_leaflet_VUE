@@ -14,11 +14,11 @@
             <a-tag color="red" class="text-red-500 font-extrabold">{{model.hosp_source}}</a-tag>
             <a-divider class="bg-orange-500" type="vertical" />
           </a-form-item>
-          <a-form-item label="醫院收治人數">
+          <a-form-item label="後送醫院人數">
             <a-tag class="font-extrabold">{{model.hosp_ihp}}</a-tag>
             <a-divider class="bg-orange-500" type="vertical" />
           </a-form-item>
-          <a-form-item label="醫院後送人數">
+          <a-form-item label="到達醫院人數">
             <a-tag class="font-extrabold">{{model.hosp_whp}}</a-tag>
             <a-divider class="bg-orange-500" type="vertical" />
           </a-form-item>
@@ -54,7 +54,7 @@
         <a-tag class="font-extrabold bg-green-500 text-white">Non-ECRH</a-tag>
         <span v-if="model.PATIENT_NAME" class="m-2">
           (
-          病患
+          傷患
           <span class="m-1 p-2 bg-yellow-200">{{model.PATIENT_NAME}}</span>)
         </span>
       </span>

@@ -5057,7 +5057,8 @@ export default {
       data: Object.assign(DB_MC_PATIENT_INFO, {}),
       hospList,
       windowHeight: 0,
-      windowWidth: 0
+      windowWidth: 0,
+      now: this.$moment().format('YYYY-MM-DD HH:mm')
     }
   },
   mounted: function () {
@@ -5091,9 +5092,6 @@ export default {
     },
     title () {
       return document.title
-    },
-    now () {
-      return this.$moment().format('YYYYMMDDHHmmss')
     }
   },
   watch: {

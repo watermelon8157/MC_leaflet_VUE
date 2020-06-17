@@ -39,43 +39,7 @@
         </template>
       </a-table>
     </div>
-    <div v-if="step === '1'" class="vue-leaflet">
-      <div>
-        <a-tag class="bg-red-500 text-white">現在位置</a-tag>
-        <a-tag class="bg-green-500 text-white">最推薦</a-tag>
-        <a-tag class="bg-blue-500 text-white">推薦</a-tag>
-        <a-tag class="bg-yellow-500 text-white">比較推薦</a-tag>
-        <a-tag class="bg-purple-500 text-white">不太推薦</a-tag>
-      </div>
-      <l-map
-        ref="Map"
-        :style="{'height' : windowHeight/8*6 + 'px' }"
-        style="width: 100%;  "
-        :zoom="zoom"
-        :center="center"
-        @update:zoom="zoomUpdated"
-        @update:center="centerUpdated"
-        @update:bounds="boundsUpdated"
-      >
-        <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
-        <l-polyline :lat-lngs="polyline" color="red"></l-polyline>
-        <l-marker :lat-lng="circleMarker" :icon="plusMarkerIcon"></l-marker>
-        <l-marker :lat-lng="sideMarker"></l-marker>
-        <l-marker ref="markerLocation" :lat-lng="location" :icon="centerIcon">
-          <l-popup :content="text"></l-popup>
-        </l-marker>
-        <l-marker
-          v-for="(i,index) in markerList"
-          :key="index"
-          :lat-lng="i.location"
-          @click="(e)=>open(i)"
-          :icon="get_hosp_color(i.hosp_ranking)"
-        >
-          <l-popup :content="i.hosp_name"></l-popup>
-        </l-marker>
-        <l-circle-marker :lat-lng="circleMarker" :radius="zoom*10" color="#bee3f8" />
-      </l-map>
-    </div>
+    <div v-if="step === '1'" class="vue-leaflet">非HTTPS網站無法使用地圖</div>
     <a-drawer
       placement="bottom"
       :closable="false"
@@ -182,7 +146,6 @@
 </template>
 
 <script>
-import { LMap, LTileLayer, LMarker, LPopup, LCircleMarker, LPolyline } from 'vue2-leaflet'
 import Pngbarn from '@/assets/pngbarn.png'
 import markerblue from '@/assets/marker/marker-icon-2x-blue.png'
 import markergold from '@/assets/marker/marker-icon-2x-gold.png'
@@ -212,14 +175,6 @@ const columns = [
 export default {
   mixins: [Mixin],
   name: 'VueLeaflet',
-  components: {
-    LMap,
-    LTileLayer,
-    LMarker,
-    LPopup,
-    LCircleMarker,
-    LPolyline
-  },
   data () {
     return {
       step: '0',
@@ -320,7 +275,8 @@ export default {
   },
   mounted () {
     this.List = this.PatListnow
-    navigator.geolocation.getCurrentPosition(this.showPosition)
+    // navigator.geolocation.getCurrentPosition(this.showPosition)
+    this.loading = true
     // this.$refs.Map =
   },
   methods: {

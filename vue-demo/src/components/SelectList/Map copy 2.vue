@@ -42,10 +42,9 @@
     <div v-if="step === '1'" class="vue-leaflet">
       <div>
         <a-tag class="bg-red-500 text-white">現在位置</a-tag>
-        <a-tag class="bg-green-500 text-white">最推薦</a-tag>
-        <a-tag class="bg-blue-500 text-white">推薦</a-tag>
-        <a-tag class="bg-yellow-500 text-white">比較推薦</a-tag>
-        <a-tag class="bg-purple-500 text-white">不太推薦</a-tag>
+        <a-tag class="bg-blue-500 text-white">最適合</a-tag>
+        <a-tag class="bg-yellow-500 text-white">適合</a-tag>
+        <a-tag class="bg-purple-500 text-white">不太適合</a-tag>
       </div>
       <l-map
         ref="Map"

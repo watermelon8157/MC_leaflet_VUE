@@ -284,99 +284,22 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\SwaggerConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Areas\Backend\BackendAreaRegistration.cs" />
-    <Compile Include="Areas\Backend\Controllers\AdminController.cs" />
-    <Compile Include="Areas\Backend\Controllers\BaseController.cs" />
-    <Compile Include="Areas\Backend\Controllers\MainController.cs" />
-    <Compile Include="Areas\Backend\Controllers\RCS_USERController.cs" />
-    <Compile Include="Areas\Backend\Controllers\SystemFunctionController.cs" />
-    <Compile Include="Areas\Backend\Models\ViewModel\SystemFunctionViewModel.cs" />
-    <Compile Include="Areas\CARE_LIST\CARE_LISTAreaRegistration.cs" />
-    <Compile Include="Areas\CARE_LIST\Controllers\CARE_LISTController.cs" />
-    <Compile Include="Areas\CARE_LIST\Models\CARE_LIST.cs" />
-    <Compile Include="Controllers\AuthorityController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
-    <Compile Include="Controllers\BoardController.cs" />
-    <Compile Include="Controllers\CPTController.cs" />
-    <Compile Include="Controllers\decisionSupportController.cs" />
-    <Compile Include="Controllers\ErrorController.cs" />
-    <Compile Include="Controllers\ExamLabController.cs" />
-    <Compile Include="Controllers\ExternalController.cs" />
     <Compile Include="Controllers\MainController.cs" />
-    <Compile Include="Controllers\MeasuresFormController.cs" />
-    <Compile Include="Controllers\PDFHtmlController.cs" />
-    <Compile Include="Controllers\RTAssessController.cs" />
-    <Compile Include="Controllers\RTChartController.cs" />
-    <Compile Include="Controllers\RTController.cs" />
-    <Compile Include="Controllers\RTRecordController.cs" />
-    <Compile Include="Controllers\RTTakeoffAssessController.cs" />
-    <Compile Include="Controllers\ShiftController.cs" />
-    <Compile Include="Controllers\SuppliesController.cs" />
-    <Compile Include="Controllers\SystemManageController.cs" />
-    <Compile Include="Controllers\VIPController.cs" />
-    <Compile Include="Controllers\VPN_UPLOADController.cs" />
     <Compile Include="Controllers\WEBAPI\BasicController.cs" />
-    <Compile Include="Controllers\WEBAPI\FIleDirectorController.cs" />
-    <Compile Include="Controllers\WEBAPI\HIsDataController.cs" />
-    <Compile Include="Controllers\WEBAPI\ListHistoryController.cs" />
+    <Compile Include="Controllers\WEBAPI\DefaultController.cs" />
     <Compile Include="Controllers\WEBAPI\MCController.cs" />
-    <Compile Include="Controllers\WEBAPI\RtAssessController.cs" />
-    <Compile Include="Controllers\WEBAPI\RTCalendarController.cs" />
-    <Compile Include="Controllers\WEBAPI\RTController.cs" />
-    <Compile Include="Controllers\WEBAPI\OPDSchedulingController.cs" />
-    <Compile Include="Controllers\WEBAPI\RtCptAssController.cs" />
-    <Compile Include="Controllers\WEBAPI\RtCptReqController.cs" />
-    <Compile Include="Controllers\WEBAPI\RtCptRecordController.cs" />
-    <Compile Include="Controllers\WEBAPI\RtOPDShiftController.cs" />
-    <Compile Include="Controllers\WEBAPI\RTRecordController.cs" />
-    <Compile Include="Controllers\WEBAPI\RtStatusController.cs" />
-    <Compile Include="Controllers\WEBAPI\RtValuationController.cs" />
-    <Compile Include="Controllers\WEBAPI\RTTakeoffController.cs" />
-    <Compile Include="Controllers\WEBAPI\ShiftController.cs" />
-    <Compile Include="Controllers\WEBAPI\SystemController.cs" />
-    <Compile Include="Controllers\WEBAPI\BordController.cs" />
-    <Compile Include="Controllers\WEBAPI\UploadController.cs" />
-    <Compile Include="Controllers\WorkVolumeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\BaseModel.cs" />
     <Compile Include="Models\BaseThread\BaseThread.cs" />
+    <Compile Include="Models\BaseThread\MCSource.cs" />
     <Compile Include="Models\HospSetDDL.cs" />
-    <Compile Include="Models\HOSP\JAG\JAGRoot.cs" />
-    <Compile Include="Models\HOSP\JAG\RtCPTRecordJAGRoot.cs" />
-    <Compile Include="Models\HOSP\JAG\RtAssessJAGRoot.cs" />
-    <Compile Include="Models\HOSP\JAG\RtRecordJAGRoot.cs" />
-    <Compile Include="Models\HOSP\JAG\RTTakeoffJAGRoot.cs" />
     <Compile Include="Models\HOSP\WebService\HISGetPatient_ER_OPD_LIST.cs" />
     <Compile Include="Models\JwtAuthActionFilterAttribute.cs" />
     <Compile Include="Models\CxrCanvasLineDraw.cs" />
-    <Compile Include="Models\DB\CPT.cs" />
-    <Compile Include="Models\DB\DBACentralMonitor.cs" />
-    <Compile Include="Models\DB\Exam.cs" />
-    <Compile Include="Models\DB\Main.cs" />
-    <Compile Include="Models\DB\Measures.cs" />
-    <Compile Include="Models\DB\RCS_WEANING_ASSESS_CHECKLIST.cs" />
-    <Compile Include="Models\DB\RT.cs" />
-    <Compile Include="Models\DB\RTChart.cs" />
-    <Compile Include="Models\DB\RTRecord.cs" />
-    <Compile Include="Models\BaseThread\Upload_to_hosp.cs" />
-    <Compile Include="Models\ViewModel\Bord.cs" />
-    <Compile Include="Models\ViewModel\HisDataModel.cs" />
-    <Compile Include="Models\ViewModel\OPDScheduling.cs" />
-    <Compile Include="Models\ViewModel\RtAssess.cs" />
-    <Compile Include="Models\ViewModel\RTCalendarModel.cs" />
-    <Compile Include="Models\ViewModel\RtCptAssess.cs" />
-    <Compile Include="Models\ViewModel\RtCptRecord.cs" />
-    <Compile Include="Models\ViewModel\RtOPDShift.cs" />
-    <Compile Include="Models\ViewModel\RtCptReq.cs" />
-    <Compile Include="Models\ViewModel\RTModels.cs" />
-    <Compile Include="Models\ViewModel\RtRecord.cs" />
-    <Compile Include="Models\ViewModel\RTTakeoff.cs" />
-    <Compile Include="Models\ViewModel\RTTakeoffAssess.cs" />
-    <Compile Include="Models\DB\Shift.cs" />
-    <Compile Include="Models\DB\Supplies.cs" />
-    <Compile Include="Models\DB\SystemManage.cs" />
+    <Compile Include="Models\ViewModel\MCModel.cs" />
     <Compile Include="Models\exportFileModel.cs" />
     <Compile Include="Models\HOSP\HospFactory.cs" />
     <Compile Include="Models\HOSP\WebService\AreaPatientList.cs" />
@@ -397,24 +320,9 @@
     <Compile Include="Models\pdfModel.cs" />
     <Compile Include="Models\PrintPDF.cs" />
     <Compile Include="Models\System.cs" />
-    <Compile Include="Models\BaseThread\UpdateIPDPatientInfo.cs" />
-    <Compile Include="Models\ViewModel\AuthorityViewModel.cs" />
-    <Compile Include="Models\ViewModel\BoardModel.cs" />
-    <Compile Include="Models\ViewModel\CPTNewRecord.cs" />
-    <Compile Include="Models\ViewModel\decisionSupport.cs" />
-    <Compile Include="Models\ViewModel\extend_RCS_Data.cs" />
-    <Compile Include="Models\ViewModel\IndicatorsAnalysisModel.cs" />
-    <Compile Include="Models\ViewModel\RtValuation.cs" />
-    <Compile Include="Models\ViewModel\ShiftModels.cs" />
-    <Compile Include="Models\ViewModel\SuppliesViewModel.cs" />
-    <Compile Include="Models\ViewModel\Upload.cs" />
-    <Compile Include="Models\ViewModel\VentilatorStatus.cs" />
-    <Compile Include="Models\ViewModel\VIPViewModel.cs" />
-    <Compile Include="Models\ViewModel\VPN_UPLOAD_ViewModel.cs" />
-    <Compile Include="Models\ViewModel\WorkVolumeViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RCSWebService.asmx.cs">
-      <DependentUpon>RCSWebService.asmx</DependentUpon>
+    <Compile Include="MCWebService.asmx.cs">
+      <DependentUpon>MCWebService.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Startup.cs" />
@@ -1956,9 +1864,6 @@
     <Content Include="Plugin\jquery-scrollbox-master\jquery.scrollbox.js" />
     <Content Include="Plugin\jquery-scrollbox-master\jquery.scrollbox.min.js" />
     <Content Include="folder\外部網站參數說明20171207%28公司用%29.docx" />
-    <Content Include="Areas\Backend\Views\Web.config" />
-    <Content Include="Areas\CARE_LIST\Views\CARE_LIST\Index2.cshtml" />
-    <Content Include="Areas\CARE_LIST\Views\Web.config" />
     <Content Include="App_Font\glyphicons-halflings-regular.eot" />
     <Content Include="App_Font\glyphicons-halflings-regular.ttf" />
     <Content Include="App_Font\glyphicons-halflings-regular.woff" />
@@ -1969,7 +1874,7 @@
     <Content Include="App_Code\CPT_Helper.cshtml" />
     <Content Include="App_Code\WebTool.cshtml" />
     <Content Include="App_Config\RCSConfigLocal.ini" />
-    <Content Include="RCSWebService.asmx" />
+    <Content Include="MCWebService.asmx" />
     <Content Include="T4Json.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>T4Json1.text</LastGenOutput>
@@ -3064,7 +2969,6 @@
     <Content Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
-    <Content Include="Views\CPT\CPTAssessOP.cshtml" />
     <Content Include="WFVueRCS\src\T4Json\T4Json.text">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -3072,20 +2976,6 @@
     </Content>
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\PDFHtml\CPTPageForm.cshtml" />
-    <Content Include="Views\PDFHtml\Index.cshtml" />
-    <Content Include="Views\PDFHtml\RTRecordPageForm.cshtml" />
-    <Content Include="Views\External\RCS.cshtml" />
-    <Content Include="Views\RT\exportFile\BASIC\_CPTReqForm.cshtml" />
-    <Content Include="Views\PDFHtml\RtTakeOffPageForm.cshtml" />
-    <Content Include="Views\RT\exportFile\BASIC\_ValuationForm.cshtml" />
-    <Content Include="Views\OPDScheduling\Index.cshtml" />
-    <Content Include="Views\OPDScheduling\OPDScheduling_Index_Pdf.cshtml" />
-    <Content Include="Views\OPDScheduling\OPDScheduling_WeekIndex_Pdf.cshtml" />
-    <Content Include="Views\OPDScheduling\week_index.cshtml" />
-    <Content Include="Views\PDFHtml\rtCPTRecordPageForm.cshtml" />
-    <Content Include="Views\PDFHtml\rtCPTAssPageForm.cshtml" />
-    <Content Include="Views\PDFHtml\OpdShiftMainTable_Pdf.cshtml" />
     <Content Include="T4Json.text" />
     <Content Include="T4Json1.text">
       <AutoGen>True</AutoGen>
@@ -3094,18 +2984,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Areas\Backend\Scripts\" />
-    <Folder Include="Areas\Backend\Views\Shared\" />
-    <Folder Include="Areas\CARE_LIST\Views\Shared\" />
     <Folder Include="FIleDirector\" />
     <Folder Include="Images\temp\" />
     <Folder Include="Scripts\i18n\" />
-    <Folder Include="Views\Account\" />
-    <Folder Include="Views\Home\" />
-    <Folder Include="Views\Manage\" />
-    <Folder Include="Views\RTAssess\" />
-    <Folder Include="Views\RtOPDShiftController\" />
-    <Folder Include="Views\template\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
@@ -3113,79 +2994,12 @@
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="packages.config" />
     <None Include="Project_Readme.html" />
-    <Content Include="Views\Authority\Index.cshtml" />
-    <Content Include="Views\Board\Index.cshtml" />
-    <Content Include="Views\CPT\IndexTet.cshtml" />
-    <Content Include="Views\CPT\OpenCPTindexTetForm.cshtml" />
-    <Content Include="Views\decisionSupport\Index.cshtml" />
     <Content Include="Views\Error\Error.cshtml" />
-    <Content Include="Views\ExamLab\ExamList.cshtml" />
-    <Content Include="Views\ExamLab\ExamViewer.cshtml" />
-    <Content Include="Views\ExamLab\_ExamViewTable.cshtml" />
-    <Content Include="Views\External\Guide.cshtml" />
-    <Content Include="Views\External\OpenSystem.cshtml" />
     <Content Include="Views\Layout\ExternalLayout.cshtml" />
     <Content Include="Views\Layout\MainLayout.cshtml" />
     <Content Include="Views\Layout\VIPLayout.cshtml" />
     <Content Include="Views\Main\Index.cshtml" />
     <Content Include="Views\Main\LogViewer.cshtml" />
-    <Content Include="Views\MeasuresForm\Index.cshtml" />
-    <Content Include="Views\MeasuresForm\List.cshtml" />
-    <Content Include="Views\MeasuresForm\_MeasuresForm.cshtml" />
-    <Content Include="Views\RTChart\RTChart.cshtml" />
-    <Content Include="Views\RTChart\RTChartData.cshtml" />
-    <Content Include="Views\RTRecord\cxr_paint.cshtml" />
-    <Content Include="Views\RTRecord\List.cshtml" />
-    <Content Include="Views\RTRecord\OnModeList.cshtml" />
-    <Content Include="Views\RTRecord\RCS_WEANING_ASSESS_CHECKLIST.cshtml" />
-    <Content Include="Views\RTRecord\RTRecordForm.cshtml" />
-    <Content Include="Views\RTRecord\RtRecord_OpenCxrEditForm.cshtml" />
-    <Content Include="Views\RTRecord\WeaningIndex.cshtml" />
-    <Content Include="Views\RTTakeoffAssess\Index.cshtml" />
-    <Content Include="Views\RTTakeoffAssess\RTTakeoffAssessNewForm.cshtml" />
-    <Content Include="Views\RT\exportFile\_CPTPageForm.cshtml" />
-    <Content Include="Views\RT\exportFile\_RTAssessCXRForm.cshtml" />
-    <Content Include="Views\RT\exportFile\BASIC\_RTCPTCXRForm.cshtml" />
-    <Content Include="Views\RT\exportFile\BASIC\_RTTakeoffForm.cshtml" />
-    <Content Include="Views\RT\exportFile\CHGH\_CHGHRTRecordForm.cshtml" />
-    <Content Include="Views\RT\exportFile\CHGH\_CHGHRTTakeoffForm.cshtml" />
-    <Content Include="Views\RT\exportFile\FJU\_FJUCPTPageForm.cshtml" />
-    <Content Include="Views\RT\exportFile\FJU\_FJURTAssessCXRForm.cshtml" />
-    <Content Include="Views\RT\exportFile\FJU\_FJURTCPTCXRForm.cshtml" />
-    <Content Include="Views\RT\exportFile\FJU\_FJURTTakeoffForm.cshtml" />
-    <Content Include="Views\RT\Index.cshtml" />
-    <Content Include="Views\RT\RT_Index.cshtml" />
-    <Content Include="Views\RT\RT_modal.cshtml" />
-    <Content Include="Views\RT\Status.cshtml" />
-    <Content Include="Views\Shift\CheckList.cshtml" />
-    <Content Include="Views\Shift\DailyShiftBasic.cshtml" />
-    <Content Include="Views\Shift\_shift_viewBasic.cshtml" />
-    <Content Include="Views\Supplies\Index.cshtml" />
-    <Content Include="Views\Supplies\Supplies_package.cshtml" />
-    <Content Include="Views\Supplies\_supplies_view.cshtml" />
-    <Content Include="Views\SystemManage\chartChange.cshtml" />
-    <Content Include="Views\SystemManage\Count_7190.cshtml" />
-    <Content Include="Views\SystemManage\HISWebService.cshtml" />
-    <Content Include="Views\SystemManage\Index.cshtml" />
-    <Content Include="Views\SystemManage\Index_device.cshtml" />
-    <Content Include="Views\SystemManage\indicatorsAnalysis.cshtml" />
-    <Content Include="Views\SystemManage\paint.cshtml" />
-    <Content Include="Views\SystemManage\ParamSetting.cshtml" />
-    <Content Include="Views\SystemManage\PhraseMaintain.cshtml" />
-    <Content Include="Views\SystemManage\QueueMonitor.cshtml" />
-    <Content Include="Views\SystemManage\RT_shift_rate.cshtml" />
-    <Content Include="Views\SystemManage\RT_work_count.cshtml" />
-    <Content Include="Views\SystemManage\Scheduling.cshtml" />
-    <Content Include="Views\SystemManage\SysParams_DragDrop_EditTable.cshtml" />
-    <Content Include="Views\SystemManage\UserMaintain.cshtml" />
-    <Content Include="Views\SystemManage\WebServiceRecode.cshtml" />
-    <Content Include="Views\VIP\Index.cshtml" />
-    <Content Include="Views\VIP\List.cshtml" />
-    <Content Include="Views\VPN_UPLOAD\Index.cshtml" />
-    <Content Include="Views\VPN_UPLOAD\list.cshtml" />
-    <Content Include="Views\VPN_UPLOAD\upload_index.cshtml" />
-    <Content Include="Views\WorkVolume\Index.cshtml" />
-    <Content Include="Views\WorkVolume\mainBreathReport.cshtml" />
     <Content Include="Scripts\ckeditor\plugins\imagebrowser\README.rst" />
     <Content Include="Scripts\ckeditor\plugins\scayt\LICENSE.md" />
     <Content Include="Scripts\ckeditor\plugins\scayt\README.md" />

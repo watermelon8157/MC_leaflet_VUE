@@ -7,20 +7,7 @@ namespace RCS.Models
     /// Thread is a sealed class you can't inherit from it. So you should create your own BaseThread class.
     /// </summary>
     public abstract class BaseThread
-    {
-
-        private HospFactory _hospFactory { get; set; }
-        protected HospFactory hospFactory
-        {
-            get
-            {
-                if (this._hospFactory == null)
-                {
-                    this._hospFactory = new HospFactory();
-                }
-                return this._hospFactory;
-            }
-        }
+    { 
 
         private Thread _thread;
         private object _locker = new object();

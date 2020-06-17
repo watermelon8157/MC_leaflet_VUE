@@ -1,31 +1,19 @@
 ﻿using RCS_Data;
 using System.Web.Mvc;
 using Com.Mayaminer;
-using System.Data.Common;
 using System;
 using RCSData.Models;
 using System.Collections.Generic;
 using System.Linq;
-using System.Data;
 using Newtonsoft.Json;
-using System.IO;
-using System.Globalization;
-using System.Web.Services.Protocols;
-using System.Net;
 using RCS.Models;
-using Newtonsoft.Json.Linq;
-using System.Xml.Linq;
 using System.Web.Routing;
 using mayaminer.com.jxDB;
-using mayaminer.com.library;
-using System.Web.Configuration;
-using System.Xml;
 using log4net;
-using System.Reflection;
-using RCS_Data.Controllers.RT;
-using RCS_Data.Models.ViewModels;
 
-namespace RCS.Controllers {
+
+namespace RCS.Controllers
+{
 
     public class BaseController : Controller
     {
@@ -170,205 +158,7 @@ namespace RCS.Controllers {
         public IPDPatientInfo pat_info { get; set; }
 
         #endregion
-
-
-        #region Session設定
-
-        /// <summary>
-        /// 檢查使用者行為，判斷是否登出
-        /// </summary>
-        /// <returns></returns>
-        [Silencer(CheckPat_infoSession = false, CheckUser_infoSession = false)]
-        public JsonResult checkTimeout()
-        {
-            RESPONSE_MSG rm = new RESPONSE_MSG();
-            string actionName = "checkTimeout";
-            try
-            {
-                LogUserUseRecord Temp  = (LogUserUseRecord)Session["userUse"];
-                if (Session != null && Temp != null)
-                    rm.attachment = Temp;
-            }
-            catch (Exception ex)
-            {
-                rm.status = RESPONSE_STATUS.ERROR;
-                rm.message = ex.Message;
-                LogTool.SaveLogMessage(ex, actionName, this.csName);
-            }
-            return Json(rm);
-        }
-
-        /// <summary>變更Session <para> 2016.4.20 JoeShen</para></summary>
-        /// <param name="ipd_no">住院序號</param>
-        /// <param name="user_id">使用者帳號</param>
-        /// <returns></returns>
-        [Silencer(CheckPat_infoSession = false, CheckUser_infoSession = false)]
-        [HttpPost]
-        public JsonResult ChangeSession(string chart_no, string ipd_no, string user_id, UserInfo pUser_info)
-        {
-            RESPONSE_MSG rm = new RESPONSE_MSG();
-            string actionName = "ChangeSession";
-            try
-            {
-                IPDPatientInfo tmp_ipd_info = pat_info;
-                UserInfo tmp_user_info = user_info;
-                if (tmp_user_info != null && !string.IsNullOrWhiteSpace(tmp_user_info.user_id)  && tmp_user_info.user_id == user_id)
-                {
-                    if (!string.IsNullOrWhiteSpace(chart_no) && !string.IsNullOrWhiteSpace(ipd_no))
-                    {
-
-                        if (tmp_ipd_info != null && tmp_ipd_info.chart_no != null && tmp_ipd_info.ipd_no != null && pat_info.chart_no == chart_no && pat_info.ipd_no == ipd_no)
-                        {
-                            Session["pat_info"] = pat_info;
-                            rm.status = RESPONSE_STATUS.SUCCESS;
-                            rm.message = "session update to" + ipd_no;
-                        }
-                        else
-                        {
-                            rm.status = RESPONSE_STATUS.ERROR;
-                            LogTool.SaveLogMessage(string.Format("帶錯病患資料，原病患({0})，變成({1}))，資料有問題，自動登出!", tmp_ipd_info.chart_no, chart_no), actionName, GetLogToolCS.BaseController);
-                            rm.message = "病患資料有誤，請重新登入!";
-                            TempData["message"] = "病患資料有誤，請重新登入!";
-                        }
-                    }
-                    //Session["user_info"] = pUser_info;
-                }
-                else
-                {
-                    rm.status = RESPONSE_STATUS.ERROR;
-                    LogTool.SaveLogMessage(string.Format("使用者重複登入，原使用者({0})，變成({1}))，資料有問題，自動登出!", tmp_user_info.user_id, user_id), actionName, GetLogToolCS.BaseController);
-                    rm.message = "使用者重複登入，請重新登入!";
-                    TempData["message"] = "使用者重複登入，請重新登入!";
-                }
-
-               
-            }
-            catch (Exception ex)
-            {
-                rm.status = RESPONSE_STATUS.EXCEPTION;
-                rm.message = "程式發生錯誤，請洽資訊人員!";
-                LogTool.SaveLogMessage(ex, actionName, GetLogToolCS.BaseController);
-                TempData["message"] = "程式發生錯誤，請重新登入!";
-            }
-            return Json(rm);
-        }
-
-        /// <summary>
-        /// 檢查Session是否存在
-        /// </summary>
-        /// <returns>String True or False</returns>
-        [Silencer(CheckPat_infoSession = false, CheckUser_infoSession = false)]
-        public ActionResult CheckSessionExist(string session_name)
-        {
-            bool exist_v = false;
-            session_name = string.IsNullOrEmpty(session_name) ? "user_info" : session_name;
-            if (Session[session_name] != null)
-            {
-                exist_v = true;
-            }
-            else
-            {
-                TempData["message"] = "登入逾時或重複登入，請重新登入!";
-            }
-            return Content(exist_v.ToString());
-        }
-
-        /// <summary>
-        /// 寫入Session
-        /// </summary>
-        /// <param name="pChart_no"></param>
-        /// <param name="typeMode"></param>
-        /// <param name="pipd_no"></param>
-        /// <param name="diag_date"></param>
-        /// <returns>data_set_keys</returns>
-        [Silencer(CheckPat_infoSession = false, CheckUser_infoSession = false)]
-        public JsonResult SetSession(string pChart_no, string typeMode, string pipd_no = "", string diag_date ="")
-        {
-            IPDPatientInfo pat_info = new IPDPatientInfo();
-            try
-            {
-                //pat_info = JsonConvert.DeserializeObject<RCS_Data.IPDPatientInfo>(json_data_set);
-                RT model = new RT();
-                List<PatientListItem> newPat_info = model.get_CareIList(user_info.user_id, typeMode, pChart_no, diag_date);
-                if (newPat_info != null && newPat_info.Count > 0)
-                {
-                    if (!string.IsNullOrWhiteSpace(pipd_no))
-                    {
-                        if(newPat_info.Exists(x=>x.ipd_no == pipd_no))
-                            pat_info = newPat_info.Find(x => x.ipd_no == pipd_no);
-                        else
-                            pat_info = newPat_info[0];
-                    }
-                    else
-                        pat_info = newPat_info[0];
-                    // pat_info = BaseModel.updateCaseData(this.hospFactory.webService.HISPatientInfo(), pat_info);
-                    List<string> stringList = BaseModel.getCPTAssess(pChart_no);
-                    if (!string.IsNullOrWhiteSpace(stringList[4]))
-                    {
-                        pat_info.diagnosis_code = BaseModel.getCPTAssess(pChart_no)[4];
-                    }
-                 
-                    Session["pat_info"] = pat_info;
-                }
-                else
-                {
-                    //Session["pat_info"] = pat_info;
-                    LogTool.SaveLogMessage("取得最新病患資料失敗!", "SetSession", GetLogToolCS.BaseController);
-                }
-            }
-            catch (Exception ex)
-            {
-                LogTool.SaveLogMessage(ex.Message, "SetSession", GetLogToolCS.BaseController);
-            }
-            return Json(pat_info);
-        }
-
-        /// <summary>
-        /// 檢查病患Session
-        /// </summary>
-        /// <param name="pChart_no"></param>
-        /// <param name="pIpd_no"></param>
-        /// <param name="typeMode"></param>
-        /// <returns></returns>
-        [Silencer(CheckPat_infoSession = false, CheckUser_infoSession = false)]
-        public JsonResult checkPatSession(string pChart_no,string pIpd_no, string typeMode)
-        {
-            RESPONSE_MSG rm = new RESPONSE_MSG();
-            string actionName = "checkPatSession";
-            try
-            {
-                if(!string.IsNullOrWhiteSpace(pChart_no) && !string.IsNullOrWhiteSpace(typeMode))
-                {
-                    IPDPatientInfo tempPat_info = pat_info;
-                    if (!string.IsNullOrWhiteSpace(pChart_no) && pat_info.chart_no != pChart_no)
-                        tempPat_info = (IPDPatientInfo)SetSession(pChart_no, typeMode).Data;
-                    if (tempPat_info != null && tempPat_info.chart_no == pChart_no)
-                        rm.status = RESPONSE_STATUS.SUCCESS;
-                    else
-                    {
-                        rm.status = RESPONSE_STATUS.ERROR;
-                        rm.message = "檢查病患資料時，程式發生錯誤，請洽資訊人員!";
-                        LogTool.SaveLogMessage(rm.message, actionName, GetLogToolCS.BaseController);
-                    }
-                }
-                else
-                {
-                    Session.Remove("pat_info");
-                    rm.status = RESPONSE_STATUS.SUCCESS;
-                }
-            }
-            catch (Exception ex)
-            {
-                rm.status = RESPONSE_STATUS.EXCEPTION;
-                rm.message = "程式發生錯誤，請洽資訊人員!錯誤訊息如下:" + ex.Message;
-                LogTool.SaveLogMessage(ex, actionName, GetLogToolCS.BaseController);
-            }
-            return Json(rm);
-        }
-
-        #endregion
-
-
+         
         bool _IsAjaxRequest = false;
         /// <summary> 執行前先讀取資料 </summary>
         /// <param name="filterContext"></param>

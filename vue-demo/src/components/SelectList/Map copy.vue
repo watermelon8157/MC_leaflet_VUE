@@ -40,7 +40,7 @@ import L from 'leaflet'
 import Mixin from '@/mixin'
 const columns = [
   {
-    title: '病歷編號',
+    title: '傷患號碼',
     dataIndex: 'PATIENT_ID',
     scopedSlots: { customRender: 'PATIENT_ID' }
   },

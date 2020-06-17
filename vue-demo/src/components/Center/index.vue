@@ -27,7 +27,45 @@ body {
 }
 </style>
 <template>
-  <router-view id="app" :key="$route.path"></router-view>
+  <a-layout id="app" >
+    <a-layout id="components-layout-demo-top" class="layout">
+      <a-layout-header class="bg-orange-400">
+        <div class="logo text-white" />
+        {{titleName}}
+      </a-layout-header>
+      <a-layout-content class="container">
+        <div class="m-2">
+          <transition name="fade" mode="out-in">
+            <router-view :key="$route.path"></router-view>
+          </transition>
+        </div>
+      </a-layout-content>
+      <a-layout-footer style="text-align: center">Ant Design 2020 Created by MC</a-layout-footer>
+    </a-layout>
+    <a-back-top :visibilityHeight="100" />
+    <a-button
+      class="fixed z-50 mt-3 mx-2 pb-4 left-0 top-0"
+      shape="circle"
+      @click="(e)=>showDrawer()"
+    >
+      <a-icon type="menu-unfold" class="m-2" />
+    </a-button>
+    <a-drawer placement="left" :closable="false" @close="onClose" :visible="visible">
+      <a-form-item style="display:block;" label="事件代碼">
+        <select class="form-control">
+          <option>所有事件</option>
+          <option>1111</option>
+          <option>1112</option>
+        </select>
+      </a-form-item>
+      <a-menu style="width: 256px"  v-model="$route.name"  mode="vertical" @click="handleClick">
+        <a-menu-item key="CenterHospAdmission">後送醫院狀況</a-menu-item>
+        <a-menu-item key="CenterHospEvacuation">到達醫院狀況</a-menu-item>
+        <a-menu-item key="CenterPatList">傷患查詢</a-menu-item>
+      </a-menu>
+    </a-drawer>
+    <Spin class="z-50"></Spin>
+  </a-layout>
 </template>
 
 <script>
@@ -42,6 +80,11 @@ export default {
   name: 'App',
   data () {
     return {
+      loginDrawer: false,
+      btnTxt: '登入',
+      user_id: '',
+      User_pwd: '',
+      disabled: false,
       visibleLoginAlert: false,
       visibleLogin: false,
       titleName: document.title,
@@ -91,6 +134,20 @@ export default {
   mounted () {
   },
   methods: {
+    Login () {
+      this.$api.MC.LoginForm({ site_id: this.user_id })
+        .then(result => {
+          this.$auth.setToken(result.data.token)
+          this.disabled = false
+          this.$emit('emitLogin')
+        })
+        .catch(err => {
+          this.$notification.error({
+            message: err.data
+          })
+          this.disabled = false
+        })
+    },
     Loginform () {
       location.reload()
     },

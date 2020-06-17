@@ -1,31 +1,35 @@
-<style scoped>
-</style>
 <template>
-  <div class="m-4">
-    <div>查詢時間: {{now}}</div>
-    <div class="bg-red-300 p-2">送出人數: 總人數、重傷、中傷、輕傷、已送出、尚未送出</div>
-    <Chart></Chart>
-    <div class="bg-white">
+  <div>
+    <a-card title="傷患清單">
       <a-table
         class="table-striped"
         :columns="columns"
-        :rowKey="record => record.PATIENT_ID"
         :dataSource="data"
+        :pagination="false"
+        bordered
       >
-        <template slot="event" slot-scope="text, record">1111</template>
-        <template slot="Triage" slot-scope="text, record">Severe</template>
+        <template slot="event" slot-scope="text, record">
+          1111
+        </template>
+        <template slot="Triage" slot-scope="text, record">
+          Severe
+        </template>
       </a-table>
-    </div>
+    </a-card>
   </div>
 </template>
+
 <script>
-import Mixin from '@/mixin'
-import Chart from '@/components/ChartHosppat'
 const columns = [
   {
     title: '事件',
     dataIndex: 'event',
     scopedSlots: { customRender: 'event' }
+  },
+  {
+    title: '傷勢',
+    dataIndex: 'Triage',
+    scopedSlots: { customRender: 'Triage' }
   },
   {
     title: '日期',
@@ -38,10 +42,6 @@ const columns = [
     dataIndex: 'Departure'
   },
   {
-    title: '抵達時間',
-    dataIndex: 'Arrival'
-  },
-  {
     title: '性別',
     dataIndex: 'Gender'
   },
@@ -52,11 +52,6 @@ const columns = [
   {
     title: '姓名',
     dataIndex: 'Last_name'
-  },
-  {
-    title: '傷勢',
-    dataIndex: 'Triage',
-    scopedSlots: { customRender: 'Triage' }
   },
   {
     title: '救護車代碼',
@@ -80,22 +75,20 @@ const data = [
   { Date: '2019/6/35', Departure: '21:28', Arrival: '21:44', Gender: '男', Age: '24', Last_name: 'Chen', Triage: '2度 3% ', Sever: '', Minor: 'V', code119: 'C94', Hospital: '三總' },
   { Date: '2019/6/36', Departure: '21:28', Arrival: '21:44', Gender: '女', Age: '20', Last_name: 'Mon', Triage: '2度 10%', Sever: '', Minor: 'V', code119: 'C95', Hospital: '淡水馬偕' }
 ]
+
 export default {
-  mixins: [Mixin],
-  components: { Chart },
+  name: 'patList',
   data () {
     return {
-      columns,
-      data
+      data,
+      columns
     }
-  },
-  computed: {
-    title () {
-      return document.title
-    }
-  },
-  methods: {
-
   }
 }
 </script>
+<style>
+th.column-money,
+td.column-money {
+  text-align: right !important;
+}
+</style>

@@ -37,6 +37,16 @@ Vue.prototype.$notification.config({
   bottom: '50px',
   duration: 3
 })
+
+const isDev = process.env.NODE_ENV === 'development'
+if (isDev) {
+  if (!Vue.prototype.$auth.TokenExist()) {
+    // 設定測試機用token
+    Vue.prototype.$auth.setToken(
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMTExMSIsInVzZXJfaWQiOiJhYWFhIiwidXNlcl9uYW1lIjoiYWFhYSIsInJvbGUiOm51bGwsImlhdCI6bnVsbH0.C-2ZkCHBkqUeVYzjE-zphsfQeVcCqten5EpBFjNGk2Q'
+    ) // 設定開發模式 toekn
+  }
+}
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

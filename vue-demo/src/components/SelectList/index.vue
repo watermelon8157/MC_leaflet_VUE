@@ -11,6 +11,7 @@
             <span class="m-1">{{patListLength}}</span>人
           </span>
           <a-table
+            class="table-striped"
             :columns="columns"
             :rowClassName="RowClassName"
             :rowKey="record => record.PATIENT_ID"
@@ -46,7 +47,7 @@ import VueLeaflet from '@/components/SelectList/VueLeaflet'
 import Mixin from '@/mixin'
 const columns = [
   {
-    title: '病歷編號',
+    title: '傷患號碼',
     dataIndex: 'PATIENT_ID',
     scopedSlots: { customRender: 'PATIENT_ID' }
   },
@@ -113,7 +114,7 @@ export default {
         this.$notification.info({
           message: '請請選擇病人!'
         })
-        this.$refs.alert.showInfo('病患已送出!')
+        this.$refs.alert.showInfo('傷患已送出!')
       } else {
         this.$notification.error({
           message: '請請選擇病人!'

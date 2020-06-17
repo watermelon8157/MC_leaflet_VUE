@@ -27,7 +27,63 @@ body {
 }
 </style>
 <template>
-  <router-view id="app" :key="$route.path"></router-view>
+  <a-layout id="app" >
+    <a-layout id="components-layout-demo-top" class="layout">
+      <a-layout-header class="bg-blue-400">
+        <div class="logo text-white" />
+        {{titleName}}
+      </a-layout-header>
+      <a-layout-content class="container">
+        <div class="m-2">
+          <transition name="fade" mode="out-in">
+            <router-view :key="$route.path"></router-view>
+          </transition>
+        </div>
+      </a-layout-content>
+      <a-layout-footer style="text-align: center">Ant Design 2020 Created by MC</a-layout-footer>
+    </a-layout>
+    <a-back-top :visibilityHeight="100" />
+    <a-button
+      class="fixed z-50 mt-3 mx-2 pb-4 left-0 top-0"
+      shape="circle"
+      @click="(e)=>showDrawer()"
+    >
+      <a-icon type="menu-unfold" class="m-2" />
+    </a-button>
+    <a-drawer placement="left" :closable="false" @close="onClose" :visible="visible">
+      <a-menu style="width: 256px"  v-model="$route.name"  mode="vertical" @click="handleClick">
+        <a-menu-item key="AreaForm">建立資料</a-menu-item>
+        <a-menu-item key="AreaSelectList">後送</a-menu-item>
+        <a-menu-item key="AreaHospAdmission">後送醫院狀況</a-menu-item>
+        <a-menu-item key="AreaHospEvacuation">到達醫院狀況</a-menu-item>
+        <a-menu-item key="AreaPatList">傷患查詢</a-menu-item>
+      </a-menu>
+    </a-drawer>
+    <a-modal title="登入" :visible="visibleLogin" :closable="false" :footer="null">
+      <div>
+        <a-form layout="inline">
+          <div>
+            <a-form-item
+              required
+              :validate-status="!!user_id ? '' : 'error'"
+              :help="!!user_id ? ' ':'請輸入事件代碼'"
+            >
+              <a-input v-model="user_id" placeholder="事件代碼" @pressEnter="(e)=>Login()">
+                <a-icon slot="prefix" type="user" style="color:rgba(0,0,0,.25)" />
+              </a-input>
+            </a-form-item>
+          </div>
+          <div>
+            <a-form-item>
+              <a-button :disabled="disabled" type="primary" @click="Login">{{btnTxt}}</a-button>
+            </a-form-item>
+          </div>
+        </a-form>
+      </div>
+      <a-alert v-if="visibleLoginAlert" type="error" message="登入驗證失敗，請重新登入!" banner closable />
+    </a-modal>
+    <Spin class="z-50"></Spin>
+  </a-layout>
 </template>
 
 <script>
@@ -42,6 +98,11 @@ export default {
   name: 'App',
   data () {
     return {
+      loginDrawer: false,
+      btnTxt: '登入',
+      user_id: '',
+      User_pwd: '',
+      disabled: false,
       visibleLoginAlert: false,
       visibleLogin: false,
       titleName: document.title,
@@ -91,6 +152,20 @@ export default {
   mounted () {
   },
   methods: {
+    Login () {
+      this.$api.MC.LoginForm({ site_id: this.user_id })
+        .then(result => {
+          this.$auth.setToken(result.data.token)
+          this.disabled = false
+          this.Loginform()
+        })
+        .catch(err => {
+          this.$notification.error({
+            message: err.data
+          })
+          this.disabled = false
+        })
+    },
     Loginform () {
       location.reload()
     },

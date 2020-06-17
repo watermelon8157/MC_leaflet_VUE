@@ -9,9 +9,9 @@
       </a-col>
     </a-row>
     <a-row>
-      <a-card title="病患基本資料卡">
+      <a-card title="傷患基本資料卡">
         <a-button-group slot="extra">
-          <a-button type="primary" @click="AutoCreatePatData">自動產生病人</a-button>
+          <a-button type="primary" @click="AutoCreatePatData">產生下一筆傷患資料</a-button>
         </a-button-group>
         <div v-if="loading">
           <a-skeleton active />
@@ -26,11 +26,11 @@
               style="display:block;"
               :labelCol="{span: 3}"
               required
-              label="病歷編號"
+              label="傷患號碼"
               :validate-status="!!model.PATIENT_ID ? '' : 'error'"
-              :help="!!model.PATIENT_ID ? ' ':'請輸入病歷編號'"
+              :help="!!model.PATIENT_ID ? ' ':'請輸入傷患號碼'"
             >
-              <a-input v-model="model.PATIENT_ID" placeholder="病歷編號" />
+              <a-input v-model="model.PATIENT_ID" placeholder="傷患號碼" />
             </a-form-item>
             <a-form-item
               style="display:block;"
@@ -100,12 +100,26 @@
               </a-radio-group>
             </a-form-item>
             <a-form-item
+              v-if="model.CITY === '2'"
+              style="display:block;"
+              :labelCol="{span: 3}"
+              label="請輸入國家"
+              :validate-status=" model.CITY=== '1' ? '' : 'error'"
+              :help="model.CITY=== '1' ? ' ':'請輸入國家'"
+            >
+              <a-select style="width: 120px">
+                <a-select-option value>請選擇</a-select-option>
+                <a-select-option value="日本">日本</a-select-option>
+                <a-select-option value="美國">美國</a-select-option>
+              </a-select>
+            </a-form-item>
+            <a-form-item
               style="display:block;"
               required
               :labelCol="{span: 3}"
-              label="出發時間"
+              label="記錄時間"
               :validate-status="!!model.SELECTION_DATETIME ? '' : 'error'"
-              :help="!!model.SELECTION_DATETIME ? ' ':'請輸入出發時間'"
+              :help="!!model.SELECTION_DATETIME ? ' ':'請輸入記錄時間'"
             >
               <a-date-picker
                 :allowClear="false"
@@ -181,10 +195,10 @@ export default {
     AutoCreatePatData () {
       let tempModel = JSON.parse(JSON.stringify(this.SetNewModel()))
       tempModel.PATIENT_ID = this.$moment().format('YYYYMMDDHHmmss')
-      tempModel.PATIENT_NAME = this.$moment().format('mmss') + '病患'
+      tempModel.PATIENT_NAME = this.$moment().format('mmss') + '傷患'
       tempModel.SELECTION_DATETIME = this.$moment().format('YYYY-MM-DD HH:mm:ss')
       this.model = tempModel
-      this.$refs.alert.showInfo('自動產生病人!')
+      this.$refs.alert.showInfo('產生下一筆傷患資料!')
     }
   }
 }
