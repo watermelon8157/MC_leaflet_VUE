@@ -9,6 +9,7 @@ using RCS_Data;
 using RCS_Data.Models.DB;
 using RCSData.Models;
 using RCS.Models.ViewModel;
+using RCS_Data.Models;
 
 namespace RCS.Controllers.WEBAPI
 {
@@ -19,7 +20,17 @@ namespace RCS.Controllers.WEBAPI
         string csName = "MCController";
 
 
-        MCModel _model = new MCModel(); 
+        MCModel _model = new MCModel();
+        private UserInfo userinfo { get; set; }
+
+        public MCController()
+        {
+            this.userinfo = new UserInfo()
+            {
+                user_id = "admin",
+                user_name = "admin"
+            };
+        }
 
         public string HelloWord()
         { 
@@ -110,27 +121,61 @@ namespace RCS.Controllers.WEBAPI
         [JwtAuthActionFilterAttribute(notVerification = true)]
         public object Login(Login_Form_Body form)
         {
-            if (!string.IsNullOrWhiteSpace(form.site_id))
+            if (!string.IsNullOrWhiteSpace(form.site_id) || !string.IsNullOrWhiteSpace(form.hosp_id))
             {
-
+                if (!string.IsNullOrWhiteSpace(form.site_id))
+                {
+                    if (_model.getMC_SITE_INFO(form.site_id).Count == 0)
+                    { 
+                        if (!string.IsNullOrWhiteSpace(form.LATITUDE) && !string.IsNullOrWhiteSpace(form.LONGITUDE))
+                        {
+                            List<DB_MC_SITE_INFO> pList = new List<DB_MC_SITE_INFO>();
+                            pList.Add(new DB_MC_SITE_INFO() {
+                                SITE_ID = form.site_id, 
+                                CREATE_DATE = Function_Library.getDateNowString(DATE_FORMAT.yyyy_MM_dd_HHmmss),
+                                CREATE_ID = this.userinfo.user_id,
+                                CREATE_NAME = this.userinfo.user_name,
+                                MODIFY_DATE = Function_Library.getDateNowString(DATE_FORMAT.yyyy_MM_dd_HHmmss),
+                                MODIFY_ID = this.userinfo.user_id,
+                                MODIFY_NAME = this.userinfo.user_name,
+                                DATASTATUS = "1",
+                                LATITUDE = form.LATITUDE,
+                                LONGITUDE = form.LONGITUDE,
+                            });
+                            this.DBLink.DBA.DBExecInsert<DB_MC_SITE_INFO>(pList);
+                            if (this.DBLink.DBA.hasLastError)
+                            {
+                                this.throwHttpResponseException("程式發生錯誤，請洽資訊人員!");
+                                Com.Mayaminer.LogTool.SaveLogMessage(this.DBLink.DBA.lastError, "Login", this.csName);
+                            }
+                        }
+                        else
+                        {
+                            this.throwHttpResponseException("查無經緯度資料無法填寫資料!!");
+                        }
+                    } 
+                }
                 return new
                 {
                     Result = true,
                     token = JwtAuthActionFilterAttribute.EncodeToken(new PAYLOAD()
                     {
+                        hosp_id = form.hosp_id,
                         site_id = form.site_id,
-                        user_name = "aaaa",
-                        user_id = "aaaa"
+                        user_name = this.userinfo.user_name,
+                        user_id = this.userinfo.user_id,
                     })
                 };
             }
             else
             {
-                this.throwHttpResponseException("請輸入帳號或密碼!!");
+                this.throwHttpResponseException("請輸入資料!!");
             }
-            this.throwHttpResponseException("帳號或密碼錯誤!!");
+            this.throwHttpResponseException("請輸入資料!!");
             return false;
         }
+
+       
 
         /// <summary>
         /// 驗證Auth

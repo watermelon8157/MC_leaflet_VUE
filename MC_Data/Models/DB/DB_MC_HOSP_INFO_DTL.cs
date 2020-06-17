@@ -30,7 +30,12 @@ namespace RCS_Data.Models.DB
         public string MODIFY_NAME { get; set; }
         public string MODIFY_DATE { get; set; }
         public string DATASTATUS { get; set; }
-        public string CV { get; set; } 
+        public string CV { get; set; }
+        public string PS { get; set; }
+        public string SEVERE_PAT { get; set; }
+        public string MODERATE_PAT { get; set; }
+        public string MILD_PAT { get; set; }
+        public string SOURCE { get; set; }
 
 
     }

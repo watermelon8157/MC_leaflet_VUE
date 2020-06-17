@@ -43,7 +43,8 @@ namespace RCSData.Models
     }
 
     public class PAYLOAD
-    { 
+    {
+        public string hosp_id { get; set; }
         public string site_id { get; set; }
         /// <summary>
         /// 使用者帳號

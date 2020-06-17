@@ -33,7 +33,10 @@ export default {
     let _params = {
       userName: '',
       password: '',
-      site_id: ''
+      site_id: '',
+      hosp_id: '',
+      LATITUDE: '',
+      LONGITUDE: ''
     }
     let setConfig = {
       url: baseUrl + 'Login',

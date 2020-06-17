@@ -42,7 +42,7 @@ namespace RCS
         /// <param name="state"></param>
         private static void MC_Source(object state)
         {
-            string actionName = "get_ptlist_from_hosp";
+            string actionName = "MC_Source";
 
             try
             {

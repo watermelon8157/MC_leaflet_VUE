@@ -350,6 +350,9 @@ namespace RCS.Controllers.WEBAPI
 
         public string password { get; set; }
         public string site_id { get; set; }
+        public string hosp_id { get; set; }
+        public string LATITUDE { get; set; }
+        public string LONGITUDE { get; set; }
     }
 
     public class PDF_FORM_BODY

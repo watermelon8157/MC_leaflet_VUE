@@ -27,7 +27,7 @@ body {
 }
 </style>
 <template>
-  <a-layout id="app" >
+  <a-layout id="app">
     <a-layout id="components-layout-demo-top" class="layout">
       <a-layout-header class="bg-blue-400">
         <div class="logo text-white" />
@@ -51,7 +51,7 @@ body {
       <a-icon type="menu-unfold" class="m-2" />
     </a-button>
     <a-drawer placement="left" :closable="false" @close="onClose" :visible="visible">
-      <a-menu style="width: 256px"  v-model="$route.name"  mode="vertical" @click="handleClick">
+      <a-menu style="width: 256px" v-model="$route.name" mode="vertical" @click="handleClick">
         <a-menu-item key="AreaForm">建立資料</a-menu-item>
         <a-menu-item key="AreaSelectList">後送</a-menu-item>
         <a-menu-item key="AreaHospAdmission">後送醫院狀況</a-menu-item>
@@ -102,6 +102,8 @@ export default {
       btnTxt: '登入',
       user_id: '',
       User_pwd: '',
+      latitude: '',
+      longitude: '',
       disabled: false,
       visibleLoginAlert: false,
       visibleLogin: false,
@@ -150,10 +152,18 @@ export default {
     })
   },
   mounted () {
+    this.GPS()
   },
   methods: {
+    GPS () {
+      navigator.geolocation.getCurrentPosition(this.getGPSlatitude)
+    },
+    getGPSlatitude (position) {
+      this.latitude = position.coords.latitude
+      this.longitude = position.coords.longitude
+    },
     Login () {
-      this.$api.MC.LoginForm({ site_id: this.user_id })
+      this.$api.MC.LoginForm({ site_id: this.user_id, LATITUDE: this.latitude, LONGITUDE: this.longitude })
         .then(result => {
           this.$auth.setToken(result.data.token)
           this.disabled = false

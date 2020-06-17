@@ -151,7 +151,7 @@ export default {
   },
   methods: {
     Login () {
-      this.$api.MC.LoginForm({ site_id: this.user_id })
+      this.$api.MC.LoginForm({ hosp_id: this.user_id })
         .then(result => {
           this.$auth.setToken(result.data.token)
           this.disabled = false

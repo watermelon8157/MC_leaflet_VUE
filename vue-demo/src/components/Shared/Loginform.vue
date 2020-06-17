@@ -40,6 +40,8 @@ export default {
     return {
       User_pwd: '',
       site_id: '',
+      latitude: '',
+      longitude: '',
       disabled: false
     }
   },
@@ -47,9 +49,19 @@ export default {
   computed: {
 
   },
+  mounted () {
+    this.GPS()
+  },
   methods: {
+    GPS () {
+      navigator.geolocation.getCurrentPosition(this.getGPSlatitude)
+    },
+    getGPSlatitude (position) {
+      this.latitude = position.coords.latitude
+      this.longitude = position.coords.longitude
+    },
     Login () {
-      this.$api.MC.LoginForm({ site_id: this.site_id })
+      this.$api.MC.LoginForm({ site_id: this.site_id, LATITUDE: this.latitude, LONGITUDE: this.longitude })
         .then(result => {
           this.$auth.setToken(result.data.token)
           this.disabled = false
