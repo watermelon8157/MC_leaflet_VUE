@@ -34,19 +34,7 @@ namespace RCSData.Models
             }
         } 
 
-        HISDataExchangeJAG _HISDataJAG;
-        public HISDataExchangeJAG HISDataJAG
-        {
-            get
-            {
-                if (_HISDataJAG == null)
-                {
-                    _HISDataJAG = new HISDataExchangeJAG();
-                }
-                return _HISDataJAG;
-            }
-        }  
-
+        
         /// <summary> 資料狀態 </summary>
         public RESPONSE_MSG rm { get {
                 RESPONSE_MSG _rm = new RESPONSE_MSG();

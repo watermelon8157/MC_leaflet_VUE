@@ -1,14 +1,4 @@
-﻿using Newtonsoft.Json;
-using RCS_Data.Controllers.Upload;
-using RCSData.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml;
-using System.Xml.Serialization;
-
-namespace RCSData.Models
+﻿namespace RCSData.Models
 {
     /// <summary>
     /// 輔大簽章功能

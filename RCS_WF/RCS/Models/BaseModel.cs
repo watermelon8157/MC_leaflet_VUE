@@ -9,7 +9,6 @@
 //2016/08/16 修改:使用者資料及病患資料取得方式
 //**************************************************
 using Com.Mayaminer;
-using mayaminer.com.jxDB;
 using mayaminer.com.library;
 using RCS_Data;
 using System;
@@ -18,13 +17,11 @@ using System.Data;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using RCS.Controllers;
 using Newtonsoft.Json;
 using System.Reflection;
 using System.Xml.Serialization;
 using log4net;
 using RCSData.Models;
-using RCS_Data.Models.ViewModels;
 
 namespace RCS.Models
 {
@@ -231,130 +228,7 @@ namespace RCS.Models
             return InCaseList;
         }
 
-        /// <summary>
-        /// 確認是否有修改或刪除的權限
-        /// <para> 用記錄時間排序(OrderByDescending)</para>
-        /// <para> 修改權限(只能修改自己的) 20161124</para>
-        /// <para> 記錄時間如果為24小時前的為唯讀狀態 20161228</para>
-        /// <para> 病患記錄的資料只帶出以上傳的資料(UPLOAD_STATUS == "1") 20161228</para>
-        /// </summary>
-        /// <returns></returns>
-        public object set_modify_power(object formData, string formName)
-        {
-            //只能修改自己的記錄單
-            //記錄時間24小時前為唯讀狀態
-            string error = "";
-            object obj = null;
-            switch (formName)
-            {
-                case "RT_RECORD_MAIN":
-                    List<RT_RECORD_MAIN> RT_RECORD = (List<RT_RECORD_MAIN>)formData;
-                    if (pat_info.isHistoryData)
-                    {
-                        if (!user_info.canCheckNotUpLoadData)
-                        {
-                            if (RT_RECORD.Exists(x => x.UPLOAD_STATUS == "1"))
-                                RT_RECORD = RT_RECORD.FindAll(x => x.UPLOAD_STATUS == "1");
-                            else
-                                RT_RECORD = new List<RT_RECORD_MAIN>();
-                        }
-                    }
-                    else
-                        RT_RECORD.FindAll(x => x.CREATE_ID == user_info.user_id && this.checkFormRecordWithin24hr(ref error, x.RECORDDATE)).ForEach(s => s.hasPowerEdit = true);
-                    if(!user_info.canCheckNotUpLoadData)
-                        if (RT_RECORD.Exists(x => x.UPLOAD_STATUS == "1"))
-                            RT_RECORD = RT_RECORD.FindAll(x => x.UPLOAD_STATUS == "1");
-                    RT_RECORD = RT_RECORD.OrderByDescending(x => x.RECORDDATE).ToList();
-                    obj = RT_RECORD;
-                    break;
-                case "RCS_DATA_RT_ASSESS":
-                    List<RCS_DATA_RT_ASSESS> ASSESS = (List<RCS_DATA_RT_ASSESS>)formData;
-                    if (pat_info.isHistoryData)
-                    {
-                        if (!user_info.canCheckNotUpLoadData)
-                        {
-                            if (ASSESS.Exists(x => x.UPLOAD_STATUS == "1"))
-                                ASSESS = ASSESS.FindAll(x => x.UPLOAD_STATUS == "1");
-                            else
-                                ASSESS = new List<RCS_DATA_RT_ASSESS>();
-                        }
-                    }
-                    else
-                        ASSESS.FindAll(x => x.create_id == user_info.user_id && this.checkFormRecordWithin24hr(ref error, x.rec_date)).ForEach(s => s.hasPowerEdit = true);
-                    if (!user_info.canCheckNotUpLoadData)
-                        if (ASSESS.Exists(x => x.UPLOAD_STATUS == "1"))
-                            ASSESS = ASSESS.FindAll(x => x.UPLOAD_STATUS == "1");
-                    ASSESS = ASSESS.OrderByDescending(x => x.rec_date).ToList();
-                    obj = ASSESS;
-                    break;
-                case "RCS_DATA_TK_ASSESS":
-                    List<RCS_DATA_TK_ASSESS> RT_ASSESS = (List<RCS_DATA_TK_ASSESS>)formData;
-                    if (pat_info.isHistoryData)
-                    {
-                        if (!user_info.canCheckNotUpLoadData)
-                        {
-                            if (RT_ASSESS.Exists(x => x.UPLOAD_STATUS == "1"))
-                                RT_ASSESS = RT_ASSESS.FindAll(x => x.UPLOAD_STATUS == "1");
-                            else
-                                RT_ASSESS = new List<RCS_DATA_TK_ASSESS>();
-                        }
-                    }
-                    else
-                        RT_ASSESS.FindAll(x => x.create_id == user_info.user_id && this.checkFormRecordWithin24hr(ref error, x.rec_date)).ForEach(s => s.hasPowerEdit = true);
-                    if (!user_info.canCheckNotUpLoadData)
-                        if (RT_ASSESS.Exists(x => x.UPLOAD_STATUS == "1"))
-                            RT_ASSESS = RT_ASSESS.FindAll(x => x.UPLOAD_STATUS == "1");
-                    RT_ASSESS = RT_ASSESS.OrderByDescending(x => x.rec_date).ToList();
-                    obj = RT_ASSESS;
-                    break;
-                //RTTakeoffAssessViewModel
-                //case "RTTakeoffAssessViewModel":
-                //    List<RTTakeoffAssessViewModel> RT_ASSESS_VM = (List<RTTakeoffAssessViewModel>)formData;
-                //    if (pat_info.isHistoryData)
-                //    {
-                //        if (!user_info.canCheckNotUpLoadData)
-                //        {
-                //            if (RT_ASSESS_VM.Exists(x => x.UPLOAD_STATUS == "1"))
-                //                RT_ASSESS_VM = RT_ASSESS_VM.FindAll(x => x.UPLOAD_STATUS == "1");
-                //            else
-                //                RT_ASSESS_VM = new List<RTTakeoffAssessViewModel>();
-                //        }
-                //    }
-                //    else
-                //        RT_ASSESS_VM.FindAll(x => x.create_id == user_info.user_id && this.checkFormRecordWithin24hr(ref error, x.rec_date)).ForEach(s => s.hasPowerEdit = true);
-                //    if (!user_info.canCheckNotUpLoadData)
-                //        if (RT_ASSESS_VM.Exists(x => x.UPLOAD_STATUS == "1"))
-                //            RT_ASSESS_VM = RT_ASSESS_VM.FindAll(x => x.UPLOAD_STATUS == "1");
-                //    RT_ASSESS_VM = RT_ASSESS_VM.OrderByDescending(x => x.rec_date).ToList();
-                //    obj = RT_ASSESS_VM;
-                //    break;
-                case "RCS_DATA_CR_RECORD":
-                    List<RCS_DATA_CR_RECORD> CR_RECORD = (List<RCS_DATA_CR_RECORD>)formData;
-                    if (pat_info.isHistoryData)
-                    {
-                        if (!user_info.canCheckNotUpLoadData)
-                        {
-                            if (CR_RECORD.Exists(x => x.UPLOAD_STATUS == "1"))
-                                CR_RECORD = CR_RECORD.FindAll(x => x.UPLOAD_STATUS == "1");
-                            else
-                                CR_RECORD = new List<RCS_DATA_CR_RECORD>();
-                        }
-                    }
-                    else
-                        CR_RECORD.FindAll(x => x.create_id == user_info.user_id && this.checkFormRecordWithin24hr(ref error, x.cpt_date + " " + x.cpt_time)).ForEach(s => s.hasPowerEdit = true);
-                    if (!user_info.canCheckNotUpLoadData)
-                        if (CR_RECORD.Exists(x => x.UPLOAD_STATUS == "1"))
-                            CR_RECORD = CR_RECORD.FindAll(x => x.UPLOAD_STATUS == "1");
-                    CR_RECORD = CR_RECORD.OrderByDescending(x => x.show_date).ToList();
-                    obj = CR_RECORD;
-                    break;
-                default:
-                    break;
-            }
-
-            return obj;
-        }
-
+      
         /// <summary>字串小數點無條件捨去</summary>
         /// <param name="input">輸入字串</param>
         /// <param name="digit">小數點位數</param>
@@ -460,73 +334,14 @@ namespace RCS.Models
             }
         } 
 
-        public  List<RTVentilator> GetLastRTRecList(List<string> IpdnoList, string[] getItem = null)
-        {
-            List<RTVentilator> _list = new List<RTVentilator>();
-            List<string> sqlList = new List<string>();
-            DataTable dt = null;
-            SQLProvider SQL = new SQLProvider();
-            Dapper.DynamicParameters dp = new Dapper.DynamicParameters();
-            string pIpdnoSql = "";
-            if (IpdnoList.Count> 0)
-            {
-                pIpdnoSql = " AND L.IPD_NO in('" + string.Join("','", IpdnoList) + "') ";
-            }
-            string whereSql = "";
-            if (getItem != null && getItem.Length > 0)
-                whereSql = string.Format(" AND ITEM_NAME in('{0}') ", string.Join("','", getItem));
-            string mainSql = string.Concat("SELECT rm.RECORD_ID,rd.ITEM_NAME,rd.ITEM_VALUE,rm.IPD_NO,rm.CHART_NO,rm.ONMODE_TYPE2_ID FROM RCS_RECORD_MASTER as rm RIGHT JOIN (SELECT L.IPD_NO,L.CHART_NO, MAX(M.RECORDDATE) RECORDDATE   FROM RCS_RT_CARE_SCHEDULING as L ",
-                                             "LEFT JOIN RCS_RECORD_MASTER AS M ON L.IPD_NO = M.IPD_NO AND L.CHART_NO = M.CHART_NO AND M.DATASTATUS = '1' WHERE L.RT_ID = '", user_info.user_id, "'", pIpdnoSql,
-                                             "GROUP BY L.IPD_NO, L.CHART_NO) as rl on rm.RECORDDATE = rl.RECORDDATE AND rm.IPD_NO = rl.IPD_NO AND rm.CHART_NO = rl.CHART_NO AND rm.DATASTATUS = '1' LEFT JOIN RCS_RECORD_DETAIL as rd ON rm.RECORD_ID = rd.RECORD_ID ",
-                                             whereSql );
-            dt = SQL.DBA.getSqlDataTable(mainSql);
-            if (DTNotNullAndEmpty(dt))
-            {
-                foreach (string ipdno in IpdnoList)
-                {
-                    List<DataRow> drList = new List<DataRow>();
-                    if (dt.AsEnumerable().ToList().Exists(x => !DBNull.ReferenceEquals(x["IPD_NO"], DBNull.Value) &&  x["IPD_NO"].ToString() == ipdno))
-                    {
-                        drList = dt.AsEnumerable().ToList().FindAll(x => x["IPD_NO"].ToString() == ipdno).ToList();
-                        Dictionary<string, string> vcch = new Dictionary<string, string>();
-                        foreach (DataRow dr in drList)
-                        { 
-                            if (!DBNull.ReferenceEquals(dr["ITEM_NAME"], DBNull.Value) && !DBNull.ReferenceEquals(dr["ITEM_VALUE"], DBNull.Value))
-                                vcch.Add(dr["ITEM_NAME"].ToString(), dr["ITEM_VALUE"].ToString());
-                        }
-                        RTVentilator vObj = JsonConvert.DeserializeObject<RTVentilator>(JsonConvert.SerializeObject(vcch));
-                        vObj.RECORD_ID = checkDataColumn(drList[0], "RECORD_ID");
-                        vObj.chart_no = checkDataColumn(drList[0], "chart_no");
-                        vObj.ipd_no = checkDataColumn(drList[0], "ipd_no");
-                        vObj.hasData = true;
-                        vObj.ONMODE_ID_2 = checkDataColumn(drList[0], "ONMODE_TYPE2_ID");
-                        if (!String.IsNullOrWhiteSpace(vObj.is_humidifier) && vObj.is_humidifier == "1")
-                        {
-                            vObj._is_humidifier = vObj.device + "\\H";
-                        }//if
-                        else
-                        {
-                            vObj._is_humidifier = vObj.device;
-                        }//else
-                        _list.Add(vObj);
-                    }
-                }
-            }
-            else
-            {
-                if (this.DBA.LastError != null && this.DBA.LastError != "")
-                    LogTool.SaveLogMessage(this.DBA.LastError, "GetLastRTRecList", GetLogToolCS.BaseModel);
-            }
-            return _list;
-        }
-
+      
         /// <summary>取得使用天數</summary>
         /// <param name="pIpdNo">批價序號</param>
         /// <returns></returns>
         public int getUseDays(string pIpdNo,string pChart_no, out List<string> on_dateList)
         {
             on_dateList = new List<string>();
-            int days = this.basicfunction.getUseDays(pIpdNo, pChart_no,"", out on_dateList);
+            int days = 0;
             return days;  
         }
 
@@ -644,75 +459,7 @@ namespace RCS.Models
             return false;
         }
 
-        /// <summary>
-        /// 更新指定呼吸器現在的位置
-        /// </summary>
-        /// <param name="respidList">設定Room清單</param>
-        /// <param name="upDateNow">是否馬上更新</param>
-        /// <param name="rDt">是否將DataTable加入附加資訊</param>
-        /// <returns></returns>
-        public RESPONSE_MSG updateVtSettingRoom(List<DeviceMaster> respidList, bool upDateNow, bool isEnd, bool rDt = true)
-        {
-            RESPONSE_MSG rm = new RESPONSE_MSG();
-            string actionName = "updateVtSettingRoom";
-            DataTable dt = null;
-            try
-            {
-                string sql = "SELECT * FROM " + GetTableName.RCS_VENTILATOR_SETTINGS + " WHERE DEVICE_NO in ('" + string.Join("','", respidList.Select(x => x.DEVICE_NO).ToList()) + "')";
-                dt = this.DBA.getSqlDataTable(sql);
-                if (DTNotNullAndEmpty(dt))
-                {
-                    dt.TableName = GetTableName.RCS_VENTILATOR_SETTINGS.ToString();
-                    foreach (DeviceMaster item in respidList)
-                    {
-                         List<DataRow> drList =new List<DataRow>();
-                         if (dt.AsEnumerable().ToList().Exists(x => x["DEVICE_NO"].ToString() == item.DEVICE_NO))
-                             drList = dt.AsEnumerable().ToList().FindAll(x => x["DEVICE_NO"].ToString() == item.DEVICE_NO);
-                        foreach (DataRow dr in drList)
-                        {
-                            if (isEnd)
-                            {
-                                dr["ROOM"] = "";
-                            }
-                            else
-                            {
-                                dr["ROOM"] = item.ROOM;
-                            }
-                        }
-                    }
-                    if (upDateNow)
-                    {
-                        dbResultMessage dRm = this.DBA.UpdateResult(dt, GetTableName.RCS_VENTILATOR_SETTINGS.ToString());
-                        if (dRm.State != enmDBResultState.Success && !string.IsNullOrWhiteSpace(dRm.dbErrorMessage))
-                        {
-                            rm.status = RESPONSE_STATUS.ERROR;
-                            rm.message = "更新資料發生錯誤" + dRm.dbErrorMessage;
-                            LogTool.SaveLogMessage(rm.message, actionName, GetLogToolCS.BaseModel);
-                        }
-                    }
-                }
-                else
-                {
-                    if (!string.IsNullOrWhiteSpace(this.DBA.LastError))
-                    {
-                        rm.status = RESPONSE_STATUS.ERROR;
-                        rm.message = "取得資料發生錯誤，錯誤訊息如下所示" + this.DBA.LastError;
-                        LogTool.SaveLogMessage(rm.message, actionName, GetLogToolCS.BaseModel);
-                    }
-                    dt = new DataTable();
-                }
-            }
-            catch (Exception ex)
-            {
-                rm.status = RESPONSE_STATUS.EXCEPTION;
-                rm.message = "程式發生錯誤，錯誤訊息如下所示:" + ex.Message;
-                LogTool.SaveLogMessage(ex, actionName, GetLogToolCS.BaseModel);
-                dt = new DataTable();
-            }
-            if (rDt)rm.attachment = dt;
-            return rm;
-        }
-
+        
         /// <summary>
         /// 轉換特殊字元
         /// </summary>
@@ -1058,56 +805,7 @@ namespace RCS.Models
           
             return statusList;
         }
-
-        /// <summary>
-        /// 取得住院治療評估單資料
-        /// </summary>
-        /// <returns></returns>
-        public List<string> getCPTAssess(string pChart_no)
-        {
-            string actionName = "getCPTAssess";
  
-            List<string> cptData = new List<string>();
-            try
-            {
-                List<RCS_DATA_CR_MASTER> pList = new DB.CPT().getCPTAssessIpdBed(pChart_no);
-                
-                if (pList.Count > 0)
-                {
-                    List<RCS_CPT_DTL_NEW_ITEMS> tempCPT = new List<RCS_CPT_DTL_NEW_ITEMS>();
-                    tempCPT = new CPTController().CPTDataDTL(pList[0].cpt_id);
-                  
-                    if (tempCPT.Count > 0)
-                    {
-                        cptData.Add(string.IsNullOrWhiteSpace(tempCPT[0].diagnosis) ? "" : tempCPT[0].diagnosis);
-                        cptData.Add(string.IsNullOrWhiteSpace(tempCPT[0].history_diag) ? "" : tempCPT[0].history_diag);
-                        cptData.Add(string.IsNullOrWhiteSpace(tempCPT[0].other_history) ? "" : tempCPT[0].other_history);
-                        
-                        if (tempCPT[0].brief_status != null && tempCPT[0].brief_status.Exists(x=>x.id == "rt_start_time") && !string.IsNullOrWhiteSpace(tempCPT[0].brief_status.Find(x => x.id == "rt_start_time").val))
-                        {
-                            cptData.Add(tempCPT[0].brief_status.Find(x => x.id == "rt_start_time").val);
-                        }
-                        else
-                        {
-                            cptData.Add("");
-                        }
-                        cptData.Add(string.IsNullOrWhiteSpace(tempCPT[0].now_pat_diagnosis) ? "" : tempCPT[0].now_pat_diagnosis);
-
-                        cptData.Add(pList[0].cpt_id);
-                    }
-                }
-                if (cptData.Count == 0)
-                {
-                    cptData = new List<string>() { "", "", "", "", "", "" };
-                }
-            }
-            catch (Exception ex)
-            {
-                LogTool.SaveLogMessage(ex, csName, actionName);
-            }
-         
-            return cptData;
-        }
     }
 
     /// <summary> 系統參數集合 </summary>

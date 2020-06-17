@@ -1,9 +1,4 @@
-﻿using Newtonsoft.Json;
-using RCS_Data.Controllers.Upload;
-using RCSData.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
@@ -12,49 +7,7 @@ namespace RCSData.Models
 {
     public partial class WebMethod
     {
-        /// <summary>
-        /// UploadEMRFile
-        /// </summary>
-        /// <param name="iwp"></param>
-        /// <param name="OrderStr"></param>
-        /// <param name="Base64Str"></param>
-        public string UploadEMRFile<T>(IWebServiceParam iwp, T ijr ,string XMLRoot  , byte[] pdf )
-        {
-            string actioName = "UploadEMRFile";
-            string OrderStr = "", Base64Str ="";
-            ServiceResult<string> sr = new ServiceResult<string>();
-            if (pdf == null)
-            {
-                sr.datastatus = RCS_Data.HISDataStatus.ParametersError;
-                sr.errorMsg = "";
-            }
-            else
-            { 
-                XmlSerializer syphy_collect = new XmlSerializer(typeof(T));
-                StringBuilder sb = new StringBuilder();
-                // Remove XML declaration
-                XmlWriterSettings settings = new XmlWriterSettings();
-                settings.Indent = true;
-                settings.OmitXmlDeclaration = true;
-                XmlWriter writer = XmlWriter.Create(sb, settings);
-                XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
-                ns.Add("", "");
-                syphy_collect.Serialize(writer, ijr, ns);
-                writer.Flush(); 
-                string rawXml = sb.ToString().Replace("<" + XMLRoot + ">", "").Replace("</" + XMLRoot + ">", "").Replace(" ", "").Trim();
-                OrderStr = string.Concat("<![CDATA[", rawXml, "]]>");
-                Base64Str = Convert.ToBase64String(pdf); 
-                WS_UploadEMRFile eo = new WS_UploadEMRFile(OrderStr, Base64Str, iwp);
-                sr = HISDataJAG.getEMRServiceResult(eo);
-            }
-            this.datastatus = sr.datastatus;
-            this.errorMsg = sr.errorMsg;
-            if (sr.datastatus == RCS_Data.HISDataStatus.SuccessWithData)
-            {
-                return "-1";
-            }
-            return "";
-        }
+         
     }
 
     public class WS_UploadEMRFile : AwebMethod<string>, IwebMethod<string>

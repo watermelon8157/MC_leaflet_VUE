@@ -1,28 +1,11 @@
-﻿using Com.Mayaminer;
-using mayaminer.com.jxDB;
-using mayaminer.com.library;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using RCS.Models;
-using System.Globalization;
-using System.Text;
-using System.Security.Cryptography;
-using Dapper;
-using log4net;
-using RCSData.Models;
-using RCS_Data.Controllers.RT;
-using RCS_Data.Models.ViewModels;
+﻿using System.Collections.Generic;
+
 /// <summary>
 /// 系統基本物件
 /// </summary>
 namespace RCS_Data
 {
      
-     
-  
-
     #region 授權清單
 
     public class RCS_DATA_RtGrantList : BASE_DATA
@@ -82,11 +65,7 @@ namespace RCS_Data
         /// <summary>
         /// 授權webservice回傳訊息
         /// </summary>
-        public string wsMsg_RtGrant { get; set; }
-        /// <summary>
-        /// 病患資料
-        /// </summary>
-        public List<PatientListItem> PatientData { get; set; }
+        public string wsMsg_RtGrant { get; set; } 
         /// <summary>
         /// 性別
         /// </summary>

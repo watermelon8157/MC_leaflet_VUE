@@ -1,32 +1,7 @@
 ﻿@using RCS_Data;
 @using System.Web.Mvc; 
 @using RCSData.Models;
-@using RCS_Data.Models.ViewModels;
-
-@functions{
-    /// <summary>
-    /// 輸出病人清單樣式
-    /// </summary>
-    /// <param name="ptinfo">病人基本資料</param>
-    /// <param name="machine">呼吸器</param>
-}
-@helper setPatientListItem(IPDPatientInfo ptinfo, Ventilator machine) {
-
-    <ul class="col-md-6">
-        <li class="list-group-item list-group-item-@(ptinfo.gender == "女"?"warning":"info")">
-            <span class="glyphicon glyphicon-remove remove-btn"></span>
-            <a href="javascript:void(0);" onclick="select_pti(this);" r_id="@(ptinfo.r_id)" idno="@(ptinfo.idno)" ipd_no="@(ptinfo.ipd_no)" chart_no="@(ptinfo.chart_no)" class="list-group-item">
-                <h4>
-                    <span class="glyphicon glyphicon-user @if (ptinfo.accept_status == "1") { @("accept_case")  } " aria-hidden="true"></span>
-                    @(ptinfo.bed_no)&nbsp;&nbsp;@(ptinfo.patient_name)&nbsp;/@ptinfo.age
-                    <span class="tag tag00">CPT </span>
-                    <span class="tag tag01">O<sub>2</sub></span>
-                    <span class="tag tag02">MV</span>
-                </h4>
-            </a>
-        </li>
-    </ul>
-}
+ 
 
 @functions{
     /// <summary>

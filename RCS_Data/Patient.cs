@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 using System.Data;
 using mayaminer.com.jxDB;
-using RCS_Data.Controllers;
-using RCS_Data.Controllers.RtRecord;
 
-namespace RCS_Data {
+namespace RCS_Data
+{
 
     /// <summary>
     /// 院內病床資訊
@@ -59,154 +55,7 @@ namespace RCS_Data {
 
     }
 
-    public class Vicrt_CCH :RT_RECORD {
-        /// <summary> 護理人員ID </summary>
-        public string op_id { set; get; }
-        /// <summary> 病患ID </summary>
-        public string patient_id { set; get; }
-        /// <summary> 來源 </summary>
-        public string id_source { set; get; }
-        /// <summary> 位置 </summary>
-        public string location { set; get; }
-        /// <summary> 裝置 </summary>
-        public string device { set; get; }
-        /// <summary> 記錄型態 0:定時記錄、1:手動記錄 </summary>
-        public string save_type { set; get; }
-        public string o2_device { set; get; }
-        public string mode { set; get; }
-        public string vt_set { set; get; }
-        public string vt { set; get; }
-        private string _vr_set = "";
-        public string vr_set {
-            set {
-                _vr_set = value;
-            }
-            get {
-                if (_vr_set.Trim() != "") {
-                    _vr_set = ((int)Convert.ToDouble(_vr_set)).ToString();
-                }
-                return _vr_set;
-            }
-        }
-        private string _vr = "";
-        public string vr {
-            set {
-                _vr = value;
-            }
-            get {
-                if (_vr.Trim() != "") {
-                    _vr = ((int)Convert.ToDouble(_vr)).ToString();
-                }
-                return _vr;
-            }
-        }
-        public string insp_time { set; get; }
-        public string ie_ratio { set; get; }
-        public string flow { set; get; }
-        /// <summary>每分鐘通氣量設定</summary>
-        public string mv_set { set; get; }
-        /// <summary>每分鐘通氣量</summary>
-        public string mv { set; get; }
-        public string pressure_peak { set; get; }
-        public string pressure_plateau { set; get; }
-        public string pressure_mean { set; get; }
-        /// <summary>吐氣末正壓</summary>
-        public string pressure_peep { set; get; }
-        /// <summary>壓力支持</summary>
-        public string pressure_ps { set; get; }
-        /// <summary>壓力控制</summary>
-        public string pressure_pc { set; get; }
-        public string e_sense { set; get; }
-        public string rise_time { set; get; }
-        public string temp { set; get; }
-        /// <summary>氧氣濃度設定</summary>
-        public string fio2_set { set; get; }
-        public string low_mv_alarm { set; get; }
-        public string paw_alarm { set; get; }
-        public string pressure_sensitivity { set; get; }
-        public string sensitivity_flow { set; get; }
-        public string phigh { set; get; }
-        public string plow { set; get; }
-        public string thigh { set; get; }
-        public string tlow { set; get; }
-        public string ph { set; get; }
-        public string paco2 { set; get; }
-        public string pao2 { set; get; }
-        public string sao2 { set; get; }
-        public string hco3 { set; get; }
-        public string be { set; get; }
-        public string paado2 { set; get; }
-        public string shunt { set; get; }
-        public string spo2 { set; get; }
-        public string etco2 { set; get; }
-        public string rr { set; get; }
-        public string et_size { set; get; }
-        public string et_mark { set; get; }
-        public string cuff { set; get; }
-        public string breath_sound { set; get; }
-        public string pr { set; get; }
-        public string bps { set; get; }
-        public string bpd { set; get; }
-        public string humi_set { set; get; }
-        public string humi_temp { set; get; }
-        public string fio2_ana { set; get; }
-        public string pulse { set; get; }
-        public string vt2 { set; get; }
-        public string ve { set; get; }
-        public string pi_max { set; get; }
-        public string pe_max { set; get; }
-        public string rsi { set; get; }
-        public string cvp { set; get; }
-        public string emv { set; get; }
-        public string paao2 { set; get; }
-        public string realtime_data { set; get; }
-        public string alarm_message { set; get; }
-        public string text_message { set; get; }
-        public string mv_settings { set; get; }
-        public string measure_data { set; get; }
-        public string extends { set; get; }
-        public string data_time { set; get; }
-        public string status { set; get; }
-        public string upload_time { set; get; }
-        public string update_time { set; get; }
-        public string log { set; get; }
-
-        /*以下為合併欄位*/
-        public string merger_o2_device { set; get; }
-        public string merger_vt_set { set; get; }
-        public string merger_vr_set { set; get; }
-        public string merger_insptime_ieratio { set; get; }
-        public string merger_mv_set { set; get; }
-        public string merger_peak_plateau { set; get; }
-        public string merger_mean_peep { set; get; }
-        public string merger_ps_pc { set; get; }
-        public string merger_esense_risetime { set; get; }
-        public string merger_lowmvalarm_pawalarm { set; get; }
-        public string merger_sensitivity_flow { set; get; }
-        public string merger_phigh_plow { set; get; }
-        public string merger_thigh_tlow { set; get; }
-
-        public void setOtherValue() {
-            this.merger_o2_device = device + "/" + o2_device;
-            this.merger_vt_set = vt_set + "/" + vt;
-            this.merger_vr_set = vr_set + "/" + vr;
-            this.merger_insptime_ieratio = insp_time + "/" + ie_ratio;
-            this.merger_mv_set = mv_set + "/" + mv;
-            this.merger_peak_plateau = pressure_peak + "/" + pressure_plateau;
-            this.merger_mean_peep = pressure_mean + "/" + pressure_peep;
-            this.merger_ps_pc = pressure_ps + "/" + pressure_pc;
-            this.merger_esense_risetime = e_sense + "/" + rise_time;
-            this.merger_lowmvalarm_pawalarm = low_mv_alarm + "/" + paw_alarm;
-            this.merger_sensitivity_flow = pressure_sensitivity + "/" + sensitivity_flow;
-            this.merger_phigh_plow = phigh + "/" + plow;
-            this.merger_thigh_tlow = thigh + "/" + tlow;
-        }
-
-        
-    }
-
-  
-
+   
     public class Patient 
     {
 
@@ -991,119 +840,7 @@ namespace RCS_Data {
         public string type { get; set; }
     }
 
-    /// <summary> 主呼吸紀錄單 </summary>
-
-    public class RT_RECORD_MAIN_BASIC : RTRECORD_MASTER, IEditPower_base
-    {
-        public string central_message_txt { get { if (string.IsNullOrWhiteSpace(central_message)) return ""; else return central_message.Replace("<br />", ","); } }
-        /// <summary>
-        /// 警報訊息
-        /// </summary>
-        public string central_message { set; get; }
-        /// <summary> 住院序號 </summary>
-        public string ipd_no { set; get; }
-        /// <summary> 病歷號 </summary>
-        public string chart_no { set; get; }
-        /// <summary>
-        /// 是否要填寫每日呼吸脫離評估
-        /// </summary>
-        public bool hasRWC { get; set; }
-
-        /// <summary>
-        /// 列印顯示model資料
-        /// </summary>
-        public string showMode
-        {
-            get
-            {
-                string val = "";
-                if (rt_record != null)
-                {
-                    val = string.IsNullOrWhiteSpace(rt_record.mode) ? rt_record.device_o2 : rt_record.mode;
-                    //列印時判斷呼吸器結束時間=氧療開始時間=記錄單時間時，該筆紀錄單的Ventilation Mode顯示O2 equipment
-                    if (onBreath != null && onOxygen != null && !string.IsNullOrWhiteSpace(onBreath.ENDDATE) && !string.IsNullOrWhiteSpace(onOxygen.STARTDATE)
-                        && DateTime.Parse(onBreath.ENDDATE) == showRECORDDATE
-                        && showRECORDDATE == DateTime.Parse(onOxygen.STARTDATE))
-                    {
-                        val = rt_record.device_o2;
-                    }
-                    //呼吸器開始時間=氧療結束時間=記錄單時間時，該筆資料的Ventilation Mode顯示呼吸器Mode
-                    if (onBreath != null && onOxygen != null && !string.IsNullOrWhiteSpace(onBreath.STARTDATE) && !string.IsNullOrWhiteSpace(onOxygen.ENDDATE)
-                        && DateTime.Parse(onBreath.STARTDATE) == showRECORDDATE
-                        && showRECORDDATE == DateTime.Parse(onOxygen.ENDDATE))
-                    {
-                        val = rt_record.mode;
-                    }
-                }
-                return val;
-            }
-        }
-        public DateTime showRECORDDATE
-        {
-            get
-            {
-                DateTime _RECORDDATE = DateTime.Now;
-            if (RECORDDATE != null && RECORDDATE != "")
-            {
-                try
-                {
-                    _RECORDDATE = DateTime.Parse(RECORDDATE);
-                }
-                catch 
-                {
-                    return _RECORDDATE;
-                }
-                return _RECORDDATE;
-            }
-            else
-            {
-                return _RECORDDATE;
-            }
-            } 
-        }
-        ///// <summary> 錯誤訊息 </summary>
-        //public RESPONSE_MSG RESPONSE_MSG = new RESPONSE_MSG();
-        /// <summary>取得webservice錯誤</summary>
-        public bool isWsError { set; get; }
-        /// <summary>錯誤訊息</summary>
-        public string wsError { set; get; }
-
-        /// <summary>是否是修改資料</summary>
-        public bool isModify { set; get; }
-        /// <summary>  是否有修改資料的權限  </summary>
-        public bool hasPowerEdit { set; get; }
-
-        public RT_RECORD rt_record { get; set; }
-        public ONINTUBATE on_intubate { get; set; }
-        public ONBREATH on_breath { get; set; }
-        public ONOXYGEN on_oxygen { get; set; }
-        /// <summary>插管資料</summary>
-        public RCS_ONMODE_MASTER onIntubate { get; set; }
-        /// <summary>呼吸資料</summary>
-        public RCS_ONMODE_MASTER onBreath { get; set; }
-        /// <summary>氧療資料</summary>
-        public RCS_ONMODE_MASTER onOxygen { get; set; }
-        /// <summary>自訂醫師</summary>
-        public string custom_vs_doc { set; get; }
-        /// <summary>自訂ID</summary>
-        public string custom_vs_id { set; get; }
-
-        /// <summary> by turns所有資料RECORD_ID資料 </summary>
-        public List<string> byTurnIdList { get; set; } 
-
-        /// <summary>取得最後一筆呼吸照護記錄單 </summary>
-        public string lastRecordID { get; set; }
-
-        /// <summary>計算天數 </summary>
-        public int useDays { get; set; }
-
-        /// <summary>是否是VIP資料</summary>
-        public bool isVIP { get; set; } 
-    }
-
     
-
-
     #endregion
 
     #region 呼吸器脫離評估
