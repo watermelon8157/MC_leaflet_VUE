@@ -69,7 +69,11 @@
     <Compile Include="CompressTool.cs" />
     <Compile Include="Controllers\BaseModels.cs" />
     <Compile Include="Models\DB\DB_MC_HOSP_INFO.cs" />
+    <Compile Include="Models\DB\DB_MC_HOSP_INFO_DTL.cs" />
     <Compile Include="Models\DB\DB_MC_PATIENT_INFO.cs" />
+    <Compile Include="Models\DB\DB_MC_SITE_DRIVING_TIME_INFO.cs" />
+    <Compile Include="Models\DB\DB_MC_SITE_INFO.cs" />
+    <Compile Include="Models\DB\DB_MC_SOURCE_LIST.cs" />
     <Compile Include="Models\DB\IDB.cs" />
     <Compile Include="Models\HISDataExchangeEMR.cs" />
     <Compile Include="Models\WebMethod\WebService\CreateEMRSign.cs" />

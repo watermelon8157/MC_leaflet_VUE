@@ -12,7 +12,7 @@ using System.Web.Routing;
 using System.Reflection;
 using RCS.Models;
 using RCSData.Models;
-
+using RCS_Data.Models.DB;
 
 namespace RCS
 {
@@ -28,27 +28,51 @@ namespace RCS
 
         /// <summary> 上傳簽章資料 </summary>
         private static Timer timer_upload;
-
-        /// <summary> 彰基病人清單是否有更新 </summary>
-        private static bool patient_update { get; set; }
+         
 
         private static bool first_time { get; set; }
+          
 
-        private static bool first_upload_hl7 { get; set; }
+        /// <summary> 醫院資料 </summary>
+        public static List<DB_MC_HOSP_INFO> hospList { get; set; }
 
-        /// <summary> 比對病床、科別、護理站資訊更新清單 </summary>
-        public static List<IPDPatientInfo> ipd_list { get; set; }
-         
+        /// <summary>
+        /// 從醫院取得最新的病患清單比對
+        /// </summary>
+        /// <param name="state"></param>
+        private static void MC_Source(object state)
+        {
+            string actionName = "get_ptlist_from_hosp";
+
+            try
+            {
+                if (first_time)
+                {
+                    if (MvcApplication.hospList == null)
+                    { 
+                        MvcApplication.hospList.Clear();
+                    }
+                    else
+                    {
+                        MvcApplication.hospList = new List<DB_MC_HOSP_INFO>();
+                    }
+                    first_time = false;
+                    new RCS.Models.MCSource().RunThread();
+                }
+                else
+                {
+                    //對應院內資料
+                    new RCS.Models.MCSource().RunThread();
+                }
 
 
-        /// <summary> 上傳者清單 </summary>
-        public static List<UserInfo> userList { get; set; }
-        /// <summary> 比對病床、科別、護理站資訊更新清單 </summary> 
+            }
+            catch (Exception ex)
+            {
+                LogTool.SaveLogMessage(ex, actionName, MvcApplication.csName);
+            }
 
-      
-
-         
-
+        }
 
         protected void Application_Start()
         {
@@ -57,20 +81,12 @@ namespace RCS
             GlobalConfiguration.Configure(WebApiConfig.Register);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
-             
-            MvcApplication.ipd_list = new List<IPDPatientInfo>();
-            MvcApplication.userList = new List<UserInfo>();
-            MvcApplication.first_time = true;
-            MvcApplication.patient_update = false;
-            MvcApplication.first_upload_hl7 = true;
-            if (!RCS.Controllers.BaseController.isDebuggerMode)
-            {
-                ////設定病人資料同步的 Schedule 開啟後五秒執行起來，每十分鐘跑一次
-                //TimerCallback tc = new TimerCallback(get_ptlist_from_hosp);
-                //timer_get_ptlist = new Timer(tc, null, 5000, 10 * 60 * 1000);
- 
-            }
 
+            MvcApplication.hospList = new List<DB_MC_HOSP_INFO>();
+            MvcApplication.first_time = true;
+            //設定病人資料同步的 Schedule 開啟後五秒執行起來，每十分鐘跑一次
+            TimerCallback tc = new TimerCallback(MC_Source);
+            timer_get_ptlist = new Timer(tc, null, 5000, 10 * 60 * 1000);
 
             string log4netPath = Server.MapPath("~/App_Config/log4net.config");
             log4net.Config.XmlConfigurator.ConfigureAndWatch(new System.IO.FileInfo(log4netPath));
@@ -82,13 +98,10 @@ namespace RCS
         /// </summary>
         protected void Application_End()
         { 
-            if (MvcApplication.ipd_list != null)
+            
+            if (MvcApplication.hospList != null)
             {
-                MvcApplication.ipd_list.Clear();
-            }
-            if (MvcApplication.userList != null)
-            {
-                MvcApplication.userList.Clear();
+                MvcApplication.hospList.Clear();
             } 
             try
             {

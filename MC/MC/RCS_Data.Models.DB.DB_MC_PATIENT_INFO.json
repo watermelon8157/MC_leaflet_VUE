@@ -1,18 +1,18 @@
 {
   "PATIENT_ID" : "",
   "PATIENT_NAME" : "",
-  "CASE_ID" : "",
+  "SITE_ID" : "",
   "LOCATION" : "",
   "AGE" : "",
   "GENDER" : "",
-  "CITY" : "",
+  "COUNTRY" : "",
   "TRIAGE" : "",
   "TRANSPORTATION" : "",
   "AMB_ID" : "",
   "EXPECTED_ARRIVAL_DATETIME" : "",
   "LOGIN_DATETIME" : "",
   "SELECTION_DATETIME" : "",
-  "HOSP_KEY" : "",
+  "HOSP_ID" : "",
   "HOSPITAL_SHOW_NAME" : "",
   "CREATE_ID" : "",
   "CREATE_NAME" : "",
@@ -23,5 +23,9 @@
   "DATASTATUS" : "",
   "ARRIVAL_FLAG" : "",
   "GUEST_FLAG" : "",
-  "SCORE" : ""
+  "SCORE" : "",
+  "CITY" : "",
+  "HOSP_KEY" : "",
+  "HOSP_TO_PAT_SCORE" : "",
+  "HOSP_TO_PAT_SCORE_LEVEL" : ""
 }

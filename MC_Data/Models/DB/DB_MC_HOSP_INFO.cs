@@ -22,20 +22,10 @@ namespace RCS_Data.Models.DB
     {
         [Key]
         public string HOSP_KEY { get; set; }
-        public string FULL_NAME { get; set; }
+        public string HOSP_NAME { get; set; }
         public string SHOW_NAME { get; set; }
-        public string LATITUDE { get; set; }
-        public string LONGITUDE { get; set; }
-        public string NHI_REGIONAL_DIVISION { get; set; }
-        public string CITY_COUNTRY { get; set; }
-        public string ERH { get; set; }
-        public string ERH_LEVEL { get; set; }
+        public string CITY { get; set; }
         public string NEW_RANKING { get; set; }
-        public string PARAMETER_SEV { get; set; }
-        public string PARAMETER_MOD { get; set; }
-        public string PARAMETER_MILD { get; set; }
-        public string BED_EDOBSERV { get; set; }
-        public string BED_ACUTEBEDS { get; set; }
         public string ERH_URL { get; set; }
         public string CREATE_ID { get; set; }
         public string CREATE_NAME { get; set; }
@@ -44,7 +34,28 @@ namespace RCS_Data.Models.DB
         public string MODIFY_NAME { get; set; }
         public string MODIFY_DATE { get; set; }
         public string DATASTATUS { get; set; }
+        public string LATITUDE { get; set; }
+        public string LONGITUDE { get; set; }
+        public string ID { get; set; }
+        public string MOHWDIVISION { get; set; }
+        public string CONTYPE { get; set; }
+        public string ORIGINAL_RANKING { get; set; }
+        public string SEVERE { get; set; }
+        public string MODERATE { get; set; }
+        public string MILD { get; set; }
+        public string EDOBSERVBEDS { get; set; }
+        public string EDRELATEDBEDS { get; set; }
+        public string MEDICALSTAFF { get; set; }
+        public string W2 { get; set; }
+        public string CV { get; set; }
 
+
+
+    }
+
+
+    public class VIEW_MC_HOSP_INFO : DB_MC_HOSP_INFO
+    {
 
     }
 }

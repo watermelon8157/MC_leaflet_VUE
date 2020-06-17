@@ -1,4 +1,6 @@
-﻿using System;
+﻿using RCS_Data;
+using RCS_Data.Models.DB;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -10,9 +12,62 @@ namespace RCS.Models
     /// </summary>
     public class MCSource : BaseThread
     {
+        string csName = "MCSource";
+        private SQLProvider _DBLink { get; set; }
+        protected SQLProvider DBLink
+        {
+            get
+            {
+                if (this._DBLink == null)
+                {
+                    this._DBLink = new SQLProvider();
+                }
+                return this._DBLink;
+            }
+        }
+
         public override void RunThread()
         {
-            throw new NotImplementedException();
+            // 取得醫院資料
+            if (MvcApplication.hospList.Count == 0)
+            {
+                this.gethospList();
+            }
+            // 計算分數相關變數 
+            // 𝑺𝒄𝒐𝒓𝒆_𝒊𝒋=  (𝒙_𝒊𝒋) + ( 𝒚_𝒊𝒋 (𝟏−𝒛_𝒊𝒋 )+ 𝒚_𝒊𝒋 𝒘𝟐_𝒊𝒋 ) 
+
+            // 計算 MC_HOSP_INFO_DTL
+            // (  𝒚_𝒊𝒋 (𝟏−𝒛_𝒊𝒋 )+ 𝒚_𝒊𝒋 𝒘𝟐_𝒊𝒋 ) 
+
+            // 計算 DB_MC_SITE_DRIVING_TIME_INFO
+            //  (𝒙_𝒊𝒋) 
+
+            // 計算 DB_MC_SOURCE_LIST
+            //  𝑺𝒄𝒐𝒓𝒆_𝒊𝒋
+
+
+        }
+
+        private void gethospList()
+        {
+            string actionName = "gethospList";
+            string sql = "SELECT * FROM " + DB_TABLE_NAME.DB_MC_HOSP_INFO + " WHERE DATASTATUS = '1';";
+            MvcApplication.hospList = this.DBLink.DBA.getSqlDataTable<DB_MC_HOSP_INFO>(sql);
+            if (this.DBLink.DBA.hasLastError)
+            {
+                MvcApplication.hospList = new List<DB_MC_HOSP_INFO>();
+                Com.Mayaminer.LogTool.SaveLogMessage(this.DBLink.DBA.lastError, actionName, this.csName);
+            }
+        }
+
+        /// <summary>
+        /// 計算CV
+        /// </summary>
+        /// <param name="pDate">計算日期</param>
+        public void runCV(DateTime pDate)
+        {
+            //檢查是否有計算過資料
+
         }
 
         // 𝑺𝒄𝒐𝒓𝒆_𝒊𝒋=𝒙_𝒊𝒋+𝒚_𝒊𝒋 (𝟏−𝒛_𝒊𝒋 )+ 𝒚_𝒊𝒋 𝒘𝟐_𝒊𝒋  

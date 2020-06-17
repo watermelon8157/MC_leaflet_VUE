@@ -23,18 +23,18 @@ namespace RCS_Data.Models.DB
         [Key]
         public string PATIENT_ID { get; set; }
         public string PATIENT_NAME { get; set; }
-        public string CASE_ID { get; set; }
+        public string SITE_ID { get; set; }
         public string LOCATION { get; set; }
         public string AGE { get; set; }
         public string GENDER { get; set; }
-        public string CITY { get; set; }
+        public string COUNTRY { get; set; }
         public string TRIAGE { get; set; }
         public string TRANSPORTATION { get; set; }
         public string AMB_ID { get; set; }
         public string EXPECTED_ARRIVAL_DATETIME { get; set; }
         public string LOGIN_DATETIME { get; set; }
         public string SELECTION_DATETIME { get; set; }
-        public string HOSP_KEY { get; set; }
+        public string HOSP_ID { get; set; }
         public string HOSPITAL_SHOW_NAME { get; set; }
         public string CREATE_ID { get; set; }
         public string CREATE_NAME { get; set; }
@@ -45,7 +45,12 @@ namespace RCS_Data.Models.DB
         public string DATASTATUS { get; set; }
         public string ARRIVAL_FLAG { get; set; }
         public string GUEST_FLAG { get; set; }
-        public string SCORE { get; set; } 
+        public string SCORE { get; set; }
+        public string CITY { get; set; }
+        public string HOSP_KEY { get; set; }
+        public string HOSP_TO_PAT_SCORE { get; set; }
+        public string HOSP_TO_PAT_SCORE_LEVEL { get; set; }
+
 
 
     }

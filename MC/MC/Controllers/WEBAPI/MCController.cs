@@ -19,8 +19,7 @@ namespace RCS.Controllers.WEBAPI
         string csName = "MCController";
 
 
-        MCModel _model = new MCModel();
-
+        MCModel _model = new MCModel(); 
 
         public string HelloWord()
         { 
@@ -102,8 +101,7 @@ namespace RCS.Controllers.WEBAPI
 
         #endregion
 
-
-
+          
         /// <summary>
         /// 登入驗證
         /// </summary>
@@ -162,10 +160,10 @@ namespace RCS.Controllers.WEBAPI
             return pList;
          }
 
-
-
+         
         #endregion
 
 
+         
     }
 }

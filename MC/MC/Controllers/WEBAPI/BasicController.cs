@@ -127,11 +127,7 @@ namespace RCS.Controllers.WEBAPI
                 if (user_info.hasUserData )
                 {
                     if (!string.IsNullOrWhiteSpace(user_info.sysAuthority))
-                    {
-                        if (!MvcApplication.userList.Exists(x=>x.user_id == user_info.user_id))
-                        {
-                            MvcApplication.userList.Add(user_info);
-                        }
+                    { 
                         return new
                         {
                             Result = true,
