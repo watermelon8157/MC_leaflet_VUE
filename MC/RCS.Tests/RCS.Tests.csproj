@@ -92,12 +92,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RCS\RCS.csproj">
-      <Project>{38131550-7F01-4933-AA26-D63AE135ED94}</Project>
-      <Name>RCS</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Controllers\" />
   </ItemGroup>
   <ItemGroup>
