@@ -319,30 +319,27 @@ namespace RCS.Models.ViewModel
                             MODIFY_ID = this.userinfo.user_id,
                             MODIFY_NAME = this.userinfo.user_name,
                             DATASTATUS = "1",
-                            DRIVING_TIME = Dis.ToString(),
+                            DRIVING_TIME = Math.Round((double.Parse(Dis.ToString()) / 1000) > 60 ? 60 : (double.Parse(Dis.ToString()) / 1000), 0).ToString(),
                         });
-                    } 
-
-                }
-                
-            }
-
+                    }
+                    this.time_ordinal(ref tempList);
+                    this.DBLink.DBA.DBExecInsert<DB_MC_SITE_DRIVING_TIME_INFO>(tempList);
+                } 
+            } 
         }
 
-        /// <summary> 
-        /// 𝑥_𝑖𝑗 = "Drive−Time" 公式
+        /// <summary>
+        /// 𝑥_𝑖𝑗 = "Drive−Time" 公式 正規畫 取得距離或是時間順序
+        /// 最小的數字最大
+        /// 最大的數字最小
         /// </summary>
-        /// <param name="drivingTime">花費時間</param>
-        /// <param name="maxDrinvingTime">花費時間最大值</param>
-        /// <returns></returns>
+        /// <param name="pList"></param>
         public void time_ordinal(ref List<DB_MC_SITE_DRIVING_TIME_INFO> pList )
         { 
             int num = 0;
-            // (maxDrinvingTime+1)-drivingTime
-            if (num <= 0) return num;
-
-            
-             
+            List<string> tempList = new List<string>();
+            tempList = pList.Select(x=>x.DRIVING_TIME).Distinct().OrderByDescending(x=> double.Parse(x)).ToList();
+            pList.ForEach(x=>x.DRIVING_SOURCE = (tempList.FindIndex(y => y == x.DRIVING_TIME)+ 1).ToString()); 
         }
         #endregion
 
