@@ -12,6 +12,9 @@ const store = {
     spinMsg: 'Loading...'
   },
   mutations: {
+    LoadPatList (state, payload) {
+      state.patList = payload
+    },
     // this.$store.commit('SetNetworkError', true)  顯示載入中遮罩
     // this.$store.commit('SetNetworkError', false) 關閉載入中遮罩
     SetNetworkError (state, payload) {

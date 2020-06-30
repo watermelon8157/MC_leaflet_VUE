@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Device.Location;
 using System.Linq;
 using System.Web;
+using Dapper;
+using static Dapper.SqlMapper;
 
 namespace RCS.Models.ViewModel
 {
@@ -73,14 +75,102 @@ namespace RCS.Models.ViewModel
             // 計算 DB_MC_SITE_DRIVING_TIME_INFO
             //  (𝒙_𝒊𝒋) 
             this.runDriving();
-            
+
             // 計算 DB_MC_SOURCE_LIST
-            //  𝑺𝒄𝒐𝒓𝒆_𝒊𝒋
-
-
+            //  𝑺𝒄𝒐𝒓𝒆_𝒊𝒋 
+            this.getAllScore(dateNow);
             #endregion
 
         }
+
+
+        public void getAllScore(DateTime pDate)
+        {
+            string actionName = "getAllScore"; 
+            List<DB_MC_SOURCE_LIST> insertList = new List<DB_MC_SOURCE_LIST>();
+            List<DB_MC_SOURCE_LIST> updateList = new List<DB_MC_SOURCE_LIST>();
+            List<DB_MC_SITE_INFO> sList = new List<DB_MC_SITE_INFO>();
+            List<DB_MC_SITE_DRIVING_TIME_INFO> tList = new List<DB_MC_SITE_DRIVING_TIME_INFO>();
+            List<DB_MC_HOSP_INFO_DTL> dList = new List<DB_MC_HOSP_INFO_DTL>();
+            List<DB_MC_PATIENT_INFO> pList = new List<DB_MC_PATIENT_INFO>();
+            List<DB_MC_SOURCE_LIST> saList = new List<DB_MC_SOURCE_LIST>();
+            Dapper.DynamicParameters dp = new Dapper.DynamicParameters();
+            string sql = "", _date = Function_Library.getDateString(pDate, RCS_Data.Models.DATE_FORMAT.yyyy_MM_dd); 
+            sql = "SELECT * FROM " + DB_TABLE_NAME.DB_MC_SITE_INFO + " WHERE DATASTATUS = '1';" ; 
+            sList = this.DBLink.DBA.getSqlDataTable<DB_MC_SITE_INFO>(sql ); 
+            sql = "SELECT * FROM " + DB_TABLE_NAME.DB_MC_PATIENT_INFO + " WHERE DATASTATUS = '1' AND SITE_ID in @SITE_ID;"
+                  + " SELECT * FROM " + DB_TABLE_NAME.DB_MC_SITE_DRIVING_TIME_INFO + " WHERE DATASTATUS = '1'  AND SITE_ID in @SITE_ID;"
+                  + " SELECT * FROM " + DB_TABLE_NAME.DB_MC_HOSP_INFO_DTL + " WHERE DATASTATUS = '1' AND SOURCE_DATE = @SOURCE_DATE;"
+                  + " SELECT * FROM " + DB_TABLE_NAME.DB_MC_SOURCE_LIST + " WHERE DATASTATUS = '1' AND SOURCE_DATE = @SOURCE_DATE AND SITE_ID in @SITE_ID;";
+            dp.Add("SITE_ID", sList.Select(x=>x.SITE_ID).Distinct().ToList());
+            dp.Add("SOURCE_DATE", _date);
+            this.DBLink.DBA.Open();
+            GridReader gr = this.DBLink.DBA.dbConnection.QueryMultiple(sql, dp);
+            pList = gr.Read<DB_MC_PATIENT_INFO>().ToList();  
+            tList = gr.Read<DB_MC_SITE_DRIVING_TIME_INFO>().ToList();  
+            dList = gr.Read<DB_MC_HOSP_INFO_DTL>().ToList();
+            saList = gr.Read<DB_MC_SOURCE_LIST>().ToList();
+            this.DBLink.DBA.Close(); 
+            foreach (DB_MC_SITE_DRIVING_TIME_INFO t in tList)
+            {
+                bool hasData = false;
+                DB_MC_SOURCE_LIST temp = new DB_MC_SOURCE_LIST();
+                DB_MC_HOSP_INFO hosp = MvcApplication.hospList.Find(x => x.HOSP_KEY == t.HOSP_KEY);
+                if (saList.Exists(x => x.SITE_ID == t.SITE_ID && x.SOURCE_DATE == _date && x.HOSP_KEY == t.HOSP_KEY))
+                {
+                    hasData = true;
+                    temp = saList.Find(x => x.SITE_ID == t.SITE_ID && x.SOURCE_DATE == _date && x.HOSP_KEY == t.HOSP_KEY);
+                    temp.MODIFY_DATE = Function_Library.getDateNowString(DATE_FORMAT.yyyy_MM_dd_HHmmss);
+                    temp.MODIFY_ID = this.userinfo.user_id;
+                    temp.MODIFY_NAME = this.userinfo.user_name;
+                }
+                else
+                {
+                    temp = new DB_MC_SOURCE_LIST()
+                    {
+                        HOSP_KEY = t.HOSP_KEY,
+                        MILD = hosp.MILD,
+                        SEVERE = hosp.SEVERE,
+                        MODERATE = hosp.MODERATE,
+                        W2 = hosp.W2,
+                        CV = dList.Find(x => x.HOSP_KEY == t.HOSP_KEY && x.SOURCE_DATE == _date).SOURCE,
+                        SITE_ID = t.SITE_ID,
+                        DRIVING_SOURCE = t.DRIVING_SOURCE,
+                        SOURCE_DATE = _date,
+                        CREATE_DATE = Function_Library.getDateNowString(DATE_FORMAT.yyyy_MM_dd_HHmmss),
+                        CREATE_ID = this.userinfo.user_id,
+                        CREATE_NAME = this.userinfo.user_name,
+                        MODIFY_DATE = Function_Library.getDateNowString(DATE_FORMAT.yyyy_MM_dd_HHmmss),
+                        MODIFY_ID = this.userinfo.user_id,
+                        MODIFY_NAME = this.userinfo.user_name,
+                        DATASTATUS = "1",
+                    };
+                } 
+                //  (𝒙_𝒊𝒋) + ( 𝒚_𝒊𝒋 (𝟏−𝒛_𝒊𝒋 )+ 𝒚_𝒊𝒋 𝒘𝟐_𝒊𝒋 ) 
+                double x_ij = double.Parse(temp.DRIVING_SOURCE),
+                    y_ij = double.Parse(temp.MILD), z_ij = double.Parse(temp.CV), w2_ij = double.Parse(temp.MILD);
+
+                temp.MILD_SOURCE = Math.Round(x_ij + (double.Parse(temp.MILD) * (1- z_ij) + double.Parse(temp.MILD) * w2_ij),2).ToString();
+                temp.MODERATE_SOURCE = Math.Round(x_ij + (double.Parse(temp.MODERATE) * (1 - z_ij) + double.Parse(temp.MODERATE) * w2_ij), 2).ToString();
+                temp.SEVERE_SOURCE = Math.Round(x_ij + (double.Parse(temp.SEVERE) * (1 - z_ij) + double.Parse(temp.SEVERE) * w2_ij), 2).ToString();
+                if (hasData)
+                { 
+                    updateList.Add(temp);
+                }
+                else
+                { 
+                    insertList.Add(temp);
+                } 
+            }
+            this.DBLink.DBA.DBExecInsert<DB_MC_SOURCE_LIST>(insertList);
+            this.DBLink.DBA.DBExecUpdate<DB_MC_SOURCE_LIST>(updateList);
+            if (this.DBLink.DBA.hasLastError)
+            {
+                Com.Mayaminer.LogTool.SaveLogMessage(this.DBLink.DBA.lastError, actionName, this.csName);
+            }
+
+        }
+
 
         public List<DB_MC_SITE_INFO> getMC_SITE_INFO(string site_id ="")
         {
@@ -339,7 +429,8 @@ namespace RCS.Models.ViewModel
             int num = 0;
             List<string> tempList = new List<string>();
             tempList = pList.Select(x=>x.DRIVING_TIME).Distinct().OrderByDescending(x=> double.Parse(x)).ToList();
-            pList.ForEach(x=>x.DRIVING_SOURCE = (tempList.FindIndex(y => y == x.DRIVING_TIME)+ 1).ToString()); 
+            pList.ForEach(x=>x.DRIVING_SOURCE = (tempList.FindIndex(y => y == x.DRIVING_TIME)).ToString());
+            pList = pList.FindAll(x => x.DRIVING_SOURCE != "0").ToList();
         }
         #endregion
 
@@ -395,5 +486,7 @@ namespace RCS.Models.ViewModel
             tempList = this.DBLink.DBA.getSqlDataTable<DB_MC_PATIENT_INFO>(sql, dp);
             return tempList;
         }
+
+
     }
 }

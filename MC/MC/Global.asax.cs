@@ -31,7 +31,8 @@ namespace RCS
          
 
         private static bool first_time { get; set; }
-          
+         
+        public static MCSource MCSourceThread { get; set; }
 
         /// <summary> 醫院資料 </summary>
         public static List<DB_MC_HOSP_INFO> hospList { get; set; }
@@ -46,25 +47,22 @@ namespace RCS
 
             try
             {
-                if (first_time)
+                if (MvcApplication.hospList == null)
                 {
-                    if (MvcApplication.hospList == null)
-                    { 
-                        MvcApplication.hospList.Clear();
-                    }
-                    else
-                    {
-                        MvcApplication.hospList = new List<DB_MC_HOSP_INFO>();
-                    }
-                    first_time = false;
-                    new RCS.Models.MCSource().RunThread();
+                    MvcApplication.hospList.Clear();
                 }
                 else
                 {
-                    //對應院內資料
-                    new RCS.Models.MCSource().RunThread();
+                    MvcApplication.hospList = new List<DB_MC_HOSP_INFO>();
                 }
-
+                if (MvcApplication.MCSourceThread == null)
+                {
+                    MvcApplication.MCSourceThread = new RCS.Models.MCSource();
+                }
+                if (!MvcApplication.MCSourceThread.IsAlive)
+                { 
+                    MvcApplication.MCSourceThread.Start();
+                }
 
             }
             catch (Exception ex)
@@ -86,7 +84,7 @@ namespace RCS
             MvcApplication.first_time = true;
             //設定病人資料同步的 Schedule 開啟後五秒執行起來，每十分鐘跑一次
             TimerCallback tc = new TimerCallback(MC_Source);
-            timer_get_ptlist = new Timer(tc, null, 5000, 10 * 60 * 1000);
+            timer_get_ptlist = new Timer(tc, null, 5000, 1 * 60 * 1000);
 
             string log4netPath = Server.MapPath("~/App_Config/log4net.config");
             log4net.Config.XmlConfigurator.ConfigureAndWatch(new System.IO.FileInfo(log4netPath));

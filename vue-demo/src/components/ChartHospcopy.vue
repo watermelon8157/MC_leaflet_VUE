@@ -5,9 +5,9 @@
         <span class="m-2">請選擇醫院:</span>
         <select class="form-control inline w-64 mx-2">
           <option>所有醫院</option>
-          <option>雙和</option>
-          <option>萬芳</option>
-          <option>北醫</option>
+          <option>衛生福利部雙和醫院</option>
+          <option>臺北市立萬芳醫院</option>
+          <option>臺北醫學大學附設醫院本院</option>
         </select>
       </span>
 

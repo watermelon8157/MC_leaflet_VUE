@@ -46,6 +46,7 @@
         <a-tag class="bg-blue-500 text-white">推薦</a-tag>
         <a-tag class="bg-yellow-500 text-white">比較推薦</a-tag>
         <a-tag class="bg-purple-500 text-white">不太推薦</a-tag>
+        <a-tag class="bg-gray-600 text-white">車程太遠</a-tag>
       </div>
       <l-map
         ref="Map"
@@ -69,7 +70,7 @@
           :key="index"
           :lat-lng="i.location"
           @click="(e)=>open(i)"
-          :icon="get_hosp_color(i.hosp_ranking)"
+          :icon="get_hosp_color(i.hosp_ranking,i.location)"
         >
           <l-popup :content="i.hosp_name"></l-popup>
         </l-marker>
@@ -189,6 +190,7 @@ import markergold from '@/assets/marker/marker-icon-2x-gold.png'
 import markergreen from '@/assets/marker/marker-icon-2x-green.png'
 import markerred from '@/assets/marker/marker-icon-2x-red.png'
 import markerviolet from '@/assets/marker/marker-icon-2x-violet.png'
+import markergrey from '@/assets/marker/marker-icon-2x-grey.png'
 import markershadow from '@/assets/marker/marker-shadow.png'
 import L from 'leaflet'
 import Mixin from '@/mixin'
@@ -364,7 +366,7 @@ export default {
       }
       return '距離 ' + dis + ' km'
     },
-    get_hosp_color (pVal) {
+    get_hosp_color (pVal, pLocation) {
       let color = ''
       switch (pVal) {
         case '1':
@@ -386,8 +388,12 @@ export default {
           color = markerviolet
           break
         default:
-          color = markergreen
+          color = markergrey
           break
+      }
+      let dis = ((this.location.distanceTo(L.latLng(pLocation[0], pLocation[1]))).toFixed(0) / 1000)
+      if (dis > 10) {
+        color = markergrey
       }
       return new L.Icon({
         iconUrl: color,

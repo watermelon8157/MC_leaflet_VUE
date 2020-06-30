@@ -5054,8 +5054,8 @@ export default {
   },
   data () {
     return {
+      hospList2: hospList,
       data: Object.assign(DB_MC_PATIENT_INFO, {}),
-      hospList,
       windowHeight: 0,
       windowWidth: 0,
       now: this.$moment().format('YYYY-MM-DD HH:mm')
@@ -5072,6 +5072,9 @@ export default {
     })
   },
   computed: {
+    hospList () {
+      return this.hospList2
+    },
     site_id () {
       if (this.$auth.getSiteID()) {
         return this.$auth.getSiteID()
@@ -5085,7 +5088,7 @@ export default {
       return this.$store.state.selectPatList.length
     },
     patListLength () {
-      return this.$store.state.patList.length
+      return this.$store.state.Basic.PatListByID.length
     },
     patList () {
       return this.$store.state.patList

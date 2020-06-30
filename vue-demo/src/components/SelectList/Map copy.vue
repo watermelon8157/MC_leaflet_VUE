@@ -192,6 +192,11 @@ export default {
           color = 'marker-icon-2x-green.png'
           break
       }
+      debugger
+      let dis = ((this.location.distanceTo(L.latLng(pLocation[0], pLocation[1]))).toFixed(0) / 1000)
+      if (dis > 10) {
+
+      }
       return new L.Icon({
         iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/' + color,
         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',

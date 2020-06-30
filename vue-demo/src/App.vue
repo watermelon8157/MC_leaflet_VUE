@@ -59,9 +59,56 @@ export default {
               type: 'Basic/SetLoadFirst'
             })
           }
-          vuethis.$api.MC.GetPatList().then((result) => {
+          vuethis.$api.MC.GetPatListAll().then((result) => {
             vuethis.$store.commit({
-              type: 'Basic/SetPatListnow',
+              type: 'Basic/SetPatListAll',
+              data: result.data
+            })
+            setTimeout(() => {
+              vuethis.spinning = false
+            }, 500)
+          }).catch((err) => {
+            console.log(err)
+            this.error(err)
+            setTimeout(() => {
+              vuethis.spinning = false
+            }, 500)
+          })
+          vuethis.$api.MC.GetPatListByID({ site_id: vuethis.site_id }).then((result) => {
+            vuethis.$store.commit({
+              type: 'Basic/SetPatListBYID',
+              data: result.data
+            })
+            setTimeout(() => {
+              vuethis.spinning = false
+            }, 500)
+          }).catch((err) => {
+            console.log(err)
+            this.error(err)
+            setTimeout(() => {
+              vuethis.spinning = false
+            }, 500)
+          })
+
+          vuethis.$api.MC.GetHospList().then((result) => {
+            vuethis.$store.commit({
+              type: 'Basic/SetGetHospList',
+              data: result.data
+            })
+            setTimeout(() => {
+              vuethis.spinning = false
+            }, 500)
+          }).catch((err) => {
+            console.log(err)
+            this.error(err)
+            setTimeout(() => {
+              vuethis.spinning = false
+            }, 500)
+          })
+
+          vuethis.$api.MC.GetHospListDTLByID({ site_id: vuethis.site_id }).then((result) => {
+            vuethis.$store.commit({
+              type: 'Basic/SetGetHospListDTL',
               data: result.data
             })
             setTimeout(() => {

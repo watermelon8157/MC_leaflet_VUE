@@ -39,4 +39,11 @@ namespace RCS_Data.Models.DB
 
 
     }
+
+    /// <summary>
+    /// 畫面顯示資料
+    /// </summary>
+    public class VIEW_DB_HOSP_INFO_DTL: DB_MC_HOSP_INFO_DTL
+    {
+             }
 }

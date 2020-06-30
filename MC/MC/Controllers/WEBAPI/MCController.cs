@@ -47,12 +47,21 @@ namespace RCS.Controllers.WEBAPI
         public string INSERT_PAT_DATA(DB_MC_PATIENT_INFO model)
         {
             string actionName = "INSERT_PAT_DATA";
+            model.CREATE_DATE = Function_Library.getDateNowString(DATE_FORMAT.yyyy_MM_dd_HHmmss);
+            model.CREATE_ID = this.userinfo.user_id;
+            model.CREATE_NAME = this.userinfo.user_name;
+            model.MODIFY_DATE = Function_Library.getDateNowString(DATE_FORMAT.yyyy_MM_dd_HHmmss);
+            model.MODIFY_ID = this.userinfo.user_id;
+            model.MODIFY_NAME = this.userinfo.user_name;
             this.DBLink.DBA.DBExecInsert<DB_MC_PATIENT_INFO>(new List<DB_MC_PATIENT_INFO>() { model });
             if (this.DBLink.DBA.hasLastError)
             {
                 Com.Mayaminer.LogTool.SaveLogMessage(this.DBLink.DBA.lastError, actionName, this.csName);
+            } 
+            if (!MvcApplication.MCSourceThread.IsAlive)
+            {
+                MvcApplication.MCSourceThread.Start();
             }
-
             return "儲存成功!";
         }
 
@@ -110,9 +119,57 @@ namespace RCS.Controllers.WEBAPI
             return pList;
         }
 
+        /// <summary>
+        /// 病患 GetPatListByID
+        /// </summary>
+        /// <param name="form"></param>
+        /// <returns></returns>
+        [JwtAuthActionFilterAttribute]
+        [HttpPost]
+        public List<DB_MC_PATIENT_INFO> GetPatListByID(JWT_Form_Body form)
+        {
+            string actionName = "GetPatListByID";
+            List<DB_MC_PATIENT_INFO> pList = new List<DB_MC_PATIENT_INFO>();
+            Dapper.DynamicParameters dp = new Dapper.DynamicParameters();
+            string sql = "SELECT * FROM " + DB_TABLE_NAME.DB_MC_PATIENT_INFO + " WHERE SITE_ID =@SITE_ID";
+            dp.Add("SITE_ID", form.site_id);
+            pList = DBLink.DBA.getSqlDataTable<DB_MC_PATIENT_INFO>(sql, dp);
+            return pList;
+        } 
+
+        /// <param name="form"></param>
+        /// <returns></returns>
+        [JwtAuthActionFilterAttribute]
+        [HttpPost]
+        public List<VIEW_MC_HOSP_INFO> GetHospList(JWT_Form_Body form)
+        {
+            List < VIEW_MC_HOSP_INFO > pList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<VIEW_MC_HOSP_INFO>>(Newtonsoft.Json.JsonConvert.SerializeObject(MvcApplication.hospList.ToList()));
+            string actionName = "GetHospList"; 
+            return pList;
+        }
+
+        /// <param name="form"></param>
+        /// <returns></returns>
+        [JwtAuthActionFilterAttribute]
+        [HttpPost]
+        public Dictionary<string, DB_MC_SOURCE_LIST> GetHospListDTLByID(JWT_Form_Body form)
+        {
+            Dictionary<string, DB_MC_SOURCE_LIST> dic = new Dictionary<string, DB_MC_SOURCE_LIST>();
+            string actionName = "GetHospListDTLByID";
+            List<DB_MC_SOURCE_LIST> pList = new List<DB_MC_SOURCE_LIST>();
+            Dapper.DynamicParameters dp = new Dapper.DynamicParameters();
+            string sql = "SELECT * FROM " + DB_TABLE_NAME.DB_MC_SOURCE_LIST + " WHERE DATASTATUS = '1' AND  SITE_ID =@SITE_ID";
+            dp.Add("SITE_ID", form.site_id); 
+            pList = DBLink.DBA.getSqlDataTable<DB_MC_SOURCE_LIST>(sql, dp);
+            foreach (DB_MC_SOURCE_LIST item in pList)
+            {
+                dic.Add(item.HOSP_KEY, item);
+            }
+            return dic;
+        }
         #endregion
 
-          
+
         /// <summary>
         /// 登入驗證
         /// </summary>
@@ -174,8 +231,7 @@ namespace RCS.Controllers.WEBAPI
             this.throwHttpResponseException("請輸入資料!!");
             return false;
         }
-
-       
+         
 
         /// <summary>
         /// 驗證Auth

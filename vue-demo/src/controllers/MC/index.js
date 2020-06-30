@@ -53,7 +53,6 @@ export default {
     }
     return api.post(setConfig.url, setConfig.params)
   },
-  // 取得照護清單
   GetPatList (params) {
     let _params = {}
     let setConfig = {
@@ -62,11 +61,34 @@ export default {
     }
     return api.post(setConfig.url, setConfig.params)
   },
-  // 取得照護清單
-  GetPatLisAll (params) {
+  GetHospList (params) {
+    let _params = {}
+    let setConfig = {
+      url: baseUrl + 'GetHospList',
+      params: Object.assign(_params, params)
+    }
+    return api.post(setConfig.url, setConfig.params)
+  },
+  GetHospListDTLByID (params) {
+    let _params = { site_id: '' }
+    let setConfig = {
+      url: baseUrl + 'GetHospListDTLByID',
+      params: Object.assign(_params, params)
+    }
+    return api.post(setConfig.url, setConfig.params)
+  },
+  GetPatListAll (params) {
     let _params = {}
     let setConfig = {
       url: baseUrl + 'GetPatListAll',
+      params: Object.assign(_params, params)
+    }
+    return api.post(setConfig.url, setConfig.params)
+  },
+  GetPatListByID (params) {
+    let _params = { site_id: '' }
+    let setConfig = {
+      url: baseUrl + 'GetPatListByID',
       params: Object.assign(_params, params)
     }
     return api.post(setConfig.url, setConfig.params)

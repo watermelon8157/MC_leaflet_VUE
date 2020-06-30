@@ -339,8 +339,8 @@ namespace RCS.Controllers.WEBAPI
 
     #region Form Body Class
     public class JWT_Form_Body :AUTH
-    {
-        
+    { 
+        public string site_id { get; set; }
     }
 
 

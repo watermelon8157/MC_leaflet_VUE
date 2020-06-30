@@ -7,15 +7,30 @@ moment.locale('zh-tw')
 export default {
   namespaced: true,
   state: {
+    hospList: [],
+    hospListDTL: [],
     windowWidth: document.documentElement.clientWidth,
     windowHeight: document.documentElement.clientHeight,
     loadFirst: true,
     PatListAll: [],
+    PatListByID: [],
     PatListnow: []
   },
   mutations: {
     SetPatListnow (state, payload) {
       state.PatListnow = payload.data
+    },
+    SetGetHospList (state, payload) {
+      state.hospList = payload.data
+    },
+    SetGetHospListDTL (state, payload) {
+      state.hospListDTL = payload.data
+    },
+    SetPatListBYID (state, payload) {
+      state.PatListByID = payload.data
+    },
+    pushPatListBYID (state, payload) {
+      state.PatListByID.push(payload)
     },
     SetPatListAll (state, payload) {
       state.PatListAll = payload.data

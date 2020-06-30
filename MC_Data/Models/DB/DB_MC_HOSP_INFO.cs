@@ -56,6 +56,10 @@ namespace RCS_Data.Models.DB
 
     public class VIEW_MC_HOSP_INFO : DB_MC_HOSP_INFO
     {
-
+        public string hosp_desc { get; set; }
+        public string hosp_name { get; set; }
+        public string hosp_class { get; set; }
+        public string hosp_city { get; set; }  
+        public List<double> location { get { return new List<double>() { double.Parse(this.LATITUDE), double.Parse(this.LONGITUDE) } ; } }
     }
 }

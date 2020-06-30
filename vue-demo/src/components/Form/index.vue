@@ -179,7 +179,10 @@ export default {
         })
         this.$refs.alert.show('請填寫必要欄位!')
       } else {
-        this.$store.commit('SetPatList', this.model)
+        this.$store.commit({
+          type: 'Basic/pushPatListBYID',
+          data: this.model
+        })
         this.model.SITE_ID = this.site_id
         this.$api.MC.INSERT_PAT_DATA(this.model).then((result) => {
           this.info(result.data)

@@ -41,11 +41,22 @@ namespace RCS_Data.Models.DB
         public string SEVERE { get; set; }
         public string MODERATE { get; set; }
         public string MILD { get; set; }
-        public string SEVERE_SOURCE { get; set; }
-        public string MODERATE_SOURCE { get; set; }
-        public string MILD_SOURCE { get; set; }
+        public string SEVERE_SOURCE { get; set; } 
+        public string MODERATE_SOURCE { get; set; } 
+        public string MILD_SOURCE { get; set; } 
 
 
 
+    }
+    public class VIEW_MC_SOURCE_LIST : DB_MC_SOURCE_LIST
+    {
+
+        public double SEVERE_S { get { return double.Parse(this.SEVERE_SOURCE); } }
+        public double MODERATE_S { get { return double.Parse(this.MODERATE_SOURCE); } }
+        public double MILD_S { get { return double.Parse(this.MILD_SOURCE); } }
+         
+        public string SEVERE_LEVEL { get; set; }
+        public string MODERATE_LEVEL { get; set; }
+        public string MILD_LEVEL { get; set; }
     }
 }
