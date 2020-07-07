@@ -1,5 +1,4 @@
-﻿using RCS.Models.ViewModel;
-using RCS_Data.Models;
+﻿using RCS_Data.Models;
 using RCS_Data.Models.DB;
 using System;
 using System.Collections.Generic;
@@ -10,15 +9,16 @@ using System.Web.Services;
 namespace RCS
 {
     /// <summary>
-    ///RCSWebService 的摘要描述
+    ///MC_WebService 的摘要描述
     /// </summary>
     [WebService(Namespace = "http://tempuri.org/")]
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [System.ComponentModel.ToolboxItem(false)]
     // 若要允許使用 ASP.NET AJAX 從指令碼呼叫此 Web 服務，請取消註解下列一行。
     // [System.Web.Script.Services.ScriptService]
-    public class MCWebService : System.Web.Services.WebService
+    public class MC_WebService : System.Web.Services.WebService
     {
+
         string csName = "MCWebService";
 
         [WebMethod]
@@ -26,6 +26,7 @@ namespace RCS
         {
             return "Hello World";
         }
+
 
         // 新增資料
         [WebMethod]
@@ -66,7 +67,7 @@ string HOSPITAL_SHOW_NAME)
             dblink.DBA.DBExecInsert<DB_MC_SITE_INFO>(sList);
             #endregion  
             List<string> msg = new List<string>();
-            WSresponse rm = new WSresponse(); 
+            WSresponse rm = new WSresponse();
             if (string.IsNullOrWhiteSpace(PATIENT_NAME))
             {
                 msg.Add("請輸入病患姓名!");
@@ -76,7 +77,7 @@ string HOSPITAL_SHOW_NAME)
                 rm.success = false;
                 rm.msg = string.Join(",", msg);
                 return Newtonsoft.Json.JsonConvert.SerializeObject(rm);
-            } 
+            }
             List<DB_MC_PATIENT_INFO> pList = new List<DB_MC_PATIENT_INFO>();
             pList.Add(new DB_MC_PATIENT_INFO()
             {
@@ -157,7 +158,7 @@ string HOSP_TO_PAT_SCORE_LEVEL)
             if (pList.Count > 0)
             {
                 pList[0].PATIENT_ID = dblink.GetFixedStrSerialNumber();
-                pList[0].PATIENT_NAME = PATIENT_NAME; 
+                pList[0].PATIENT_NAME = PATIENT_NAME;
                 pList[0].AGE = AGE;
                 pList[0].GENDER = GENDER;
                 pList[0].CITY = CITY;
@@ -249,7 +250,7 @@ string HOSP_TO_PAT_SCORE_LEVEL)
         /// <returns></returns>
         [WebMethod]
         public List<DB_MC_HOSP_INFO> GET_HOSP_DATA()
-        { 
+        {
             return MvcApplication.hospList.ToList();
         }
 
@@ -266,14 +267,32 @@ string HOSP_TO_PAT_SCORE_LEVEL)
             Dapper.DynamicParameters dp = new Dapper.DynamicParameters();
             string sql = "SELECT * FROM " + DB_TABLE_NAME.DB_MC_PATIENT_INFO + " WHERE PATIENT_ID = @PATIENT_ID AND DATASTATUS = '1'";
             dp.Add("PATIENT_ID", PATIENT_ID);
-            patList = dblink.DBA.getSqlDataTable<DB_MC_PATIENT_INFO>(sql,dp);
+            patList = dblink.DBA.getSqlDataTable<DB_MC_PATIENT_INFO>(sql, dp);
             List<VIEW_DB_HOSP_INFO_DTL> pList = new List<VIEW_DB_HOSP_INFO_DTL>();
-            
-            return pList;  
-        }
 
+            return pList;
+        }
     }
 
-   
-    
+    public class WSresponse
+    {
+        /// <summary>
+        /// 是否成功
+        /// </summary>
+        public bool success { get; set; }
+        /// <summary>
+        /// 回復訊息
+        /// </summary>
+        public string msg { get; set; }
+        /// <summary>
+        /// 病歷號資料
+        /// </summary>
+        public string PATIENT_ID { get; set; }
+    }
+    public class pat_data
+    {
+        public string success { get; set; }
+
+        public string PATIENT_ID { get; set; }
+    }
 }

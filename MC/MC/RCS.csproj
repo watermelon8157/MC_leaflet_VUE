@@ -295,6 +295,10 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="MC_WebService.asmx.cs">
+      <DependentUpon>MC_WebService.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Models\BaseModel.cs" />
     <Compile Include="Models\BaseThread\BaseThread.cs" />
     <Compile Include="Models\BaseThread\MCSource.cs" />
@@ -360,6 +364,7 @@
     <Content Include="Images\patient_time.png" />
     <Content Include="Images\plus.png" />
     <Content Include="Images\Valuation_img.png" />
+    <Content Include="MC_WebService.asmx" />
     <Content Include="Plugin\Bootstrap-3-Typeahead\bootstrap3-typeahead.min.js" />
     <Content Include="Plugin\Bootstrap-3-Typeahead\readme.txt" />
     <Content Include="Plugin\bootstrap-select\bootstrap-select.css" />
