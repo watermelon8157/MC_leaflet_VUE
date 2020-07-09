@@ -75,30 +75,7 @@ namespace RCS.Controllers.WEBAPI
             }
         }
 
-        private WebMethod _webmethod { get; set; }
-        protected WebMethod webmethod
-        {
-            get
-            {
-                if (this._webmethod == null)
-                    this._webmethod = new WebMethod();
-                return this._webmethod;
-            }
-        }
-
-        private Models.HOSP.HospFactory _hospFactory { get; set; }
-        protected Models.HOSP.HospFactory hospFactory
-        {
-            get
-            {
-                if (this._hospFactory == null)
-                {
-                    this._hospFactory = new Models.HOSP.HospFactory();
-                }
-                return this._hospFactory;
-            }
-        }
-
+ 
         /// <summary>
         /// 驗證Auth
         /// </summary>
@@ -112,45 +89,7 @@ namespace RCS.Controllers.WEBAPI
         }
 
 
-        /// <summary>
-        /// 登入驗證
-        /// </summary>
-        /// <param name="form">登入資料</param>
-        /// <returns></returns>
-        [JwtAuthActionFilterAttribute(notVerification = true)]
-        public object Login(Login_Form_Body form)
-        {
-            if (!string.IsNullOrWhiteSpace(form.userName) && !string.IsNullOrWhiteSpace(form.password))
-            {
-
-                UserInfo user_info = this.webmethod.checkLoginUser(this.hospFactory.webService.HisLoginUser(),form.userName, form.password);
-                if (user_info.hasUserData )
-                {
-                    if (!string.IsNullOrWhiteSpace(user_info.sysAuthority))
-                    { 
-                        return new
-                        {
-                            Result = true,
-                            token = JwtAuthActionFilterAttribute.EncodeToken(new PAYLOAD()
-                            {
-                                user_id = user_info.user_id.Trim(),
-                                user_name = user_info.user_name.Trim(),
-                                role = user_info.sysAuthority
-                            })
-                        };
-                    }
-                    this.throwHttpResponseException("查無使用者使用權限!!");
-
-                }
-                this.throwHttpResponseException("查無使用者資料!!");
-            }
-            else
-            {
-                this.throwHttpResponseException("請輸入帳號或密碼!!");
-            }
-            this.throwHttpResponseException("帳號或密碼錯誤!!");
-            return false;
-        }
+       
          
 
         /// <summary>

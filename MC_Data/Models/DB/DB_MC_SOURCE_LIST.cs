@@ -59,4 +59,20 @@ namespace RCS_Data.Models.DB
         public string MODERATE_LEVEL { get; set; }
         public string MILD_LEVEL { get; set; }
     }
+
+    public class MC_SOURCE_LIST
+    {
+        [Key]
+        public string HOSP_KEY { get; set; }  
+        public string DRIVING_SOURCE { get; set; }
+        public string W2 { get; set; }
+        public string CV { get; set; }
+        public string SEVERE { get; set; }
+        public string MODERATE { get; set; }
+        public string MILD { get; set; }
+        public string SEVERE_SOURCE { get; set; }
+        public string MODERATE_SOURCE { get; set; }
+        public string MILD_SOURCE { get; set; }
+    }
+
 }

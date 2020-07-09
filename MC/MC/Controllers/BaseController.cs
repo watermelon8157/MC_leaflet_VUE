@@ -20,19 +20,7 @@ namespace RCS.Controllers
         string csName { get { return "BaseController"; } }
         public static string basic_model { get { return IniFile.GetConfig("System", "HOSP_ID"); } }
 
-        private Models.HOSP.HospFactory _hospFactory { get; set; }
-        protected Models.HOSP.HospFactory hospFactory
-        {
-            get
-            {
-                if (this._hospFactory == null)
-                {
-                    this._hospFactory = new Models.HOSP.HospFactory();
-                }
-                return this._hospFactory;
-            }
-        }
-
+     
         #region switch
 
         #region isBasicMode

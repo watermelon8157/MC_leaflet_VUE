@@ -15,31 +15,7 @@ namespace RCSData.Models
         /// </summary>
         public PAYLOAD payload { get; set; }
 
-        /// <summary>
-        /// 使用者資料
-        /// </summary>
-        public UserInfo user_info
-        {
-            get
-            {
-                if (this.payload == null)
-                {
-                    return new UserInfo();
-                } 
-                 return new UserInfo() {
-                    user_id = this.payload.user_id,
-                    user_name = this.payload.user_name,
-                    authority = this.payload.role,
-                };
-
-            }
-
-        }
-
-        /// <summary>
-        /// 病患資料
-        /// </summary>
-        public IPDPatientInfo pat_info { get; set; }
+       
     }
 
     public class PAYLOAD
@@ -62,6 +38,17 @@ namespace RCSData.Models
         /// token 創建時間 yyyy/MM/dd HH:mm:ss
         /// </summary>
         public string iat { get; set; }
+
+    }
+
+    public class UserInfo
+    {
+        public string user_id { get; set; }
+        public string user_name { get; set; }
+    }
+
+    public class IPDPatientInfo
+    {
 
     }
 }

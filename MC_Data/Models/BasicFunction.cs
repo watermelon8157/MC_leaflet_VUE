@@ -301,19 +301,7 @@ namespace RCS_Data.Models
                 _logger = value;
             }
         }
-        WebMethod _web_method;
-        /// <summary> 取得web service資料 </summary>
-        public WebMethod web_method
-        {
-            get
-            {
-                if (_web_method == null)
-                {
-                    _web_method = new WebMethod();
-                }
-                return _web_method;
-            }
-        }
+  
 
 
     }

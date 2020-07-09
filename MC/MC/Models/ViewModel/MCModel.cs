@@ -57,7 +57,7 @@ namespace RCS.Models.ViewModel
         public void RunThread()
         { 
             string actionName = "RunThread";
-            DateTime dateNow = DateTime.Now;
+            DateTime dateNow = DateTime.Parse("2020-07-08");
             // 取得醫院資料
             if (MvcApplication.hospList.Count == 0)
             {

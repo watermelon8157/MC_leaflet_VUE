@@ -62,4 +62,21 @@ namespace RCS_Data.Models.DB
         public string hosp_city { get; set; }  
         public List<double> location { get { return new List<double>() { double.Parse(this.LATITUDE), double.Parse(this.LONGITUDE) } ; } }
     }
+
+    public class MC_HOSP_INFO
+    {
+        public string HOSP_KEY { get; set; }
+        public string HOSP_NAME { get; set; }
+        public string CITY { get; set; }
+        public string NEW_RANKING { get; set; } 
+        public string LATITUDE { get; set; }
+        public string LONGITUDE { get; set; }  
+        public string ORIGINAL_RANKING { get; set; }
+        public string SEVERE { get; set; }
+        public string MODERATE { get; set; }
+        public string MILD { get; set; }
+        public string EDOBSERVBEDS { get; set; }
+        public string EDRELATEDBEDS { get; set; }
+        public string MEDICALSTAFF { get; set; } 
+    }
 }

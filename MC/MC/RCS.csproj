@@ -303,26 +303,10 @@
     <Compile Include="Models\BaseThread\BaseThread.cs" />
     <Compile Include="Models\BaseThread\MCSource.cs" />
     <Compile Include="Models\HospSetDDL.cs" />
-    <Compile Include="Models\HOSP\WebService\HISGetPatient_ER_OPD_LIST.cs" />
     <Compile Include="Models\JwtAuthActionFilterAttribute.cs" />
     <Compile Include="Models\CxrCanvasLineDraw.cs" />
     <Compile Include="Models\ViewModel\MCModel.cs" />
     <Compile Include="Models\exportFileModel.cs" />
-    <Compile Include="Models\HOSP\HospFactory.cs" />
-    <Compile Include="Models\HOSP\WebService\AreaPatientList.cs" />
-    <Compile Include="Models\HOSP\WebService\HISABGLabData.cs" />
-    <Compile Include="Models\HOSP\WebService\HisBedAreaList.cs" />
-    <Compile Include="Models\HOSP\WebService\HISBloodBiochemicalLabData.cs" />
-    <Compile Include="Models\HOSP\WebService\HISInputOutput.cs" />
-    <Compile Include="Models\HOSP\WebService\HISLabData.cs" />
-    <Compile Include="Models\HOSP\WebService\HisLoginUser.cs" />
-    <Compile Include="Models\HOSP\WebService\HISOrderList.cs" />
-    <Compile Include="Models\HOSP\WebService\HISPatientHistory.cs" />
-    <Compile Include="Models\HOSP\WebService\HISPatientInfo.cs" />
-    <Compile Include="Models\HOSP\WebService\HISPatOperationList.cs" />
-    <Compile Include="Models\HOSP\WebService\HISReportData.cs" />
-    <Compile Include="Models\HOSP\WebService\HISVitalSign.cs" />
-    <Compile Include="Models\HOSP\WebService\RCSConsultList.cs" />
     <Compile Include="Models\NPOITool.cs" />
     <Compile Include="Models\pdfModel.cs" />
     <Compile Include="Models\PrintPDF.cs" />
@@ -1887,10 +1871,6 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>T4Json1.text</LastGenOutput>
     </Content>
-    <Content Include="WFVueRCS\src\T4Json\T4Json.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>T4Json.text</LastGenOutput>
-    </Content>
     <Content Include="App_Data\Word_Template\RTTakeoffAssess.docx" />
     <None Include="Plugin\jquery.linq\jquery.linq-vsdoc.js" />
     <Content Include="Plugin\jquery.linq\jquery.linq.js" />
@@ -2905,6 +2885,7 @@
     <Content Include="Plugin\material-design-for-bootstrap\css\ripples.min.css.map" />
     <Content Include="Plugin\material-design-for-bootstrap\js\material.min.js.map" />
     <Content Include="Plugin\material-design-for-bootstrap\js\ripples.min.js.map" />
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Properties\PublishProfiles\WF.pubxml" />
     <None Include="Scripts\jquery-1.6.4-vsdoc.js" />
     <Content Include="Scripts\jquery-1.6.4.js" />
@@ -2977,11 +2958,6 @@
     <Content Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
-    <Content Include="WFVueRCS\src\T4Json\T4Json.text">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>T4Json.tt</DependentUpon>
-    </Content>
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="T4Json.text" />
@@ -2994,6 +2970,7 @@
   <ItemGroup>
     <Folder Include="FIleDirector\" />
     <Folder Include="Images\temp\" />
+    <Folder Include="Models\HOSP\" />
     <Folder Include="Scripts\i18n\" />
   </ItemGroup>
   <ItemGroup>

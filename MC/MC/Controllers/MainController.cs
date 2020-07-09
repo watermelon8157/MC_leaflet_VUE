@@ -154,61 +154,6 @@ namespace RCS.Controllers
         }
 
         /// <summary>
-        /// 檢查登入使用者
-        /// </summary>
-        /// <returns></returns>
-        [HttpPost]
-        [Silencer(CheckPat_infoSession = false, CheckUser_infoSession = false)]
-        public ActionResult LogCheck()
-        {
-
-            RESPONSE_MSG rm = new RESPONSE_MSG();
-            rm.status = RESPONSE_STATUS.ERROR;
-            if (Request["user_id"] != null || Request["user_pwd"] != null)
-            {
-                //傳入值
-                string user_id = Request["user_id"];
-                string user_pwd = Request["user_pwd"];
-
-                if(!string.IsNullOrWhiteSpace(user_id) && !string.IsNullOrWhiteSpace(user_pwd))
-                {
-                    //工作
-                    UserInfo ui = new UserInfo();
-                    ui = ui.getUserInfo(this.hospFactory.webService.HisLoginUser(), user_id, user_pwd);
-
-
-                    //取得結果
-                    if (ui.hasUserData)
-                    {
-                        if (!string.IsNullOrWhiteSpace(ui.loginMsg))
-                        {
-                            rm.message = ui.loginMsg;
-                        }
-                        rm.status = RESPONSE_STATUS.SUCCESS;
-                        ui.user_id = ui.user_id.Trim();
-                        Session["user_info"] = ui;
-                    }
-                    else
-                    {
-                        rm.status = RESPONSE_STATUS.ERROR;
-                        rm.message = ui.loginMsg;
-                    }
-                }
-                else
-                {
-                    rm.message = "請輸入帳號密碼!";
-                    rm.status = RESPONSE_STATUS.ERROR;
-                }
-            }
-            else
-            {
-                rm.message = "請輸入帳號密碼!";
-                rm.status = RESPONSE_STATUS.ERROR;
-            }
-            return Content(rm.get_json());
-        }
-
-        /// <summary>
         /// 登出
         /// </summary>
         /// <returns></returns>

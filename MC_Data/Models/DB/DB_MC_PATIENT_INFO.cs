@@ -54,4 +54,20 @@ namespace RCS_Data.Models.DB
 
 
     }
+
+    public class MC_PATIENT_INFO
+    {
+        [Key]
+        public string PATIENT_ID { get; set; }
+        public string PATIENT_NAME { get; set; }
+        public string AGE { get; set; }
+        public string GENDER { get; set; }
+        public string COUNTRY { get; set; }
+        public string TRIAGE { get; set; } 
+        public string EXPECTED_ARRIVAL_DATETIME { get; set; }
+        public string SELECTION_DATETIME { get; set; } 
+        public string CITY { get; set; }
+        public string HOSP_KEY { get; set; } 
+
+    }
 }

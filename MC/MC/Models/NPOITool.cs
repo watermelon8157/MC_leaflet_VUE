@@ -14,8 +14,7 @@ namespace RCS.Models
 {
     public class NPOITool
     {
-        IWorkbook _WorkBook = new HSSFWorkbook();
-        WebMethod _RcsWebMethod = new WebMethod();
+        IWorkbook _WorkBook = new HSSFWorkbook(); 
         byte[] bytes;
         public string Lasterror = "";
         public byte[] ExportExcelTable(DataTable pDt, string titleName, string pFileName, string pSheetName, string pBindColName = "", string pColTitleName = "", string pExportActionName = "")

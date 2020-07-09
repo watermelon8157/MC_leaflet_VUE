@@ -18,16 +18,7 @@ namespace RCS_Data.Controllers
             }
         }
 
-        private WebMethod _webmethod { get; set; }
-        protected WebMethod webmethod
-        {
-            get
-            {
-                if (this._webmethod == null)
-                    this._webmethod = new WebMethod();
-                return this._webmethod;
-            }
-        }
+      
 
         private RCS_Data.Models.BasicFunction _bf { get; set; }
         /// <summary>

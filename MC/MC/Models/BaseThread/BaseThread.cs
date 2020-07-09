@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using RCS.Models.HOSP;
+﻿using System.Threading; 
 
 namespace RCS.Models
 {
