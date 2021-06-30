@@ -3,6 +3,8 @@ using RCS_Data;
 using System;
 using System.Web.Mvc;
 using RCSData.Models;
+using RCS_Data.Models.DB;
+using System.Collections.Generic;
 
 namespace RCS.Controllers
 {
@@ -14,79 +16,28 @@ namespace RCS.Controllers
         /// <returns></returns>
         [Silencer(CheckPat_infoSession = false,CheckUser_infoSession =false)]
         public ActionResult Index() {
-             
+
             //WebMethod wm = new WebMethod();
-            #region MyRegion
 
-            //Models.ViewModel.RtAssessJAGRoot jr = new Models.ViewModel.RtAssessJAGRoot();
-            //byte[] buf = null;
-            //string HtmlStr = "";
-            //IDocSetting ds = new CHGHRTRecordFormPDFDocSetting();
-            //string getUrl = IniFile.GetConfig("System", "MVCURL");
-            //using (System.Net.WebClient client = new System.Net.WebClient())
+            //List<DB_MC_PATIENT_INFO> tempList = new List<DB_MC_PATIENT_INFO>();
+            //SQLProvider dbLink = new SQLProvider();
+            //string sql = "SELECT * FROM MC_PATIENT_INFO_TEMP";
+            //// string sql = "SELECT * FROM " + DB_TABLE_NAME.DB_MC_PATIENT_INFO;
+            //List<DB_MC_PATIENT_INFO> pList = dbLink.DBA.getSqlDataTable<DB_MC_PATIENT_INFO>(sql);
+            //if (pList.Count > 0)
             //{
-            //    client.Encoding = Encoding.UTF8; // 設定Webclient.Encoding
-            //    HtmlStr = client.DownloadString(string.Concat(getUrl,
-            //        string.Format("PDFHtml/RTRecordPageForm?record_id={0}&chart_no={1}&ipd_no={2}",
-            //          "2020010710052746745rcsI0333037", "05945519", "I0333037"
-            //        )));
+            //    foreach (DB_MC_PATIENT_INFO item in pList)
+            //    {
+            //        if (!tempList.Exists(x=>x.PATIENT_ID  == item.PATIENT_ID && x.SITE_ID == item.SITE_ID))
+            //        {
+            //            tempList.Add(item);
+            //        }
+            //    }
             //}
-            //buf = RCS.Controllers.WEBAPI.BasicController.exportPDF(HtmlStr, ds, "<div>我是分頁</div>");
-            //wm.UploadEMRFile<Models.ViewModel.RtAssessJAGRoot>(new RCSData.Models.WebService.UploadEMRFile(), jr, "RtAssessJAGRoot", buf);
-
-            #endregion  
-            #region WF
-
-            //List<BedArea> pList1 = wm.getHisBedAreaList();
-            //LogTool.SaveLogMessage(JsonConvert.SerializeObject(pList1), "Index", "MainController");
-            //List<IPDPatientInfo> pList2 = wm.getPatientInfoList("", "", "872C");
-            //LogTool.SaveLogMessage(JsonConvert.SerializeObject(pList2), "Index", "MainController");
-            //List<IPDPatientInfo> pList3 = wm.getPatientInfoList("00446149", "I0822112", "");
-            //LogTool.SaveLogMessage(JsonConvert.SerializeObject(pList3), "Index", "MainController");
-            //List<RCS_ExamData_Common> pList4 = wm.getLabData("00446149", "I0822112", "2019-10-20", "2019-10-30");
-            //LogTool.SaveLogMessage(JsonConvert.SerializeObject(pList4), "Index", "MainController");
-            //List<PatOrder> pList5 = wm.getShiftOrderList("00446149", "I0822112");
-            //LogTool.SaveLogMessage(JsonConvert.SerializeObject(pList5), "Index", "MainController");
-            //string ipd_no = "";
-            //List<PatientHistory> pList6 = wm.getPatientHistory("00446149", ref ipd_no);
-            //LogTool.SaveLogMessage(JsonConvert.SerializeObject(pList6), "Index", "MainController");
-            //UserInfo pList7 = wm.checkLoginUser("101383", "123456");
-            //LogTool.SaveLogMessage(JsonConvert.SerializeObject(pList7), "Index", "MainController");
-            //List<VitalSign> pList8 = wm.getVitalSign("00446149", "I0822112", "2019-10-20", "2019-10-30");
-            //LogTool.SaveLogMessage(JsonConvert.SerializeObject(pList8), "Index", "MainController");
-
-            #endregion
-            #region SHH
-
-            // List<BedArea> pList1 = wm.getHisBedAreaList();
-            // LogTool.SaveLogMessage(JsonConvert.SerializeObject(pList1), "Index", "MainController");
-            // List<IPDPatientInfo> pList2 = wm.getPatientInfoList("", "", "86D0");
-            // LogTool.SaveLogMessage(JsonConvert.SerializeObject(pList2), "Index", "MainController");
-            // List<PatProgress> pList9 = wm.get7190OrderList("2019-10-20", "2019-10-30");
-            // LogTool.SaveLogMessage(JsonConvert.SerializeObject(pList9), "Index", "MainController");
-            // List<IO_PUT> pList10 = wm.getInputOutput("11728841", "I0832461", "2019-10-20", "2019-10-30");
-            // LogTool.SaveLogMessage(JsonConvert.SerializeObject(pList10), "Index", "MainController");
-            //List<RCS_ExamData_Common> pList4 = wm.getLabData("11728841", "I0832461", "2019-10-20", "2019-10-30");
-            //LogTool.SaveLogMessage(JsonConvert.SerializeObject(pList4), "Index", "MainController");
-            //List<PatOrder> pList11 = wm.getShiftOrderList("11728841", "I0832461" );
-            //LogTool.SaveLogMessage(JsonConvert.SerializeObject(pList11), "Index", "MainController");
-            //List<PatOperation> pList12 = wm.getPatOperationList("11728841", "I0832461");
-            //LogTool.SaveLogMessage(JsonConvert.SerializeObject(pList12), "Index", "MainController");
-            // List<IPDPatientInfo> pList3 = wm.getPatientInfoList("11728841", "I0832461", "");
-            // LogTool.SaveLogMessage(JsonConvert.SerializeObject(pList3), "Index", "MainController"); 
-            // string ipd_no = "";
-            // List<PatientHistory> pList6 = wm.getPatientHistory("11728841", ref ipd_no);
-            // LogTool.SaveLogMessage(JsonConvert.SerializeObject(pList6), "Index", "MainController");
-            //List<ExamReport> pList13 = wm.getReportData("11728841", "I0832461", "2019-10-20", "2019-10-30");
-            //LogTool.SaveLogMessage(JsonConvert.SerializeObject(pList13), "Index", "MainController");
-            // UserInfo pList7 = wm.checkLoginUser("11515", "115155");
-            // LogTool.SaveLogMessage(JsonConvert.SerializeObject(pList7), "Index", "MainController");
-            //Dictionary<string, string> vitalSingKey = new Dictionary<string, string>();
-            //List<VitalSign> pList8 = wm.getVitalSign("11728841", "I0832461", "2019-10-20",ref vitalSingKey, "2019-10-30");
-            // LogTool.SaveLogMessage(JsonConvert.SerializeObject(pList8), "Index", "MainController");
-
-            #endregion
-
+            //if (tempList.Count > 0)
+            //{
+            //    dbLink.DBA.DBExecInsert<DB_MC_PATIENT_INFO>(tempList);
+            //}
             try
             {
                 Session.RemoveAll();

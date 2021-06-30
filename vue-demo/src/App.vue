@@ -74,7 +74,7 @@ export default {
               vuethis.spinning = false
             }, 500)
           })
-          vuethis.$api.MC.GetPatListByID({ site_id: vuethis.site_id }).then((result) => {
+          vuethis.$api.MC.GetPatListByID({ site_id: vuethis.site_id, hosp_id: vuethis.hosp_id }).then((result) => {
             vuethis.$store.commit({
               type: 'Basic/SetPatListBYID',
               data: result.data

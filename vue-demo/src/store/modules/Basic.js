@@ -1,6 +1,7 @@
 // 導入模組
 // import Basic from '@/controllers/Basic'
 import moment from 'moment'
+import DB_MC_PATIENT_INFO from '@/RCS_Data.Models.DB.DB_MC_PATIENT_INFO.json'
 import 'moment/locale/zh-tw'
 moment.locale('zh-tw')
 
@@ -14,9 +15,13 @@ export default {
     loadFirst: true,
     PatListAll: [],
     PatListByID: [],
+    PatModel: Object.assign(DB_MC_PATIENT_INFO, {}),
     PatListnow: []
   },
   mutations: {
+    SetPatModel (state, payload) {
+      state.PatModel = payload.data
+    },
     SetPatListnow (state, payload) {
       state.PatListnow = payload.data
     },
@@ -27,6 +32,18 @@ export default {
       state.hospListDTL = payload.data
     },
     SetPatListBYID (state, payload) {
+      for (let index = 0; index < payload.data.length; index++) {
+        if (payload.data[index].EXPECTED_ARRIVAL_DATETIME) {
+          payload.data[index].jsEXPECTED_ARRIVAL_DATETIME = new Date(
+            payload.data[index].EXPECTED_ARRIVAL_DATETIME
+          ).getTime()
+        }
+        if (payload.data[index].SELECTION_DATETIME) {
+          payload.data[index].jsSELECTION_DATETIME = new Date(
+            payload.data[index].SELECTION_DATETIME
+          ).getTime()
+        }
+      }
       state.PatListByID = payload.data
     },
     pushPatListBYID (state, payload) {

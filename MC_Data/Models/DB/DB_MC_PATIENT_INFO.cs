@@ -23,6 +23,7 @@ namespace RCS_Data.Models.DB
         [Key]
         public string PATIENT_ID { get; set; }
         public string PATIENT_NAME { get; set; }
+        [Key]
         public string SITE_ID { get; set; }
         public string LOCATION { get; set; }
         public string AGE { get; set; }

@@ -25,6 +25,15 @@ export default {
     }
     return payload.site_id
   },
+  getHospID () {
+    let auth = this.getToken()
+    let payload = {}
+    let isAuth = !!auth
+    if (isAuth) {
+      payload = jwtDecode(auth)
+    }
+    return payload.hosp_id
+  },
   // 取得登入使用者名稱
   getUserName () {
     let auth = this.getToken()

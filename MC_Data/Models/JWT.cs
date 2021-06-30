@@ -22,6 +22,7 @@ namespace RCSData.Models
     {
         public string hosp_id { get; set; }
         public string site_id { get; set; }
+        public string site_desc { get; set; }
         /// <summary>
         /// 使用者帳號
         /// </summary>

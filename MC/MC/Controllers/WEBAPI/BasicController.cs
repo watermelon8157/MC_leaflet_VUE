@@ -280,6 +280,7 @@ namespace RCS.Controllers.WEBAPI
     public class JWT_Form_Body :AUTH
     { 
         public string site_id { get; set; }
+        public string hosp_id { get; set; }
     }
 
 
@@ -289,6 +290,7 @@ namespace RCS.Controllers.WEBAPI
 
         public string password { get; set; }
         public string site_id { get; set; }
+        public string site_desc { get; set; }
         public string hosp_id { get; set; }
         public string LATITUDE { get; set; }
         public string LONGITUDE { get; set; }

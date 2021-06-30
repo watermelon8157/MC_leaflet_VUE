@@ -5081,6 +5081,12 @@ export default {
       }
       return ''
     },
+    hosp_id () {
+      if (this.$auth.getHospID()) {
+        return this.$auth.getHospID()
+      }
+      return ''
+    },
     selectPatList () {
       return this.$store.state.selectPatList
     },

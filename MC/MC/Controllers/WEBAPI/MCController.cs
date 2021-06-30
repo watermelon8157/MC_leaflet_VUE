@@ -131,9 +131,22 @@ namespace RCS.Controllers.WEBAPI
             string actionName = "GetPatListByID";
             List<DB_MC_PATIENT_INFO> pList = new List<DB_MC_PATIENT_INFO>();
             Dapper.DynamicParameters dp = new Dapper.DynamicParameters();
-            string sql = "SELECT * FROM " + DB_TABLE_NAME.DB_MC_PATIENT_INFO + " WHERE SITE_ID =@SITE_ID";
-            dp.Add("SITE_ID", form.site_id);
+            string sql = "SELECT * FROM " + DB_TABLE_NAME.DB_MC_PATIENT_INFO + " WHERE 1=1 ";
+            if (!string.IsNullOrWhiteSpace(form.site_id))
+            {
+                sql += " AND SITE_ID =@SITE_ID";
+                dp.Add("SITE_ID", form.site_id);
+            }
+            if (!string.IsNullOrWhiteSpace(form.hosp_id))
+            {
+                sql += " AND HOSP_KEY LIKE @HOSP_KEY";
+                dp.Add("HOSP_KEY", form.hosp_id + '%');
+            } 
             pList = DBLink.DBA.getSqlDataTable<DB_MC_PATIENT_INFO>(sql, dp);
+            pList.ForEach(x=> {
+                x.EXPECTED_ARRIVAL_DATETIME = !string.IsNullOrWhiteSpace(x.EXPECTED_ARRIVAL_DATETIME) ?  Function_Library.getDateString(DateTime.Parse(x.EXPECTED_ARRIVAL_DATETIME), DATE_FORMAT.yyyy_MM_dd_HHmm) : "";
+                x.SELECTION_DATETIME = !string.IsNullOrWhiteSpace(x.SELECTION_DATETIME) ? Function_Library.getDateString(DateTime.Parse(x.SELECTION_DATETIME), DATE_FORMAT.yyyy_MM_dd_HHmm) : "";
+            });
             return pList;
         } 
 
@@ -231,7 +244,155 @@ namespace RCS.Controllers.WEBAPI
             this.throwHttpResponseException("請輸入資料!!");
             return false;
         }
-         
+
+
+
+        /// <summary>
+        /// 登入驗證
+        /// </summary>
+        /// <param name="form">登入資料</param>
+        /// <returns></returns>
+        [JwtAuthActionFilterAttribute(notVerification = true)]
+        public object hospLogin(Login_Form_Body form)
+        {
+            if (!string.IsNullOrWhiteSpace(form.hosp_id)  )
+            {
+                string sql = "SELECT * FROM " + DB_TABLE_NAME.DB_MC_HOSP_INFO + "  WHERE HOSP_KEY LIKE @HOSP_KEY ";
+                Dapper.DynamicParameters dp = new Dapper.DynamicParameters();
+                dp.Add("HOSP_KEY", form.hosp_id + "%");
+                List<DB_MC_HOSP_INFO> pList = DBLink.DBA.getSqlDataTable<DB_MC_HOSP_INFO>(sql, dp);
+                if (pList.Count == 0)
+                {
+                    this.throwHttpResponseException("查無此事件資料!!");
+                }
+                return new
+                {
+                    Result = true,
+                    token = JwtAuthActionFilterAttribute.EncodeToken(new PAYLOAD()
+                    { 
+                        hosp_id = pList[0].HOSP_KEY,
+                        site_id = "",
+                        site_desc = "",
+                        user_name = this.userinfo.user_name,
+                        user_id = this.userinfo.user_id,
+                    })
+                };
+            }
+            else
+            {
+                this.throwHttpResponseException("請輸入資料!!");
+            }
+            this.throwHttpResponseException("請輸入資料!!");
+            return false;
+        }
+        /// <summary>
+        /// 登入驗證
+        /// </summary>
+        /// <param name="form">登入資料</param>
+        /// <returns></returns>
+        [JwtAuthActionFilterAttribute(notVerification = true)]
+        public object SiteLogin(Login_Form_Body form)
+        {
+            if (!string.IsNullOrWhiteSpace(form.site_id))
+            {
+                List<DB_MC_SITE_INFO> pList = _model.getMC_SITE_INFO(form.site_id);
+                if (pList.Count == 0)
+                {
+                    this.throwHttpResponseException("查無此事件資料!!");
+                }
+                return new
+                {
+                    Result = true,
+                    token = JwtAuthActionFilterAttribute.EncodeToken(new PAYLOAD()
+                    {
+                        hosp_id = form.hosp_id,
+                        site_id = form.site_id,
+                        site_desc = pList[0].SITE_DESC,
+                        user_name = this.userinfo.user_name,
+                        user_id = this.userinfo.user_id,
+                    })
+                };
+            }
+            else
+            {
+                this.throwHttpResponseException("請輸入資料!!");
+            }
+            this.throwHttpResponseException("請輸入資料!!");
+            return false;
+        }
+
+
+        /// <summary>
+        /// 登入驗證
+        /// </summary>
+        /// <param name="form">登入資料</param>
+        /// <returns></returns> 
+        public List<DB_MC_SITE_INFO> getMC_SITE_INFO()
+        {
+            
+            return _model.getMC_SITE_INFO();
+        }
+
+        /// <summary>
+        /// 登入驗證
+        /// </summary>
+        /// <param name="form">登入資料</param>
+        /// <returns></returns>
+        [JwtAuthActionFilterAttribute(notVerification = true)]
+        public object SiteLoginNew(Login_Form_Body form)
+        {
+            if (!string.IsNullOrWhiteSpace(form.site_desc))
+            {
+                List<DB_MC_SITE_INFO> pList = new List<DB_MC_SITE_INFO>();
+                if (pList.Count == 0)
+                {
+                    if (!string.IsNullOrWhiteSpace(form.LATITUDE) && !string.IsNullOrWhiteSpace(form.LONGITUDE))
+                    {
+                        pList.Add(new DB_MC_SITE_INFO()
+                        {
+                            SITE_ID = this.DBLink.GetFixedStrSerialNumber(),
+                            SITE_DESC = form.site_desc,
+                            CREATE_DATE = Function_Library.getDateNowString(DATE_FORMAT.yyyy_MM_dd_HHmmss),
+                            CREATE_ID = this.userinfo.user_id,
+                            CREATE_NAME = this.userinfo.user_name,
+                            MODIFY_DATE = Function_Library.getDateNowString(DATE_FORMAT.yyyy_MM_dd_HHmmss),
+                            MODIFY_ID = this.userinfo.user_id,
+                            MODIFY_NAME = this.userinfo.user_name,
+                            DATASTATUS = "1",
+                            LATITUDE = form.LATITUDE,
+                            LONGITUDE = form.LONGITUDE,
+                        });
+                        this.DBLink.DBA.DBExecInsert<DB_MC_SITE_INFO>(pList);
+                        if (this.DBLink.DBA.hasLastError)
+                        {
+                            this.throwHttpResponseException("程式發生錯誤，請洽資訊人員!");
+                            Com.Mayaminer.LogTool.SaveLogMessage(this.DBLink.DBA.lastError, "Login", this.csName);
+                        }
+                    }
+                    else
+                    {
+                        this.throwHttpResponseException("查無經緯度資料無法填寫資料!!");
+                    }
+                }
+                return new
+                {
+                    Result = true,
+                    token = JwtAuthActionFilterAttribute.EncodeToken(new PAYLOAD()
+                    {
+                        site_id = pList[0].SITE_ID,
+                        site_desc = pList[0].SITE_DESC,
+                        user_name = this.userinfo.user_name,
+                        user_id = this.userinfo.user_id,
+                    })
+                };
+            }
+            else
+            {
+                this.throwHttpResponseException("請輸入資料!!");
+            }
+            this.throwHttpResponseException("請輸入資料!!");
+            return false;
+        }
 
         /// <summary>
         /// 驗證Auth

@@ -77,6 +77,11 @@ namespace RCS_Data.Models.DB
         public string MILD { get; set; }
         public string EDOBSERVBEDS { get; set; }
         public string EDRELATEDBEDS { get; set; }
-        public string MEDICALSTAFF { get; set; } 
+        public string MEDICALSTAFF { get; set; }
+        public int ARRIVAL_PATIENT { get; set; }
+        public int SELECT_PATIENT { get; set; }
+        public int ALL_PATIENT { get; set; }
+        public string W2 { get; set; }
+        public string CV { get; set; }
     }
 }

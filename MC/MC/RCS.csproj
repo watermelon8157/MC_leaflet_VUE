@@ -1863,8 +1863,6 @@
     <Content Include="App_Config\log4net.config" />
     <Content Include="App_Config\RCSConfig.ini" />
     <Content Include="App_Config\RCSConfigWF.ini" />
-    <Content Include="App_Code\CPT_Helper.cshtml" />
-    <Content Include="App_Code\WebTool.cshtml" />
     <Content Include="App_Config\RCSConfigLocal.ini" />
     <Content Include="MCWebService.asmx" />
     <Content Include="T4Json.tt">
@@ -2968,6 +2966,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="App_Code\" />
     <Folder Include="FIleDirector\" />
     <Folder Include="Images\temp\" />
     <Folder Include="Models\HOSP\" />
