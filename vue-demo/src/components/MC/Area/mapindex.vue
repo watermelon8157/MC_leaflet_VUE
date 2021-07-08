@@ -97,7 +97,7 @@
     >
       <div slot="title">
         {{ model.hosp_name }}
-        <span class="m-2">({{ getDistance(model.location) }})</span>
+        <span class="m-2">(距離 {{ getDistance(model.location) }}km)</span>
         <a-button-group class="float-right">
           <a-button type="primary" @click="selectPatData">送出</a-button>
         </a-button-group>
@@ -110,12 +110,8 @@
             }}</a-tag>
             <a-divider class="bg-orange-500" type="vertical" />
           </a-form-item>
-          <a-form-item label="後送醫院人數">
+          <a-form-item label="選擇醫院人數">
             <a-tag class="font-extrabold">{{ model.hosp_ihp }}</a-tag>
-            <a-divider class="bg-orange-500" type="vertical" />
-          </a-form-item>
-          <a-form-item label="到達醫院人數">
-            <a-tag class="font-extrabold">{{ model.hosp_whp }}</a-tag>
             <a-divider class="bg-orange-500" type="vertical" />
           </a-form-item>
           <a-form-item label="衛福部業務組別">
@@ -320,7 +316,7 @@ export default {
       if (hospLocation.length > 0) {
         dis = (this.location.distanceTo(L.latLng(hospLocation[0], hospLocation[1]))).toFixed(0) / 1000
       }
-      return '距離 ' + dis + ' km'
+      return dis
     },
     get_hosp_color (pVal) {
       let color = ''
@@ -355,10 +351,11 @@ export default {
       })
     },
     open (pModel) {
-      this.model = Object.assign(this.model, pModel)
-      console.log(this.model)
-      console.log(this.$store.state.Basic.PatListByID)
-      this.visible = !this.visible
+      let vuethis = this
+      vuethis.model = Object.assign(this.model, pModel)
+      console.log(vuethis.model)
+      vuethis.model.hosp_ihp = vuethis.$store.state.Basic.PatListByID.filter((x) => x.HOSP_KEY === vuethis.model.HOSP_KEY).length
+      vuethis.visible = !vuethis.visible
     },
     onClose () {
       this.visible = false
@@ -396,7 +393,7 @@ export default {
       pModel.HOSPITAL_SHOW_NAME = vuethis.model.hosp_name
       pModel.SCORE = vuethis.model.hosp_source
       pModel.SELECTION_DATETIME = moment().format('YYYY-MM-DD HH:mm:ss')
-      let minutes = vuethis.getDistance(vuethis.model.location) / 15 * 60
+      let minutes = 60 / 15 * vuethis.getDistance(vuethis.model.location)
       console.log(parseInt(minutes))
       pModel.EXPECTED_ARRIVAL_DATETIME = moment().add(parseInt(minutes), 'minutes').format('YYYY-MM-DD HH:mm:ss')
       this.$api.MC.UPDATE_PAT_DATA(pModel).then((result) => {
