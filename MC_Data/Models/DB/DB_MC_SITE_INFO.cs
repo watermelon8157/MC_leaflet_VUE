@@ -23,6 +23,7 @@ namespace RCS_Data.Models.DB
         [Key]
         public string SITE_ID { get; set; }
         public string SITE_DESC { get; set; }
+        public string SITE_AREA { get; set; }
         public string CREATE_ID { get; set; }
         public string CREATE_NAME { get; set; }
         public string CREATE_DATE { get; set; }

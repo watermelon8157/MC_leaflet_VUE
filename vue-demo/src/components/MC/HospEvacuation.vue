@@ -79,8 +79,8 @@ export default {
         datasets: [
           {
             label: '尚未抵達重傷',
-            backgroundColor: 'rgba(255, 0, 0)',
-            borderColor: 'rgba(255, 0, 0)',
+            backgroundColor: 'rgba(128, 128, 128, 1)',
+            borderColor: 'rgba(128, 128, 128, 1)',
             fill: false,
             borderDash: [5, 5],
             data: this.chartlist.Severe
@@ -94,8 +94,8 @@ export default {
           },
           {
             label: '尚未抵達中傷',
-            backgroundColor: 'rgba(239, 192, 40)',
-            borderColor: 'rgba(239, 192, 40)',
+            backgroundColor: 'rgba(128, 128, 128, 1)',
+            borderColor: 'rgba(128, 128, 128, 1)',
             fill: false,
             borderDash: [5, 5],
             data: this.chartlist.Moderate
@@ -109,8 +109,8 @@ export default {
           },
           {
             label: '尚未抵達輕傷',
-            backgroundColor: 'rgba(44, 130, 201)',
-            borderColor: 'rgba(44, 130, 201)',
+            backgroundColor: 'rgba(128, 128, 128, 1)',
+            borderColor: 'rgba(128, 128, 128, 1)',
             fill: false,
             borderDash: [5, 5],
             data: this.chartlist.Mild

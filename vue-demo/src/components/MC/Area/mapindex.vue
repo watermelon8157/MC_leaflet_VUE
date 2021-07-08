@@ -37,11 +37,10 @@
           >
             <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
             <l-polyline :lat-lngs="polyline" color="red"></l-polyline>
-            <l-marker :lat-lng="circleMarker" :icon="plusMarkerIcon"></l-marker>
-            <l-marker :lat-lng="sideMarker"></l-marker>
-            <l-marker ref="markerLocation" :lat-lng="location">
-              <l-popup :content="text"></l-popup>
-            </l-marker>
+            <l-marker
+              :lat-lng="sideMarker"
+              :icon="get_hosp_color('')"
+            ></l-marker>
             <l-marker
               v-for="(i, index) in markerList"
               :key="index"
@@ -51,11 +50,6 @@
             >
               <l-popup :content="i.hosp_name"></l-popup>
             </l-marker>
-            <l-circle-marker
-              :lat-lng="circleMarker"
-              :radius="zoom * 10"
-              color="#bee3f8"
-            />
             <l-control-zoom position="bottomright"></l-control-zoom>
           </l-map>
         </div>
@@ -82,11 +76,10 @@
           傷勢:
           <span class="m-2">{{ $store.state.Basic.PatModel.TRIAGE }}</span>
         </span>
-        <a-tag class="font-extrabold bg-red-500 text-white">很多人</a-tag>
-        <a-tag class="font-extrabold bg-orange-500 text-white">普通</a-tag>
-        <a-tag class="font-extrabold bg-yellow-500 text-white">有點多</a-tag>
-        <a-tag class="font-extrabold bg-green-500 text-white">推薦</a-tag>
-        <a-tag class="font-extrabold bg-blue-500 text-white">現在位置</a-tag>
+        <a-tag class="font-extrabold bg-yellow-500 text-white">第三推薦</a-tag>
+        <a-tag class="font-extrabold bg-blue-500 text-white">第二推薦</a-tag>
+        <a-tag class="font-extrabold bg-green-500 text-white">最推薦</a-tag>
+        <a-tag class="font-extrabold bg-red-500 text-white">目前位置</a-tag>
       </div>
       <a-button
         class="fixed z-50 mt-3 mx-2 pb-4 right-0 top-0"
@@ -133,10 +126,6 @@
             <a-tag class="font-extrabold">{{ model.hosp_city }}</a-tag>
             <a-divider class="bg-orange-500" type="vertical" />
           </a-form-item>
-          <a-form-item label="緊急醫療能力">
-            <a-tag class="font-extrabold">{{ model.hosp_injury }}</a-tag>
-            <a-divider class="bg-orange-500" type="vertical" />
-          </a-form-item>
           <a-form-item label="急救責任等級">
             <a-tag class="font-extrabold">{{ model.hosp_ranking }}</a-tag>
             <a-divider class="bg-orange-500" type="vertical" />
@@ -158,6 +147,10 @@
 <script>
 import { LMap, LTileLayer, LMarker, LPopup, LCircleMarker, LPolyline, LControlZoom } from 'vue2-leaflet'
 import Pngbarn from '@/assets/pngbarn.png'
+import blue from '@/assets/marker/marker-icon-2x-blue.png'
+import red from '@/assets/marker/marker-icon-2x-red.png'
+import gold from '@/assets/marker/marker-icon-2x-gold.png'
+import green from '@/assets/marker/marker-icon-2x-green.png'
 import L from 'leaflet'
 import Mixin from '@/mixin'
 import Spin from '@/components/Shared/Spin'
@@ -205,17 +198,15 @@ export default {
         hosp_whp: 0,
         location: []
       },
-      testL: 23.6,
-      testI: 121,
       visible: false,
       visibleMemu: false,
       loading: false,
       zoom: 12,
-      center: L.latLng(23.6, 121),
+      center: L.latLng(this.testL, this.testI),
       url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
       attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-      location: L.latLng(23.6, 121),
-      circleMarker: L.latLng(23.6, 121),
+      location: L.latLng(this.testL, this.testI),
+      circleMarker: L.latLng(this.testL, this.testI),
       text: '現在位置',
       Circle: L.circle([50.5, 30.5], { radius: 200 }),
       bounds: null,
@@ -226,6 +217,30 @@ export default {
     }
   },
   computed: {
+    testL () {
+      let vuethis = this
+      if (vuethis.site_id) {
+        let item = vuethis.siteList.filter(
+          x => x.SITE_ID === vuethis.site_id
+        )
+        if (item && item.length > 0) {
+          return item[0].LATITUDE
+        }
+      }
+      return 23.6
+    },
+    testI () {
+      let vuethis = this
+      if (vuethis.site_id) {
+        let item = vuethis.siteList.filter(
+          x => x.SITE_ID === vuethis.site_id
+        )
+        if (item && item.length > 0) {
+          return item[0].LONGITUDE
+        }
+      }
+      return 121
+    },
     polyline () {
       if (this.model.location.length > 0) {
         return [this.location, this.model.location]
@@ -233,11 +248,14 @@ export default {
       return []
     },
     markerList () {
+      let vuethis = this
       let temp = Object.assign(this.hospList, {})
       temp = temp.filter(function (x) {
         var hasText = false
         if (x['hosp_erbed'] !== '0') {
-          hasText = true
+          if (vuethis.SITE_AREA === x['hosp_class'].trim()) {
+            hasText = true
+          }
         }
 
         return hasText
@@ -245,19 +263,40 @@ export default {
       return temp
     },
     sideMarker () {
+      let vuethis = this
+      if (vuethis.site_id) {
+        let item = vuethis.siteList.filter(
+          x => x.SITE_ID === vuethis.site_id
+        )
+        if (item && item.length > 0) {
+          return L.latLng(item[0].LATITUDE, item[0].LONGITUDE)
+        }
+      }
       return L.latLng(this.testL, this.testI)
     }
   },
   mounted () {
     let vuethis = this
-    vuethis.loading = false
-    vuethis.$store.commit('SpinLoading', true)
-    navigator.geolocation.getCurrentPosition(this.showPosition)
-    // this.$refs.Map =
-    setTimeout(() => {
-      vuethis.loading = true
-      vuethis.$store.commit('SpinLoading', false)
-    }, 3000)
+    this.$nextTick(function () {
+      vuethis.loading = false
+      vuethis.$store.commit('SpinLoading', true)
+
+      vuethis.$api.MC.getMC_SITE_INFO()
+        .then(result => {
+          vuethis.siteList = result.data
+          navigator.geolocation.getCurrentPosition(vuethis.showPosition)
+          // this.$refs.Map =
+          setTimeout(() => {
+            vuethis.loading = true
+            vuethis.$store.commit('SpinLoading', false)
+          }, 3000)
+        })
+        .catch(err => {
+          vuethis.$notification.error({
+            message: err.data
+          })
+        })
+    })
   },
   methods: {
     showDrawer () {
@@ -287,29 +326,27 @@ export default {
       let color = ''
       switch (pVal) {
         case '1':
-          color = 'marker-icon-2x-green.png'
-          break
         case '2':
+          color = gold
+          break
         case '3':
         case '4':
         case '5':
-          color = 'marker-icon-2x-gold.png'
-          break
         case '6':
         case '7':
         case '8':
         case '9':
-          color = 'marker-icon-2x-orange.png'
+          color = blue
           break
         case '10':
-          color = 'marker-icon-2x-red.png'
+          color = green
           break
         default:
-          color = 'marker-icon-2x-green.png'
+          color = red
           break
       }
       return new L.Icon({
-        iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/' + color,
+        iconUrl: color,
         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
         iconSize: [25, 41],
         iconAnchor: [12, 41],
@@ -319,6 +356,8 @@ export default {
     },
     open (pModel) {
       this.model = Object.assign(this.model, pModel)
+      console.log(this.model)
+      console.log(this.$store.state.Basic.PatListByID)
       this.visible = !this.visible
     },
     onClose () {
@@ -335,11 +374,10 @@ export default {
       this.bounds = bounds
     },
     showPosition (position) {
-      this.center = L.latLng(position.coords.latitude, position.coords.longitude)
-      this.location = L.latLng(position.coords.latitude, position.coords.longitude)
-      this.circleMarker = L.latLng(position.coords.latitude, position.coords.longitude)
-      this.testL = position.coords.latitude
-      this.testI = position.coords.longitude
+      let vuethis = this
+      vuethis.center = L.latLng(this.testL, this.testI)
+      vuethis.location = L.latLng(this.testL, this.testI)
+      vuethis.circleMarker = L.latLng(this.testL, this.testI)
     },
     GPS () {
       navigator.geolocation.getCurrentPosition(this.getGPSlatitude)

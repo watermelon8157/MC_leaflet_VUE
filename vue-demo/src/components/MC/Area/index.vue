@@ -32,6 +32,7 @@ body {
       <a-layout-header class="bg-blue-400">
         <div class="logo text-white" />
         {{ titleName }}
+        <span v-if="site_id"> - {{ site_title }}</span>
       </a-layout-header>
       <a-layout-content class="container">
         <div class="m-2">
@@ -58,6 +59,7 @@ body {
       @close="onClose"
       :visible="visible"
     >
+    {{site_title}}
       <a-menu
         style="width: 256px"
         v-model="routeName"
@@ -72,7 +74,7 @@ body {
       </a-menu>
     </a-drawer>
     <a-modal
-      title="選擇或新增事件"
+      title="選擇事件"
       :visible="visibleLogin"
       :closable="false"
       :footer="null"
@@ -87,13 +89,13 @@ body {
                   :validate-status="!!siteid ? '' : 'error'"
                   :help="!!siteid ? ' ' : '請輸入事件代碼'"
                 >
-                  <a-select v-model="siteid" style="width: 120px">
+                  <a-select v-model="siteid" style="width: 280px">
                     <a-select-option value="">請選擇</a-select-option>
                     <a-select-option
                       v-for="(i, index) in siteList"
                       :key="index"
                       :value="i.SITE_ID"
-                      >{{ i.SITE_DESC }}
+                      >{{ i.SITE_DESC }}({{ i.SITE_AREA }})
                     </a-select-option>
                   </a-select>
                 </a-form-item>
@@ -105,37 +107,6 @@ body {
                     type="primary"
                     @click="SiteLogin"
                     >選擇</a-button
-                  >
-                </a-form-item>
-              </div>
-            </a-tab-pane>
-            <a-tab-pane key="2" tab="新增事件">
-              <div>
-                <a-form-item
-                  required
-                  :validate-status="!!site_desc ? '' : 'error'"
-                  :help="!!site_desc ? ' ' : '請輸入事件名稱'"
-                >
-                  <a-input
-                    v-model="site_desc"
-                    placeholder="事件名稱"
-                    @pressEnter="(e) => Login()"
-                  >
-                    <a-icon
-                      slot="prefix"
-                      type="user"
-                      style="color: rgba(0, 0, 0, 0.25)"
-                    />
-                  </a-input>
-                </a-form-item>
-              </div>
-              <div>
-                <a-form-item>
-                  <a-button
-                    :disabled="disabled"
-                    type="primary"
-                    @click="SiteLoginNew"
-                    >新增</a-button
                   >
                 </a-form-item>
               </div>
@@ -246,20 +217,6 @@ export default {
     },
     SiteLogin () {
       this.$api.MC.SiteLogin({ site_id: this.siteid, LATITUDE: this.latitude, LONGITUDE: this.longitude })
-        .then(result => {
-          this.$auth.setToken(result.data.token)
-          this.disabled = false
-          this.Loginform()
-        })
-        .catch(err => {
-          this.$notification.error({
-            message: err.data
-          })
-          this.disabled = false
-        })
-    },
-    SiteLoginNew () {
-      this.$api.MC.SiteLoginNew({ site_id: this.siteid, site_desc: this.site_desc, LATITUDE: this.latitude, LONGITUDE: this.longitude })
         .then(result => {
           this.$auth.setToken(result.data.token)
           this.disabled = false

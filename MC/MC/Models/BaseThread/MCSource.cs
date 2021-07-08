@@ -24,7 +24,7 @@ namespace RCS.Models
 
         public override void RunThread()
         {
-            _model.RunThread();
+           _model.RunThread();
              
 
         }

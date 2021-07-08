@@ -24,10 +24,7 @@ namespace RCS_Data.Models.DB
         public string HOSP_KEY { get; set; }
 
         [Key]
-        public string SITE_ID { get; set; }
-
-        [Key]
-        public string SOURCE_DATE { get; set; }
+        public string SITE_ID { get; set; } 
         public string CREATE_ID { get; set; }
         public string CREATE_NAME { get; set; }
         public string CREATE_DATE { get; set; }

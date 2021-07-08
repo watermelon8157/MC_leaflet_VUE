@@ -8,6 +8,7 @@ import SelectListIndex from '@/components/MC/Area/mapindex'
 import HospAdmission from '@/components/MC/HospAdmission'
 import HospEvacuation from '@/components/MC/HospEvacuation'
 import AreaPatList from '@/components/MC/HospAllPatList'
+import CenterSystem from '@/components/MC/Center/system'
 import moment from 'moment'
 const webTitle = 'MC-'
 let _redirect = '/menu'
@@ -104,6 +105,14 @@ export default [
         meta: {
           title: '中心-' + '傷患查詢'
         }
+      },
+      {
+        path: '/MC/Center/system/:now',
+        name: 'CenterSystem',
+        component: CenterSystem,
+        meta: {
+          title: '中心-' + '後臺管理'
+        }
       }
     ]
   },
@@ -144,7 +153,7 @@ export default [
     name: 'mapindex',
     component: SelectListIndex,
     meta: {
-      title: '地圖測試'
+      title: '地圖'
     }
   }
 ]

@@ -8,21 +8,23 @@
     <a-layout-content style="padding: 0 50px">
       <div :style="{ background: '#fff', padding: '24px', minHeight: '280px' }">
         <a-row class="text-center">
-          <a-col :span="7" class="m-2">
-            <a-card class="bg-blue-300" @click="(e)=>open('Area')">
-              <a-button type="link" class="text-4xl font-bold">現場入口</a-button>
-            </a-card>
-          </a-col>
-          <a-col :span="7" class="m-2">
-            <a-card class="bg-orange-300" @click="(e)=>open('Center')">
-              <a-button type="link" class="text-4xl font-bold">中心入口</a-button>
-            </a-card>
-          </a-col>
-          <a-col :span="7" class="m-2">
-            <a-card class="bg-green-300" @click="(e)=>open('Hosp')">
-              <a-button type="link" class="text-4xl font-bold">醫院入口</a-button>
-            </a-card>
-          </a-col>
+          <a-list size="small" class="w-64" bordered>
+            <a-list-item
+              class="bg-blue-300 cursor-pointer text-4xl text-center font-bold"
+              @click="(e) => open('Area')"
+              >現場入口</a-list-item
+            >
+            <a-list-item
+              class="bg-orange-300 cursor-pointer text-4xl text-center font-bold"
+              @click="(e) => open('Center')"
+              >中心入口</a-list-item
+            >
+            <a-list-item
+              class="bg-green-300 cursor-pointer text-4xl text-center font-bold"
+              @click="(e) => open('Hosp')"
+              >醫院入口</a-list-item
+            >
+          </a-list>
         </a-row>
       </div>
     </a-layout-content>

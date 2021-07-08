@@ -63,47 +63,54 @@ namespace RCS.Models.ViewModel
             {
                 this.gethospList();
             }
-            // 計算分數相關變數 
-            // 𝑺𝒄𝒐𝒓𝒆_𝒊𝒋=  (𝒙_𝒊𝒋) + ( 𝒚_𝒊𝒋 (𝟏−𝒛_𝒊𝒋 )+ 𝒚_𝒊𝒋 𝒘𝟐_𝒊𝒋 ) 
 
-            #region 計算 
-            // 計算 MC_HOSP_INFO_DTL
-            // 𝒛_𝒊𝒋
-            this.setMC_HOSP_INFO_DTL(dateNow);//檢查是否有計算過資料
-            this.runCV(dateNow);
+            List<DB_MC_SITE_INFO> sList = getMC_SITE_INFO();
+            foreach (DB_MC_SITE_INFO item in sList)
+            {
+                if (item.SITE_ID == "2020070813435621391")
+                {
+                    item.SITE_ID = "2020070813435621391";
+                }
+                // 計算分數相關變數 
+                // 𝑺𝒄𝒐𝒓𝒆_𝒊𝒋=  (𝒙_𝒊𝒋) + ( 𝒚_𝒊𝒋 (𝟏−𝒛_𝒊𝒋 )+ 𝒚_𝒊𝒋 𝒘𝟐_𝒊𝒋 ) 
 
-            // 計算 DB_MC_SITE_DRIVING_TIME_INFO
-            //  (𝒙_𝒊𝒋) 
-            this.runDriving();
+                #region 計算 
+                // 計算 MC_HOSP_INFO_DTL
+                // 𝒛_𝒊𝒋
+                this.setMC_HOSP_INFO_DTL(item.SITE_ID, item.SITE_AREA);//檢查是否有計算過資料
+                this.runCV(item.SITE_ID);
 
-            // 計算 DB_MC_SOURCE_LIST
-            //  𝑺𝒄𝒐𝒓𝒆_𝒊𝒋 
-            this.getAllScore(dateNow);
-            #endregion
+                // 計算 DB_MC_SITE_DRIVING_TIME_INFO
+                //  (𝒙_𝒊𝒋) 
+                this.runDriving(item.SITE_ID);
+
+                // 計算 DB_MC_SOURCE_LIST
+                //  𝑺𝒄𝒐𝒓𝒆_𝒊𝒋 
+                this.getAllScore(item.SITE_ID);
+
+                #endregion
+            }
 
         }
 
 
-        public void getAllScore(DateTime pDate)
+        public void getAllScore(string pSITE_ID)
         {
             string actionName = "getAllScore"; 
             List<DB_MC_SOURCE_LIST> insertList = new List<DB_MC_SOURCE_LIST>();
-            List<DB_MC_SOURCE_LIST> updateList = new List<DB_MC_SOURCE_LIST>();
-            List<DB_MC_SITE_INFO> sList = new List<DB_MC_SITE_INFO>();
+            List<DB_MC_SOURCE_LIST> updateList = new List<DB_MC_SOURCE_LIST>(); 
             List<DB_MC_SITE_DRIVING_TIME_INFO> tList = new List<DB_MC_SITE_DRIVING_TIME_INFO>();
             List<DB_MC_HOSP_INFO_DTL> dList = new List<DB_MC_HOSP_INFO_DTL>();
             List<DB_MC_PATIENT_INFO> pList = new List<DB_MC_PATIENT_INFO>();
             List<DB_MC_SOURCE_LIST> saList = new List<DB_MC_SOURCE_LIST>();
             Dapper.DynamicParameters dp = new Dapper.DynamicParameters();
-            string sql = "", _date = Function_Library.getDateString(pDate, RCS_Data.Models.DATE_FORMAT.yyyy_MM_dd); 
-            sql = "SELECT * FROM " + DB_TABLE_NAME.DB_MC_SITE_INFO + " WHERE DATASTATUS = '1';" ; 
-            sList = this.DBLink.DBA.getSqlDataTable<DB_MC_SITE_INFO>(sql ); 
-            sql = "SELECT * FROM " + DB_TABLE_NAME.DB_MC_PATIENT_INFO + " WHERE DATASTATUS = '1' AND SITE_ID in @SITE_ID;"
-                  + " SELECT * FROM " + DB_TABLE_NAME.DB_MC_SITE_DRIVING_TIME_INFO + " WHERE DATASTATUS = '1'  AND SITE_ID in @SITE_ID;"
-                  + " SELECT * FROM " + DB_TABLE_NAME.DB_MC_HOSP_INFO_DTL + " WHERE DATASTATUS = '1' AND SOURCE_DATE = @SOURCE_DATE;"
-                  + " SELECT * FROM " + DB_TABLE_NAME.DB_MC_SOURCE_LIST + " WHERE DATASTATUS = '1' AND SOURCE_DATE = @SOURCE_DATE AND SITE_ID in @SITE_ID;";
-            dp.Add("SITE_ID", sList.Select(x=>x.SITE_ID).Distinct().ToList());
-            dp.Add("SOURCE_DATE", _date);
+            string sql = ""; 
+            sql = "SELECT * FROM " + DB_TABLE_NAME.DB_MC_SITE_INFO + " WHERE DATASTATUS = '1';" ;  
+            sql = "SELECT * FROM " + DB_TABLE_NAME.DB_MC_PATIENT_INFO + " WHERE DATASTATUS = '1' AND SITE_ID = @SITE_ID;"
+                  + " SELECT * FROM " + DB_TABLE_NAME.DB_MC_SITE_DRIVING_TIME_INFO + " WHERE DATASTATUS = '1'  AND SITE_ID = @SITE_ID;"
+                  + " SELECT * FROM " + DB_TABLE_NAME.DB_MC_HOSP_INFO_DTL + " WHERE DATASTATUS = '1' AND SITE_ID = @SITE_ID;"
+                  + " SELECT * FROM " + DB_TABLE_NAME.DB_MC_SOURCE_LIST + " WHERE DATASTATUS = '1'  AND SITE_ID = @SITE_ID;";
+            dp.Add("SITE_ID", pSITE_ID);
             this.DBLink.DBA.Open();
             GridReader gr = this.DBLink.DBA.dbConnection.QueryMultiple(sql, dp);
             pList = gr.Read<DB_MC_PATIENT_INFO>().ToList();  
@@ -116,10 +123,10 @@ namespace RCS.Models.ViewModel
                 bool hasData = false;
                 DB_MC_SOURCE_LIST temp = new DB_MC_SOURCE_LIST();
                 DB_MC_HOSP_INFO hosp = MvcApplication.hospList.Find(x => x.HOSP_KEY == t.HOSP_KEY);
-                if (saList.Exists(x => x.SITE_ID == t.SITE_ID && x.SOURCE_DATE == _date && x.HOSP_KEY == t.HOSP_KEY))
+                if (saList.Exists(x => x.SITE_ID == t.SITE_ID  && x.HOSP_KEY == t.HOSP_KEY))
                 {
                     hasData = true;
-                    temp = saList.Find(x => x.SITE_ID == t.SITE_ID && x.SOURCE_DATE == _date && x.HOSP_KEY == t.HOSP_KEY);
+                    temp = saList.Find(x => x.SITE_ID == t.SITE_ID   && x.HOSP_KEY == t.HOSP_KEY);
                     temp.MODIFY_DATE = Function_Library.getDateNowString(DATE_FORMAT.yyyy_MM_dd_HHmmss);
                     temp.MODIFY_ID = this.userinfo.user_id;
                     temp.MODIFY_NAME = this.userinfo.user_name;
@@ -133,10 +140,9 @@ namespace RCS.Models.ViewModel
                         SEVERE = hosp.SEVERE,
                         MODERATE = hosp.MODERATE,
                         W2 = hosp.W2,
-                        CV = dList.Find(x => x.HOSP_KEY == t.HOSP_KEY && x.SOURCE_DATE == _date).SOURCE,
+                        CV = dList.Find(x => x.HOSP_KEY == t.HOSP_KEY && x.SITE_ID == t.SITE_ID).SOURCE,
                         SITE_ID = t.SITE_ID,
-                        DRIVING_SOURCE = t.DRIVING_SOURCE,
-                        SOURCE_DATE = _date,
+                        DRIVING_SOURCE = t.DRIVING_SOURCE, 
                         CREATE_DATE = Function_Library.getDateNowString(DATE_FORMAT.yyyy_MM_dd_HHmmss),
                         CREATE_ID = this.userinfo.user_id,
                         CREATE_NAME = this.userinfo.user_name,
@@ -233,13 +239,12 @@ namespace RCS.Models.ViewModel
         /// 設定今天的變動CV
         /// </summary>
         /// <param name="pDate"></param>
-        private void setMC_HOSP_INFO_DTL(DateTime pDate)
+        private void setMC_HOSP_INFO_DTL(string pSITE_ID, string pSITE_AREA)
         {
-            string actionName = "setMC_HOSP_INFO_DTL";
-            string _date = Function_Library.getDateString(pDate, RCS_Data.Models.DATE_FORMAT.yyyy_MM_dd);
+            string actionName = "setMC_HOSP_INFO_DTL"; 
             SQLProvider dba = new SQLProvider();
             List<DB_MC_HOSP_INFO_DTL> pList = new List<DB_MC_HOSP_INFO_DTL>();
-            List<DB_MC_HOSP_INFO_DTL> tempList = this.getMC_HOSP_INFO_DTL(_date);
+            List<DB_MC_HOSP_INFO_DTL> tempList = this.getMC_HOSP_INFO_DTL(pSITE_ID);
             List<DB_MC_HOSP_INFO> hpList = new List<DB_MC_HOSP_INFO>();
             if (tempList.Count > 0)
             {
@@ -247,14 +252,17 @@ namespace RCS.Models.ViewModel
             }
             else
             {
-                hpList = MvcApplication.hospList.ToList();
+                if (!string.IsNullOrWhiteSpace(pSITE_AREA))
+                { 
+                    hpList = MvcApplication.hospList.FindAll(x=>x.DIVISION.Trim() == pSITE_AREA).ToList();
+                } 
             }
             foreach (DB_MC_HOSP_INFO item in hpList)
             {
                 pList.Add(new DB_MC_HOSP_INFO_DTL()
                 {
                     HOSP_KEY = item.HOSP_KEY,
-                    SOURCE_DATE = _date,
+                    SITE_ID = pSITE_ID,
                     CREATE_DATE = Function_Library.getDateNowString(DATE_FORMAT.yyyy_MM_dd_HHmmss),
                     CREATE_ID = this.userinfo.user_id,
                     CREATE_NAME = this.userinfo.user_name,
@@ -268,22 +276,20 @@ namespace RCS.Models.ViewModel
             {
                 dba.DBA.DBExecInsert<DB_MC_HOSP_INFO_DTL>(pList);
             }
-            if (this.DBLink.DBA.hasLastError)
-            {
-                MvcApplication.hospList = new List<DB_MC_HOSP_INFO>();
-                Com.Mayaminer.LogTool.SaveLogMessage(this.DBLink.DBA.lastError, actionName, this.csName);
+            if (dba.DBA.hasLastError)
+            { 
+                Com.Mayaminer.LogTool.SaveLogMessage(dba.DBA.lastError, actionName, this.csName);
             }
         }
 
         /// <summary>
         /// 計算CV
         /// </summary>
-        /// <param name="pDate">計算日期</param>
-        public void runCV(DateTime pDate)
+        /// <param name="pSITE_ID">計算日期</param>
+        public void runCV(string pSITE_ID)
         {
-            string actionName = "runCV";
-            string _date = Function_Library.getDateString(pDate, RCS_Data.Models.DATE_FORMAT.yyyy_MM_dd);
-            List<DB_MC_HOSP_INFO_DTL> tempList = this.getMC_HOSP_INFO_DTL(_date);
+            string actionName = "runCV"; 
+            List<DB_MC_HOSP_INFO_DTL> tempList = this.getMC_HOSP_INFO_DTL(pSITE_ID);
             if (tempList.Count > 0)
             {
                 List<DB_MC_PATIENT_INFO> patList = this.getMC_PATIENT_INFO();
@@ -330,7 +336,6 @@ namespace RCS.Models.ViewModel
                 this.DBLink.DBA.DBExecUpdate<DB_MC_HOSP_INFO_DTL>(tempList);
                 if (this.DBLink.DBA.hasLastError)
                 {
-                    MvcApplication.hospList = new List<DB_MC_HOSP_INFO>();
                     Com.Mayaminer.LogTool.SaveLogMessage(this.DBLink.DBA.lastError, actionName, this.csName);
                 }
             }
@@ -383,11 +388,15 @@ namespace RCS.Models.ViewModel
 
         #region 𝑥_𝑖𝑗
 
-        public void runDriving()
+        public void runDriving(string pSITE_ID)
         {
             List<DB_MC_SITE_DRIVING_TIME_INFO> tempList = new List<DB_MC_SITE_DRIVING_TIME_INFO>();
-            List<DB_MC_SITE_INFO> sList = getMC_SITE_INFO();
+            List<DB_MC_SITE_INFO> sList = getMC_SITE_INFO(pSITE_ID);
             List<DB_MC_HOSP_INFO> pList = MvcApplication.hospList.ToList();
+            if (!string.IsNullOrWhiteSpace(pSITE_ID))
+            {
+                pList = pList.FindAll(x=>x.DIVISION.Trim() == sList.First(y => y.SITE_ID == pSITE_ID).SITE_AREA);
+            }
             List<string> dList = this.getDB_DRIVING_SITE(sList.Select(x => x.SITE_ID).ToList());
             foreach (DB_MC_SITE_INFO s in sList)
             {
@@ -446,8 +455,7 @@ namespace RCS.Models.ViewModel
             string sql = "SELECT * FROM " + DB_TABLE_NAME.DB_MC_HOSP_INFO + " WHERE DATASTATUS = '1';";
             MvcApplication.hospList = this.DBLink.DBA.getSqlDataTable<DB_MC_HOSP_INFO>(sql);
             if (this.DBLink.DBA.hasLastError)
-            {
-                MvcApplication.hospList = new List<DB_MC_HOSP_INFO>();
+            { 
                 Com.Mayaminer.LogTool.SaveLogMessage(this.DBLink.DBA.lastError, actionName, this.csName);
             }
         }
@@ -457,12 +465,12 @@ namespace RCS.Models.ViewModel
         /// </summary>
         /// <param name="pDate"></param>
         /// <returns></returns>
-        private List<DB_MC_HOSP_INFO_DTL> getMC_HOSP_INFO_DTL(string pDate)
+        private List<DB_MC_HOSP_INFO_DTL> getMC_HOSP_INFO_DTL(string pSITE_ID)
         {
             List<DB_MC_HOSP_INFO_DTL> tempList = new List<DB_MC_HOSP_INFO_DTL>();
-            string sql = "SELECT * FROM " + DB_TABLE_NAME.DB_MC_HOSP_INFO_DTL + " WHERE DATASTATUS = '1' AND SOURCE_DATE = @SOURCE_DATE";
+            string sql = "SELECT * FROM " + DB_TABLE_NAME.DB_MC_HOSP_INFO_DTL + " WHERE DATASTATUS = '1' AND SITE_ID = @SITE_ID";
             Dapper.DynamicParameters dp = new Dapper.DynamicParameters();
-            dp.Add("SOURCE_DATE", pDate);
+            dp.Add("SITE_ID", pSITE_ID);
             tempList = this.DBLink.DBA.getSqlDataTable<DB_MC_HOSP_INFO_DTL>(sql, dp);
             return tempList;
         }

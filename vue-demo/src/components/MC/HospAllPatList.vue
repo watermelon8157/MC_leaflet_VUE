@@ -77,8 +77,8 @@ export default {
         datasets: [
           {
             label: '尚未抵達',
-            backgroundColor: 'rgba(105,105,105)',
-            borderColor: 'rgba(105,105,105)',
+            backgroundColor: 'rgba(158, 158, 158, 1)',
+            borderColor: 'rgba(158, 158, 158, 1)',
             fill: false,
             borderDash: [5, 5],
             data: this.chartlist.All
@@ -88,6 +88,7 @@ export default {
             backgroundColor: 'rgba(105,105,105)',
             borderColor: 'rgba(105,105,105)',
             fill: false,
+            borderDash: [5, 5],
             data: this.chartlist.atAll
           },
           {

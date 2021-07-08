@@ -312,8 +312,7 @@ namespace RCS
             tempList = this.dblink.DBA.getSqlDataTable<DB_MC_PATIENT_INFO>(sql, dp);
             if (tempList.Count > 0)
             { 
-                sql = string.Concat("SELECT * FROM ", DB_TABLE_NAME.DB_MC_SOURCE_LIST, " WHERE SOURCE_DATE =@SOURCE_DATE AND SITE_ID =@SITE_ID");
-                dp.Add("SOURCE_DATE", Function_Library.getDateString(dateNow, DATE_FORMAT.yyyy_MM_dd));
+                sql = string.Concat("SELECT * FROM ", DB_TABLE_NAME.DB_MC_SOURCE_LIST, " WHERE SITE_ID =@SITE_ID"); 
                 dp.Add("SITE_ID", tempList[0].SITE_ID);
                 pList = this.dblink.DBA.getSqlDataTable<MC_SOURCE_LIST>(sql, dp);
             }

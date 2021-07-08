@@ -157,7 +157,16 @@ namespace RCS.Controllers.WEBAPI
         public List<VIEW_MC_HOSP_INFO> GetHospList(JWT_Form_Body form)
         {
             List < VIEW_MC_HOSP_INFO > pList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<VIEW_MC_HOSP_INFO>>(Newtonsoft.Json.JsonConvert.SerializeObject(MvcApplication.hospList.ToList()));
-            string actionName = "GetHospList"; 
+            string actionName = "GetHospList";
+            pList.ForEach(x=> {
+                x.hosp_desc = x.HOSP_KEY;
+                x.hosp_name = x.HOSP_NAME;
+                x.hosp_class = x.DIVISION.Trim();
+                x.hosp_city = x.CITY;
+                x.hosp_injury = x.CITY;
+                x.hosp_ranking = x.NEW_RANKING;
+                x.hosp_erbed = x.ORIGINAL_RANKING; 
+            });
             return pList;
         }
 
@@ -422,10 +431,82 @@ namespace RCS.Controllers.WEBAPI
             return pList;
          }
 
-         
+        public string saveSite(DB_MC_SITE_INFO form)
+        {
+            List<DB_MC_SITE_INFO> pList = new List<DB_MC_SITE_INFO>();
+            if (string.IsNullOrWhiteSpace(form.LATITUDE) || string.IsNullOrWhiteSpace(form.LONGITUDE))
+            {
+                this.throwHttpResponseException("查無經緯度資料無法填寫資料!!");
+            }
+            if (string.IsNullOrEmpty(form.SITE_ID))
+            { 
+                this.throwHttpResponseException("請填寫事件代碼!!");
+            }
+            if (string.IsNullOrEmpty(form.SITE_DESC))
+            {
+                this.throwHttpResponseException("請填寫事件名稱!!");
+            }
+            if (string.IsNullOrEmpty(form.SITE_AREA))
+            {
+                this.throwHttpResponseException("請填寫事件地區!!");
+            }
+            if (!string.IsNullOrEmpty(form.SITE_ID))
+            {
+                pList = _model.getMC_SITE_INFO(form.SITE_ID);
+                if (pList.Count == 0)
+                {
+                    pList.Add(new DB_MC_SITE_INFO() { 
+                        SITE_DESC = form.SITE_DESC,
+                        SITE_ID = form.SITE_ID,
+                        CREATE_DATE = Function_Library.getDateNowString(DATE_FORMAT.yyyy_MM_dd_HHmmss),
+                        CREATE_ID = this.userinfo.user_id,
+                        CREATE_NAME = this.userinfo.user_name,
+                        MODIFY_DATE = Function_Library.getDateNowString(DATE_FORMAT.yyyy_MM_dd_HHmmss),
+                        MODIFY_ID = this.userinfo.user_id,
+                        MODIFY_NAME = this.userinfo.user_name,
+                        DATASTATUS = "1",
+                        LATITUDE = form.LATITUDE,
+                        LONGITUDE = form.LONGITUDE,
+                    });
+                    this.DBLink.DBA.DBExecInsert<DB_MC_SITE_INFO>(pList);
+                    if (this.DBLink.DBA.hasLastError)
+                    {
+                        this.throwHttpResponseException("程式發生錯誤，請洽資訊人員!");
+                        Com.Mayaminer.LogTool.SaveLogMessage(this.DBLink.DBA.lastError, "Login", this.csName);
+                    }
+                }
+                else
+                {
+                    foreach (DB_MC_SITE_INFO item in pList)
+                    {
+                        item.SITE_DESC = form.SITE_DESC;
+                        item.SITE_AREA = form.SITE_AREA;
+                        item.LATITUDE = form.LATITUDE;
+                        item.LONGITUDE = form.LONGITUDE;
+                        item.MODIFY_DATE = Function_Library.getDateNowString(DATE_FORMAT.yyyy_MM_dd_HHmmss);
+                        item.MODIFY_ID = this.userinfo.user_id;
+                        item.MODIFY_NAME = this.userinfo.user_name;
+                    }
+                    this.DBLink.DBA.DBExecUpdate<DB_MC_SITE_INFO>(pList);
+                    if (this.DBLink.DBA.hasLastError)
+                    {
+                        this.throwHttpResponseException("程式發生錯誤，請洽資訊人員!");
+                        Com.Mayaminer.LogTool.SaveLogMessage(this.DBLink.DBA.lastError, "Login", this.csName);
+                    }
+                }
+
+            }
+
+            if (this.DBLink.DBA.hasLastError)
+            { 
+                this.throwHttpResponseException("儲存失敗!");
+            }  
+            return "儲存成功";
+        }
+
         #endregion
 
 
-         
+
     }
 }

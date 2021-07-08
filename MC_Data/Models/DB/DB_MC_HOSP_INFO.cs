@@ -48,7 +48,7 @@ namespace RCS_Data.Models.DB
         public string MEDICALSTAFF { get; set; }
         public string W2 { get; set; }
         public string CV { get; set; }
-
+        public string DIVISION { get; set; }
 
 
     }
@@ -60,6 +60,12 @@ namespace RCS_Data.Models.DB
         public string hosp_name { get; set; }
         public string hosp_class { get; set; }
         public string hosp_city { get; set; }  
+        public string hosp_injury { get; set; }
+        public string hosp_ranking { get; set; }
+        public string hosp_erbed { get; set; }
+        public string hosp_source { get; set; }
+        public string hosp_ihp { get; set; }
+        public string hosp_whp { get; set; }
         public List<double> location { get { return new List<double>() { double.Parse(this.LATITUDE), double.Parse(this.LONGITUDE) } ; } }
     }
 

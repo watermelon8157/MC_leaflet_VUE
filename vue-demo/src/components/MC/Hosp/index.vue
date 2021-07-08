@@ -32,6 +32,7 @@ body {
       <a-layout-header class="bg-green-400">
         <div class="logo text-white" />
         {{ titleName }}
+        <span v-if="site_id"> - {{ site_title }} </span>
       </a-layout-header>
       <a-layout-content class="container">
         <div class="m-2">

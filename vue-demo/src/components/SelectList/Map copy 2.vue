@@ -388,8 +388,7 @@ export default {
         default:
           color = markergrey
           break
-      }
-      debugger
+      } 
       let dis = ((this.location.distanceTo(L.latLng(pLocation[0], pLocation[1]))).toFixed(0) / 1000)
       if (dis > 10) {
         color = markergrey

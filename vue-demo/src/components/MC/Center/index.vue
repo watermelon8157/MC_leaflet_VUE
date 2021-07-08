@@ -32,6 +32,7 @@ body {
       <a-layout-header class="bg-orange-400">
         <div class="logo text-white" />
         {{ titleName }}
+        <span v-if="site_id"> - {{ site_title }}</span>
       </a-layout-header>
       <a-layout-content class="container">
         <div class="m-2">
@@ -65,7 +66,7 @@ body {
             v-for="(i, index) in siteList"
             :key="index"
             :value="i.SITE_ID"
-            >{{ i.SITE_DESC }}
+            >{{ i.SITE_DESC }}({{ i.SITE_AREA}})
           </a-select-option>
         </a-select>
       </a-form-item>
@@ -78,6 +79,7 @@ body {
         <a-menu-item key="CenterHospAdmission">後送醫院狀況</a-menu-item>
         <a-menu-item key="CenterHospEvacuation">到達醫院狀況</a-menu-item>
         <a-menu-item key="CenterPatList">傷患查詢</a-menu-item>
+        <a-menu-item key="CenterSystem">後臺管理</a-menu-item>
       </a-menu>
     </a-drawer>
     <Spin class="z-50"></Spin>

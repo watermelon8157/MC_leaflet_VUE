@@ -46,15 +46,7 @@ namespace RCS
             string actionName = "MC_Source";
 
             try
-            {
-                if (MvcApplication.hospList == null)
-                {
-                    MvcApplication.hospList.Clear();
-                }
-                else
-                {
-                    MvcApplication.hospList = new List<DB_MC_HOSP_INFO>();
-                }
+            { 
                 if (MvcApplication.MCSourceThread == null)
                 {
                     MvcApplication.MCSourceThread = new RCS.Models.MCSource();
@@ -95,12 +87,7 @@ namespace RCS
         /// IIS 停止時會記錄停止原因
         /// </summary>
         protected void Application_End()
-        { 
-            
-            if (MvcApplication.hospList != null)
-            {
-                MvcApplication.hospList.Clear();
-            } 
+        {  
             try
             {
                 HttpRuntime runtime = (HttpRuntime)typeof(System.Web.HttpRuntime).InvokeMember("_theRuntime", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.GetField, null, null, null);

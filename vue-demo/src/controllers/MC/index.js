@@ -146,5 +146,26 @@ export default {
       params: Object.assign(_params, params)
     }
     return api.post(setConfig.url, setConfig.params)
+  },
+  saveSite (params) {
+    let _params = {
+      SITE_ID: '',
+      SITE_AREA: '',
+      SITE_DESC: '',
+      CREATE_ID: '',
+      CREATE_NAME: '',
+      CREATE_DATE: '',
+      MODIFY_ID: '',
+      MODIFY_NAME: '',
+      MODIFY_DATE: '',
+      DATASTATUS: '',
+      LATITUDE: '',
+      LONGITUDE: ''
+    }
+    let setConfig = {
+      url: baseUrl + 'saveSite',
+      params: Object.assign(_params, params)
+    }
+    return api.post(setConfig.url, setConfig.params)
   }
 }

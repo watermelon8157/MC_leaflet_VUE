@@ -70,7 +70,7 @@ const columns = [
   },
   {
     title: '醫院',
-    dataIndex: 'HOSPITAL_SHOW_NAME'
+    dataIndex: 'HOSP_KEY'
   }
 ]
 
