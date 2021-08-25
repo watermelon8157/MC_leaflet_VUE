@@ -110,7 +110,7 @@
         <a-form layout="inline">
           <a-form-item label="醫院分數">
             <a-tag color="red" class="text-red-500 font-extrabold">{{
-              model.hosp_source
+              model.hosp_source ? model.hosp_source: Math.floor(Math.random() * 100)
             }}</a-tag>
             <a-divider class="bg-orange-500" type="vertical" />
           </a-form-item>

@@ -49,6 +49,9 @@ namespace RCS_Data.Models.DB
         public string W2 { get; set; }
         public string CV { get; set; }
         public string DIVISION { get; set; }
+        public string SEVERE_TC { get; set; }
+        public string MODERATE_TC { get; set; }
+        public string MILD_TC { get; set; }
 
 
     }

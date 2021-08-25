@@ -127,10 +127,10 @@ namespace RCS.Controllers.WEBAPI
         /// <returns></returns>
         [JwtAuthActionFilterAttribute]
         [HttpPost]
-        public List<DB_MC_PATIENT_INFO> GetPatListByID(JWT_Form_Body form)
+        public List<MC_PATIENT_INFO_VIEW> GetPatListByID(JWT_Form_Body form)
         {
             string actionName = "GetPatListByID";
-            List<DB_MC_PATIENT_INFO> pList = new List<DB_MC_PATIENT_INFO>();
+            List<MC_PATIENT_INFO_VIEW> pList = new List<MC_PATIENT_INFO_VIEW>();
             Dapper.DynamicParameters dp = new Dapper.DynamicParameters();
             string sql = "SELECT * FROM " + DB_TABLE_NAME.DB_MC_PATIENT_INFO + " WHERE 1=1 ";
             if (!string.IsNullOrWhiteSpace(form.site_id))
@@ -143,7 +143,7 @@ namespace RCS.Controllers.WEBAPI
                 sql += " AND HOSP_KEY LIKE @HOSP_KEY";
                 dp.Add("HOSP_KEY", form.hosp_id + '%');
             } 
-            pList = DBLink.DBA.getSqlDataTable<DB_MC_PATIENT_INFO>(sql, dp);
+            pList = DBLink.DBA.getSqlDataTable<MC_PATIENT_INFO_VIEW>(sql, dp);
             pList.ForEach(x=> {
                 x.EXPECTED_ARRIVAL_DATETIME = !string.IsNullOrWhiteSpace(x.EXPECTED_ARRIVAL_DATETIME) ?  Function_Library.getDateString(DateTime.Parse(x.EXPECTED_ARRIVAL_DATETIME), DATE_FORMAT.yyyy_MM_dd_HHmm) : "";
                 x.SELECTION_DATETIME = !string.IsNullOrWhiteSpace(x.SELECTION_DATETIME) ? Function_Library.getDateString(DateTime.Parse(x.SELECTION_DATETIME), DATE_FORMAT.yyyy_MM_dd_HHmm) : "";
@@ -153,7 +153,7 @@ namespace RCS.Controllers.WEBAPI
 
         /// <param name="form"></param>
         /// <returns></returns>
-        [JwtAuthActionFilterAttribute]
+        [JwtAuthActionFilterAttribute(notVerification =true)]
         [HttpPost]
         public List<VIEW_MC_HOSP_INFO> GetHospList(JWT_Form_Body form)
         {

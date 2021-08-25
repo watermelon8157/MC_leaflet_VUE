@@ -52,9 +52,22 @@
             </a-table>
           </a-card>
         </a-tab-pane>
-        <!-- <a-tab-pane key="hosp" tab="醫院維護">
-          <p>醫院維護</p>
-        </a-tab-pane> -->
+        <a-tab-pane key="hosp" tab="醫院資料">
+          <a-card>
+            <div slot="title">
+              醫院資料
+              <span class="float-right">共{{ hospList.length }}筆</span>
+            </div>
+            <a-table :scroll="{ x: 1700, y: 350 }"
+              class="table-striped"
+              :columns="columnshosp"
+              :dataSource="hospList"
+              :pagination="false"
+              bordered
+            >
+            </a-table>
+          </a-card>
+        </a-tab-pane>
       </a-tabs>
       <a-drawer
         title="事件維護"
@@ -125,7 +138,20 @@ const data = {
   'LATITUDE': '',
   'LONGITUDE': ''
 }
-
+const datahosp = {
+  'SITE_ID': '',
+  'SITE_AREA': '',
+  'SITE_DESC': '',
+  'CREATE_ID': '',
+  'CREATE_NAME': '',
+  'CREATE_DATE': '',
+  'MODIFY_ID': '',
+  'MODIFY_NAME': '',
+  'MODIFY_DATE': '',
+  'DATASTATUS': '',
+  'LATITUDE': '',
+  'LONGITUDE': ''
+}
 const columns = [
   {
     title: '事件代碼',
@@ -153,6 +179,68 @@ const columns = [
     scopedSlots: { customRender: 'LATITUDE' }
   }
 ]
+const columnshosp = [
+  {
+    title: '醫院名稱',
+    width: 350,
+    dataIndex: 'hosp_name',
+    scopedSlots: { customRender: 'hosp_name' }
+  },
+  {
+    title: '經度',
+    width: 150,
+    dataIndex: 'LONGITUDE',
+    scopedSlots: { customRender: 'LONGITUDE' }
+  },
+  {
+    title: '緯度',
+    width: 150,
+    dataIndex: 'LATITUDE',
+    scopedSlots: { customRender: 'LATITUDE' }
+  },
+  {
+    title: 'CONTYPE',
+    width: 150,
+    dataIndex: 'CONTYPE',
+    scopedSlots: { customRender: 'CONTYPE' }
+  },
+  {
+    title: 'SEVERE',
+    width: 150,
+    dataIndex: 'SEVERE',
+    scopedSlots: { customRender: 'SEVERE' }
+  },
+  {
+    title: 'MODERATE',
+    width: 150,
+    dataIndex: 'MODERATE',
+    scopedSlots: { customRender: 'MODERATE' }
+  },
+  {
+    title: 'MILD',
+    width: 150,
+    dataIndex: 'MILD',
+    scopedSlots: { customRender: 'MILD' }
+  },
+  {
+    title: 'SEVERE_TC',
+    width: 150,
+    dataIndex: 'SEVERE_TC',
+    scopedSlots: { customRender: 'SEVERE_TC' }
+  },
+  {
+    title: 'MODERATE_TC',
+    width: 150,
+    dataIndex: 'MODERATE_TC',
+    scopedSlots: { customRender: 'MODERATE_TC' }
+  },
+  {
+    title: 'MILD_TC',
+    width: 150,
+    dataIndex: 'MILD_TC',
+    scopedSlots: { customRender: 'MILD_TC' }
+  }
+]
 export default {
   mixins: [Mixin],
   data () {
@@ -161,11 +249,19 @@ export default {
       latitude: '',
       longitude: '',
       form: data,
+      formhosp: datahosp,
       SiteVisible: false,
       columns: columns,
+      columnshosp: columnshosp,
       siteid: '',
       siteList: []
-
+    }
+  },
+  computed: {
+    hospList () {
+      let pList = this.$store.state.Basic.hospList
+      console.log(pList)
+      return pList
     }
   },
   mounted () {
@@ -180,6 +276,21 @@ export default {
           message: err.data
         })
       })
+    vuethis.$api.MC.GetHospList().then((result) => {
+      vuethis.$store.commit({
+        type: 'Basic/SetGetHospList',
+        data: result.data
+      })
+      setTimeout(() => {
+        vuethis.spinning = false
+      }, 500)
+    }).catch((err) => {
+      console.log(err)
+      this.error(err)
+      setTimeout(() => {
+        vuethis.spinning = false
+      }, 500)
+    })
   },
   methods: {
     GPS () {
@@ -191,6 +302,14 @@ export default {
     },
     onSiteClose () {
       this.SiteVisible = false
+    },
+    openHosp (pData) {
+      let vuethis = this
+      vuethis.form = JSON.parse(JSON.stringify(pData))
+      vuethis.form.SITE_ID = vuethis.$moment().format('YYYYMMDDHHmmss')
+      vuethis.form.LATITUDE = vuethis.latitude
+      vuethis.form.LONGITUDE = vuethis.longitude
+      vuethis.SiteVisible = true
     },
     openSite (pData) {
       let vuethis = this
@@ -221,6 +340,17 @@ export default {
             message: err.data
           })
         })
+    },
+    clickhospCustomRow (record, index) {
+      var vuethis = this
+      return {
+        on: {
+          click: function () {
+            vuethis.formhosp = JSON.parse(JSON.stringify(record))
+            vuethis.SiteVisible = true
+          }
+        }
+      }
     },
     clickCustomRow (record, index) { // 點選row
       var vuethis = this

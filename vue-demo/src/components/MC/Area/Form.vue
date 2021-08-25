@@ -104,7 +104,7 @@
                   'text-yellow-500': model.TRIAGE === 'Moderate',
                   'text-blue-500': model.TRIAGE === 'Mild',
                 }"
-                >{{ model.TRIAGE }}</span
+                > </span
               >
             </a-form-item>
             <a-form-item

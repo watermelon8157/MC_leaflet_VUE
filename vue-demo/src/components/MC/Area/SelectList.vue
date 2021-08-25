@@ -59,8 +59,8 @@ const columns = [
   },
   {
     title: '傷勢',
-    dataIndex: 'TRIAGE',
-    scopedSlots: { customRender: 'TRIAGE' }
+    dataIndex: 'TRIAGE_CHT',
+    scopedSlots: { customRender: 'TRIAGE_CHT' }
   },
   {
     title: '填寫時間',
