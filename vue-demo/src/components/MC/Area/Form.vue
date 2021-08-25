@@ -10,11 +10,20 @@
     </a-row>
     <a-row>
       <a-card title="傷患基本資料卡">
-        <a-button-group slot="extra">
-          <a-button type="primary" @click="AutoCreatePatData"
-            >產生下一筆傷患資料</a-button
-          >
-        </a-button-group>
+        <div slot="extra">
+          <a-input :addonBefore="a" v-model="a1" class="w-48" addonAfter="重傷">
+          </a-input>
+          <a-input v-model="a2" class="w-24" addonAfter="中傷"> </a-input>
+          <a-input v-model="a3" class="w-24" addonAfter="輕傷"> </a-input>
+          <a-button-group>
+            <a-button type="danger" @click="AutoCreatePatDataList"
+              >產生測試資料</a-button
+            >
+            <a-button type="primary" @click="AutoCreatePatData"
+              >產生下一筆傷患資料</a-button
+            >
+          </a-button-group>
+        </div>
         <div v-if="loading">
           <a-skeleton active />
           <a-skeleton active />
@@ -77,23 +86,23 @@
             >
               <a-radio-group v-model="model.TRIAGE">
                 <a-radio-button class="text-red-500 bg-red-200" value="Severe"
-                  >Severe</a-radio-button
+                  >重傷</a-radio-button
                 >
                 <a-radio-button
-                  class="text-blue-500 bg-blue-200"
+                  class="text-yellow-500 bg-yellow-200"
                   value="Moderate"
-                  >Moderate</a-radio-button
+                  >中傷</a-radio-button
                 >
-                <a-radio-button class="text-green-500 bg-green-200" value="Mild"
-                  >Mild</a-radio-button
+                <a-radio-button class="text-blue-500 bg-blue-200" value="Mild"
+                  >輕傷</a-radio-button
                 >
               </a-radio-group>
               <span
                 class="m-2"
                 :class="{
                   'text-red-500': model.TRIAGE === 'Severe',
-                  'text-blue-500': model.TRIAGE === 'Moderate',
-                  'text-green-500': model.TRIAGE === 'Mild',
+                  'text-yellow-500': model.TRIAGE === 'Moderate',
+                  'text-blue-500': model.TRIAGE === 'Mild',
                 }"
                 >{{ model.TRIAGE }}</span
               >
@@ -164,6 +173,9 @@ export default {
   mixins: [Mixin],
   data () {
     return {
+      a1: 1,
+      a2: 1,
+      a3: 1,
       loading: false,
       selectPat: '',
       hospEvacuationVal: 0,
@@ -175,6 +187,9 @@ export default {
     this.model.SELECTION_DATETIME = this.$moment().format('YYYY-MM-DD HH:mm:ss')
   },
   computed: {
+    a () {
+      return '共' + (parseInt(this.a1) + parseInt(this.a2) + parseInt(this.a3)) + '人'
+    },
     title () {
       return document.title
     }
@@ -229,6 +244,68 @@ export default {
       tempModel.SELECTION_DATETIME = this.$moment().format('YYYY-MM-DD HH:mm:ss')
       this.model = tempModel
       this.$refs.alert.showInfo('產生下一筆傷患資料!')
+    },
+    AutoCreatePatDataList () {
+      let pList = []
+      let vuethis = this
+      for (let index = 0; index < parseInt(vuethis.a1); index++) {
+        let tempModel = JSON.parse(JSON.stringify(this.SetNewModel()))
+        tempModel.PATIENT_ID = this.$moment().format('YYYYMMDDHHmmss')
+        tempModel.PATIENT_NAME = this.$moment().format('mmss') + '傷患'
+        tempModel.SELECTION_DATETIME = this.$moment().format('YYYY-MM-DD HH:mm:ss')
+        tempModel.GENDER = '1'
+        tempModel.AGE = '30'
+        tempModel.TRIAGE = 'Severe'
+        tempModel.CITY = '1'
+        pList.push(tempModel)
+      }
+      for (let index = 0; index < parseInt(vuethis.a2); index++) {
+        let tempModel = JSON.parse(JSON.stringify(this.SetNewModel()))
+        tempModel.PATIENT_ID = this.$moment().format('YYYYMMDDHHmmss')
+        tempModel.PATIENT_NAME = this.$moment().format('mmss') + '傷患'
+        tempModel.SELECTION_DATETIME = this.$moment().format('YYYY-MM-DD HH:mm:ss')
+        tempModel.GENDER = '1'
+        tempModel.AGE = '30'
+        tempModel.TRIAGE = 'Moderate'
+        tempModel.CITY = '1'
+        pList.push(tempModel)
+      }
+      for (let index = 0; index < parseInt(vuethis.a3); index++) {
+        let tempModel = JSON.parse(JSON.stringify(this.SetNewModel()))
+        tempModel.PATIENT_ID = this.$moment().format('YYYYMMDDHHmmss')
+        tempModel.PATIENT_NAME = this.$moment().format('mmss') + '傷患'
+        tempModel.SELECTION_DATETIME = this.$moment().format('YYYY-MM-DD HH:mm:ss')
+        tempModel.GENDER = '1'
+        tempModel.AGE = '30'
+        tempModel.TRIAGE = 'Mild'
+        tempModel.CITY = '1'
+        pList.push(tempModel)
+      }
+      for (let index = 0; index < pList.length; index++) {
+        const element = pList[index]
+        element.SITE_ID = this.site_id
+        element.PATIENT_ID = element.PATIENT_ID + index
+        console.log(element.PATIENT_ID)
+        console.log(element.TRIAGE)
+        setTimeout(() => {
+          element.SELECTION_DATETIME = this.$moment().add(1, 'minutes').format('YYYY-MM-DD HH:mm:ss')
+          vuethis.$api.MC.INSERT_PAT_DATA(element).then((result) => {
+            console.log(result)
+            vuethis.$api.MC.GetPatListByID({ site_id: vuethis.site_id, hosp_id: vuethis.hosp_id }).then((result) => {
+              vuethis.$store.commit({
+                type: 'Basic/SetPatListBYID',
+                data: result.data
+              })
+            }).catch((err) => {
+              console.log(err)
+              vuethis.error(err)
+            })
+          }).catch((err) => {
+            console.log(err)
+            vuethis.error(err)
+          })
+        }, 1000 * index)
+      }
     }
   }
 }

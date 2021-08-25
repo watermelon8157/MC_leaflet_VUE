@@ -74,7 +74,11 @@
         </span>
         <span class="m-2">
           傷勢:
-          <span class="m-2">{{ $store.state.Basic.PatModel.TRIAGE }}</span>
+          <span class="m-2">
+              <span class=" text-red-500 font-bold" v-if=" $store.state.Basic.PatModel.TRIAGE === 'Severe'">重傷</span>
+              <span class=" text-yellow-500 font-bold" v-if=" $store.state.Basic.PatModel.TRIAGE === 'Moderate'">中傷</span>
+              <span class="  text-blue-500 font-bold" v-if=" $store.state.Basic.PatModel.TRIAGE === 'Mild'">輕傷</span>
+          </span>
         </span>
         <a-tag class="font-extrabold bg-yellow-500 text-white">第三推薦</a-tag>
         <a-tag class="font-extrabold bg-blue-500 text-white">第二推薦</a-tag>
@@ -114,6 +118,14 @@
             <a-tag class="font-extrabold">{{ model.hosp_ihp }}</a-tag>
             <a-divider class="bg-orange-500" type="vertical" />
           </a-form-item>
+          <a-form-item label="尚未抵達醫院人數">
+            <a-tag class="font-extrabold">{{ model.hosp_INp }}</a-tag>
+            <a-divider class="bg-orange-500" type="vertical" />
+          </a-form-item>
+          <a-form-item label="抵達醫院人數">
+            <a-tag class="font-extrabold">{{ model.hosp_ATp }}</a-tag>
+            <a-divider class="bg-orange-500" type="vertical" />
+          </a-form-item>
           <a-form-item label="衛福部業務組別">
             <a-tag class="font-extrabold">{{ model.hosp_class }}</a-tag>
             <a-divider class="bg-orange-500" type="vertical" />
@@ -123,11 +135,12 @@
             <a-divider class="bg-orange-500" type="vertical" />
           </a-form-item>
           <a-form-item label="急救責任等級">
-            <a-tag class="font-extrabold">{{ model.hosp_ranking }}</a-tag>
-            <a-divider class="bg-orange-500" type="vertical" />
-          </a-form-item>
-          <a-form-item label="急診觀察床">
-            <a-tag class="font-extrabold">{{ model.hosp_erbed }}</a-tag>
+            <a-tag class="font-extrabold">
+                <span v-if="model.hosp_ranking==='0'">非急救責任醫院</span>
+                 <span v-if="model.hosp_ranking==='1'">一般</span>
+                  <span v-if="model.hosp_ranking==='2'">中度</span>
+                   <span v-if="model.hosp_ranking==='3'">重度</span>
+               </a-tag>
             <a-divider class="bg-orange-500" type="vertical" />
           </a-form-item>
           <a-form-item label="救護車">
@@ -191,6 +204,8 @@ export default {
         amb_id: '',
         hosp_source: 0,
         hosp_ihp: 0,
+        hosp_INp: 0, // 尚未抵達
+        hosp_ATp: 0, // 已經抵達
         hosp_whp: 0,
         location: []
       },
@@ -355,6 +370,10 @@ export default {
       vuethis.model = Object.assign(this.model, pModel)
       console.log(vuethis.model)
       vuethis.model.hosp_ihp = vuethis.$store.state.Basic.PatListByID.filter((x) => x.HOSP_KEY === vuethis.model.HOSP_KEY).length
+      vuethis.model.hosp_INp = vuethis.$store.state.Basic.PatListByID.filter((x) => x.HOSP_KEY === vuethis.model.HOSP_KEY && x.EXPECTED_ARRIVAL_DATETIME &&
+      (Date.parse(x.EXPECTED_ARRIVAL_DATETIME)).valueOf() > Date.now().valueOf()).length
+      vuethis.model.hosp_ATp = vuethis.$store.state.Basic.PatListByID.filter((x) => x.HOSP_KEY === vuethis.model.HOSP_KEY && x.EXPECTED_ARRIVAL_DATETIME &&
+      (Date.parse(x.EXPECTED_ARRIVAL_DATETIME)).valueOf() <= Date.now().valueOf()).length
       vuethis.visible = !vuethis.visible
     },
     onClose () {

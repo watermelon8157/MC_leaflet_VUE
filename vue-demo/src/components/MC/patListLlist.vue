@@ -37,8 +37,8 @@ const columns = [
   },
   {
     title: '傷勢',
-    dataIndex: 'TRIAGE',
-    scopedSlots: { customRender: 'TRIAGE' }
+    dataIndex: 'TRIAGE_CHT',
+    scopedSlots: { customRender: 'TRIAGE_CHT' }
   },
   {
     title: '送出時間',
@@ -70,7 +70,7 @@ const columns = [
   },
   {
     title: '醫院',
-    dataIndex: 'HOSP_KEY'
+    dataIndex: 'HOSPITAL_SHOW_NAME'
   }
 ]
 

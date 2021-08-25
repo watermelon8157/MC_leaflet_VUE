@@ -393,7 +393,7 @@ namespace RCS.Models.ViewModel
             List<DB_MC_SITE_DRIVING_TIME_INFO> tempList = new List<DB_MC_SITE_DRIVING_TIME_INFO>();
             List<DB_MC_SITE_INFO> sList = getMC_SITE_INFO(pSITE_ID);
             List<DB_MC_HOSP_INFO> pList = MvcApplication.hospList.ToList();
-            if (!string.IsNullOrWhiteSpace(pSITE_ID))
+            if (sList.Count > 0 && !string.IsNullOrWhiteSpace(pSITE_ID))
             {
                 pList = pList.FindAll(x=>x.DIVISION.Trim() == sList.First(y => y.SITE_ID == pSITE_ID).SITE_AREA);
             }

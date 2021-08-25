@@ -2,7 +2,7 @@
 </style>
 <template>
   <div class="m-4">
-    <a-card title="到達醫院狀況時間圖">
+    <a-card title="傷患抵達醫院狀況時間圖">
       <span slot="extra">
           {{hosp_id}}
         <span class="m-2">請選擇醫院:</span>
@@ -13,7 +13,7 @@
             :key="index"
             :value="i.HOSP_KEY"
           >
-            {{ i.HOSPITAL_SHOW_NAME }}{{ i.HOSP_KEY }}
+            {{ i.HOSPITAL_SHOW_NAME }}
           </option>
         </select>
       </span>
@@ -71,12 +71,29 @@ export default {
         Mild: this.pointData('Mild'),
         atSevere: this.atPointData('Severe'),
         atModerate: this.atPointData('Moderate'),
-        atMild: this.atPointData('Mild')
+        atMild: this.atPointData('Mild'),
+        patList: this.CREATEData(),
+        atpatList: this.atPointData()
       }
     },
     chartData () {
       return {
         datasets: [
+          {
+            label: '尚未抵達所有傷患',
+            backgroundColor: 'rgba(128, 128, 128, 0.3)',
+            borderColor: 'rgba(128, 128, 128,  0.3)',
+            fill: false,
+            borderDash: [5, 5],
+            data: this.chartlist.patList
+          },
+          {
+            label: '已抵達所有傷患',
+            backgroundColor: 'rgba(42, 187, 155)',
+            borderColor: 'rgba(42, 187, 155)',
+            fill: false,
+            data: this.chartlist.atpatList
+          },
           {
             label: '尚未抵達重傷',
             backgroundColor: 'rgba(128, 128, 128, 1)',
@@ -157,7 +174,10 @@ export default {
     pointData (pVal) {
       let pList = []
       let vuethis = this
-      let tempList = vuethis.patlist.filter((x) => x.TRIAGE === pVal && x.jsSELECTION_DATETIME)
+      let tempList = vuethis.patlist.filter((x) => x.jsSELECTION_DATETIME)
+      if (pVal) {
+        tempList = tempList.filter((x) => x.TRIAGE === pVal)
+      }
       tempList.map(item => item.jsSELECTION_DATETIME)
         .filter((value, index, self) => self.indexOf(value) === index).sort(function (a, b) { return a - b }).forEach(element => {
           let sumVal = 0
@@ -175,7 +195,11 @@ export default {
     atPointData (pVal) {
       let pList = []
       let vuethis = this
-      let tempList = vuethis.patlist.filter((x) => x.TRIAGE === pVal && x.jsEXPECTED_ARRIVAL_DATETIME)
+
+      let tempList = vuethis.patlist.filter((x) => x.jsEXPECTED_ARRIVAL_DATETIME)
+      if (pVal) {
+        tempList = tempList.filter((x) => x.TRIAGE === pVal)
+      }
       tempList.map(item => item.jsEXPECTED_ARRIVAL_DATETIME)
         .filter((value, index, self) => self.indexOf(value) === index).sort(function (a, b) { return a - b }).forEach(element => {
           let sumVal = 0
@@ -186,6 +210,27 @@ export default {
             x: element,
             y: (sumVal +
               tempList.filter((x) => x.jsEXPECTED_ARRIVAL_DATETIME === element).length)
+          })
+        })
+      return pList
+    },
+    CREATEData (pVal) {
+      let pList = []
+      let vuethis = this
+      let tempList = vuethis.patlist.filter((x) => x.jsCREATE_DATE)
+      if (pVal) {
+        tempList = tempList.filter((x) => x.TRIAGE === pVal)
+      }
+      tempList.map(item => item.jsCREATE_DATE)
+        .filter((value, index, self) => self.indexOf(value) === index).sort(function (a, b) { return a - b }).forEach(element => {
+          let sumVal = 0
+          if (pList.length > 0) {
+            sumVal = pList.map(cc => cc.y)[pList.length - 1]
+          }
+          pList.push({
+            x: element,
+            y: (sumVal +
+              tempList.filter((x) => x.jsCREATE_DATE === element).length)
           })
         })
       return pList

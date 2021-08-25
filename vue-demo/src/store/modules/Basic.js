@@ -43,6 +43,11 @@ export default {
             payload.data[index].SELECTION_DATETIME
           ).getTime()
         }
+        if (payload.data[index].CREATE_DATE) {
+          payload.data[index].jsCREATE_DATE = new Date(
+            payload.data[index].CREATE_DATE
+          ).getTime()
+        }
       }
       state.PatListByID = payload.data
     },

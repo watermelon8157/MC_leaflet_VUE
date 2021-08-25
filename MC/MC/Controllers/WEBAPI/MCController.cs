@@ -46,13 +46,14 @@ namespace RCS.Controllers.WEBAPI
         /// <returns></returns>
         public string INSERT_PAT_DATA(DB_MC_PATIENT_INFO model)
         {
-            string actionName = "INSERT_PAT_DATA";
-            model.CREATE_DATE = Function_Library.getDateNowString(DATE_FORMAT.yyyy_MM_dd_HHmmss);
+            string actionName = "INSERT_PAT_DATA"; 
+            model.CREATE_DATE = Function_Library.getDateString(DateTime.Parse(model.SELECTION_DATETIME),DATE_FORMAT.yyyy_MM_dd_HHmmss);
             model.CREATE_ID = this.userinfo.user_id;
             model.CREATE_NAME = this.userinfo.user_name;
-            model.MODIFY_DATE = Function_Library.getDateNowString(DATE_FORMAT.yyyy_MM_dd_HHmmss);
+            model.MODIFY_DATE = Function_Library.getDateString(DateTime.Parse(model.SELECTION_DATETIME), DATE_FORMAT.yyyy_MM_dd_HHmmss);
             model.MODIFY_ID = this.userinfo.user_id;
             model.MODIFY_NAME = this.userinfo.user_name;
+            model.SELECTION_DATETIME = "";
             this.DBLink.DBA.DBExecInsert<DB_MC_PATIENT_INFO>(new List<DB_MC_PATIENT_INFO>() { model });
             if (this.DBLink.DBA.hasLastError)
             {
@@ -164,7 +165,7 @@ namespace RCS.Controllers.WEBAPI
                 x.hosp_class = x.DIVISION.Trim();
                 x.hosp_city = x.CITY;
                 x.hosp_injury = x.CITY;
-                x.hosp_ranking = x.NEW_RANKING;
+                x.hosp_ranking = x.ORIGINAL_RANKING;
                 x.hosp_erbed = x.ORIGINAL_RANKING; 
             });
             return pList;

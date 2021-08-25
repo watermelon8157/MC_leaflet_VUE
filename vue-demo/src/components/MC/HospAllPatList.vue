@@ -2,7 +2,7 @@
 </style>
 <template>
   <div class="m-4">
-    <a-card title="到達醫院狀況時間圖">
+    <a-card title="傷患抵達醫院狀況時間圖">
       <span slot="extra">
         <span class="m-2">請選擇醫院:</span>
         <select v-model="hospkey" class="form-control inline w-64 mx-2">
@@ -12,7 +12,7 @@
             :key="index"
             :value="i.HOSP_KEY"
           >
-            {{ i.HOSPITAL_SHOW_NAME }}{{ i.HOSP_KEY }}
+            {{ i.HOSPITAL_SHOW_NAME }}
           </option>
         </select>
       </span>
@@ -69,14 +69,15 @@ export default {
         Moderate: this.pointData('Moderate'),
         Mild: this.pointData('Mild'),
         All: this.AllPointData(),
-        atAll: this.atAllPointData()
+        atAll: this.atAllPointData(),
+        patList: this.CREATEData()
       }
     },
     chartData () {
       return {
         datasets: [
           {
-            label: '尚未抵達',
+            label: '尚未抵達所有傷患',
             backgroundColor: 'rgba(158, 158, 158, 1)',
             borderColor: 'rgba(158, 158, 158, 1)',
             fill: false,
@@ -84,7 +85,7 @@ export default {
             data: this.chartlist.All
           },
           {
-            label: '已抵達',
+            label: '已抵達所有傷患',
             backgroundColor: 'rgba(105,105,105)',
             borderColor: 'rgba(105,105,105)',
             fill: false,
@@ -92,21 +93,21 @@ export default {
             data: this.chartlist.atAll
           },
           {
-            label: '重傷',
+            label: '已抵達重傷',
             backgroundColor: 'rgba(255, 0, 0)',
             borderColor: 'rgba(255, 0, 0)',
             fill: false,
             data: this.chartlist.Severe
           },
           {
-            label: '中傷',
+            label: '已抵達中傷',
             backgroundColor: 'rgba(239, 192, 40)',
             borderColor: 'rgba(239, 192, 40)',
             fill: false,
             data: this.chartlist.Moderate
           },
           {
-            label: '輕傷',
+            label: '已抵達輕傷',
             backgroundColor: 'rgba(44, 130, 201)',
             borderColor: 'rgba(44, 130, 201)',
             fill: false,
@@ -194,6 +195,27 @@ export default {
             x: element,
             y: (sumVal +
               tempList.filter((x) => x.jsEXPECTED_ARRIVAL_DATETIME === element).length)
+          })
+        })
+      return pList
+    },
+    CREATEData (pVal) {
+      let pList = []
+      let vuethis = this
+      let tempList = vuethis.patlist.filter((x) => x.jsCREATE_DATE)
+      if (pVal) {
+        tempList = tempList.filter((x) => x.TRIAGE === pVal)
+      }
+      tempList.map(item => item.jsCREATE_DATE)
+        .filter((value, index, self) => self.indexOf(value) === index).sort(function (a, b) { return a - b }).forEach(element => {
+          let sumVal = 0
+          if (pList.length > 0) {
+            sumVal = pList.map(cc => cc.y)[pList.length - 1]
+          }
+          pList.push({
+            x: element,
+            y: (sumVal +
+              tempList.filter((x) => x.jsCREATE_DATE === element).length)
           })
         })
       return pList

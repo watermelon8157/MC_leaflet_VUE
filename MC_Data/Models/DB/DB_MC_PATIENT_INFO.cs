@@ -56,6 +56,34 @@ namespace RCS_Data.Models.DB
 
     }
 
+    public class MC_PATIENT_INFO_VIEW : DB_MC_PATIENT_INFO
+    {
+        public string TRIAGE_CHT { 
+            get {
+                string val = "受傷";
+                if (!string.IsNullOrWhiteSpace(this.TRIAGE))
+                {
+                    switch (this.TRIAGE)
+                    {
+                        case "Severe":
+                            val = "重傷";
+                            break;
+                        case "Moderate":
+                            val = "中傷";
+                            break;
+                        case "中傷":
+                            val = "輕傷";
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                return val;
+            }
+        }
+
+    }
+
     public class MC_PATIENT_INFO
     {
         [Key]
