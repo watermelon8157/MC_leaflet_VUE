@@ -27,7 +27,7 @@ body {
 }
 </style>
 <template>
-  <router-view id="app" :key="$route.path"></router-view>
+    <router-view id="app" :key="$route.path"></router-view>
 </template>
 
 <script>

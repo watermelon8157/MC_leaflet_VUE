@@ -28,6 +28,16 @@ body {
 </style>
 <template>
   <a-layout id="app">
+    <div class="fixed top-0 right-0 mt-2 mx-2 pb-4 z-50">
+      <button
+        type="button"
+        @click="logOut"
+        class="btn btn-secondary btn-lg btn-block"
+      >
+        <a-icon type="logout" />
+        <span>登出</span>
+      </button>
+    </div>
     <a-layout id="components-layout-demo-top" class="layout">
       <a-layout-header class="bg-blue-400">
         <div class="logo text-white" />
@@ -59,7 +69,7 @@ body {
       @close="onClose"
       :visible="visible"
     >
-    {{site_title}}
+      {{ site_title }}
       <a-menu
         style="width: 256px"
         v-model="routeName"

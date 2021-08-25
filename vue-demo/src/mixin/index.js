@@ -44,9 +44,7 @@ export default {
     SITE_AREA () {
       let vuethis = this
       if (vuethis.site_id) {
-        let item = vuethis.siteList.filter(
-          x => x.SITE_ID === vuethis.site_id
-        )
+        let item = vuethis.siteList.filter(x => x.SITE_ID === vuethis.site_id)
         if (item && item.length > 0) {
           return item[0].SITE_AREA
         }
@@ -56,9 +54,7 @@ export default {
     site_title () {
       let vuethis = this
       if (vuethis.site_id) {
-        let item = vuethis.siteList.filter(
-          x => x.SITE_ID === vuethis.site_id
-        )
+        let item = vuethis.siteList.filter(x => x.SITE_ID === vuethis.site_id)
         if (item && item.length > 0) {
           return item[0].SITE_DESC + '(' + item[0].SITE_AREA + ')'
         }
@@ -99,6 +95,11 @@ export default {
     }
   },
   methods: {
+    logOut () {
+      var vuethis = this
+      sessionStorage.clear()
+      vuethis.$router.push({ name: 'menu' })
+    },
     error (err) {
       if (typeof err === 'string') {
         this.$notification.error({
