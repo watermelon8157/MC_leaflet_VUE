@@ -4,18 +4,22 @@
   <div class="m-4">
     <a-card title="傷患抵達醫院狀況時間圖">
       <span slot="extra">
-          {{hosp_id}}
-        <span class="m-2">請選擇醫院:</span>
-        <select v-model="hospkey" class="form-control inline w-64 mx-2">
-          <option value="">所有醫院</option>
-          <option
-            v-for="(i, index) in hospList"
-            :key="index"
-            :value="i.HOSP_KEY"
-          >
-            {{ i.HOSPITAL_SHOW_NAME }}
-          </option>
-        </select>
+        <span v-if="hosp_id">
+          {{ hosp_id }}
+        </span>
+        <span v-else>
+          <span class="m-2">請選擇醫院:</span>
+          <select v-model="hospkey" class="form-control inline w-64 mx-2">
+            <option value="">所有醫院</option>
+            <option
+              v-for="(i, index) in hospList"
+              :key="index"
+              :value="i.HOSP_KEY"
+            >
+              {{ i.HOSPITAL_SHOW_NAME }}
+            </option>
+          </select>
+        </span>
       </span>
       <div>
         查詢時間: {{ now }} <br />
