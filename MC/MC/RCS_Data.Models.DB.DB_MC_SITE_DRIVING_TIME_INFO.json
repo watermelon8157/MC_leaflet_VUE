@@ -1,7 +1,6 @@
 {
+  "HOSP_KEY" : "",
   "SITE_ID" : "",
-  "SITE_DESC" : "",
-  "SITE_AREA" : "",
   "CREATE_ID" : "",
   "CREATE_NAME" : "",
   "CREATE_DATE" : "",
@@ -9,7 +8,6 @@
   "MODIFY_NAME" : "",
   "MODIFY_DATE" : "",
   "DATASTATUS" : "",
-  "LATITUDE" : "",
-  "LONGITUDE" : "",
-  "CLASS_TYPE" : ""
+  "DRIVING_TIME" : "",
+  "DRIVING_SOURCE" : ""
 }

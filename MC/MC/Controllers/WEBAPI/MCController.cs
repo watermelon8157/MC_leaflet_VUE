@@ -466,6 +466,7 @@ namespace RCS.Controllers.WEBAPI
                         MODIFY_ID = this.userinfo.user_id,
                         MODIFY_NAME = this.userinfo.user_name,
                         DATASTATUS = "1",
+                        CLASS_TYPE = form.CLASS_TYPE,
                         LATITUDE = form.LATITUDE,
                         LONGITUDE = form.LONGITUDE,
                     });
@@ -484,6 +485,7 @@ namespace RCS.Controllers.WEBAPI
                         item.SITE_AREA = form.SITE_AREA;
                         item.LATITUDE = form.LATITUDE;
                         item.LONGITUDE = form.LONGITUDE;
+                        item.CLASS_TYPE = form.CLASS_TYPE;
                         item.MODIFY_DATE = Function_Library.getDateNowString(DATE_FORMAT.yyyy_MM_dd_HHmmss);
                         item.MODIFY_ID = this.userinfo.user_id;
                         item.MODIFY_NAME = this.userinfo.user_name;

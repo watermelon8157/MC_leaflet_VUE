@@ -25,5 +25,9 @@
   "EDRELATEDBEDS" : "",
   "MEDICALSTAFF" : "",
   "W2" : "",
-  "CV" : ""
+  "CV" : "",
+  "DIVISION" : "",
+  "SEVERE_TC" : "",
+  "MODERATE_TC" : "",
+  "MILD_TC" : ""
 }

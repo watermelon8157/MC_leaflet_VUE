@@ -16,31 +16,17 @@
 # RCS_Data.Models.DB.DB_MC_PATIENT_INFO
          
          
+# RCS_Data.Models.DB.DB_MC_SITE_DRIVING_TIME_INFO
+         
+         
 # RCS_Data.Models.DB.DB_MC_SITE_INFO
+         
+         
+# RCS_Data.Models.DB.DB_MC_SOURCE_LIST
          
          RCS_Data.DBA_Provider
          RCS_Data.MSSQLProvider
          RCS_Data.OracleDBProvider
-         RCSData.Models.WebService.HISABGLabData
-         RCSData.Models.WebService.HisBedAreaList
-         RCSData.Models.WebServiceParam
-         RCSData.Models.WS_AddTeamCareRecordMessage
-         RCSData.Models.WS_AreaPatientList
-         RCSData.Models.WS_PatientInfo
-         RCSData.Models.WS_checkLoginUser
-         RCSData.Models.WS_ConsultList
-         RCSData.Models.WS_CreateEMRSign
-         RCSData.Models.WS_ERAndOPDListbyChartNo
-         RCSData.Models.WS_GetInputOutput
-         RCSData.Models.WS_GetPatientICD10
-         RCSData.Models.WS_GetVitalSign
-         RCSData.Models.WS_HisBedAreaList
-         RCSData.Models.WS_LabData
-         RCSData.Models.WS_OrderList
-         RCSData.Models.WS_PatientHistory
-         RCSData.Models.WS_PatOperationList
-         RCSData.Models.WS_ReportData
-         RCSData.Models.WS_UploadEMRFile
          RCS_Data.LAB_DATA
          RCS_Data.LAB_DATA
          RCS_Data.RCS_DATA_TK_ASSESS

@@ -16,7 +16,7 @@
               :key="index"
               :value="i.HOSP_KEY"
             >
-              {{ i.HOSPITAL_SHOW_NAME }}
+              {{ i.HOSP_KEY.substring(10) }}
             </option>
           </select>
         </span>

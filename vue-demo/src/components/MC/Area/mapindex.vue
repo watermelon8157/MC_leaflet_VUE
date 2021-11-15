@@ -80,9 +80,9 @@
               <span class="  text-blue-500 font-bold" v-if=" $store.state.Basic.PatModel.TRIAGE === 'Mild'">輕傷</span>
           </span>
         </span>
-        <a-tag class="font-extrabold bg-yellow-500 text-white">第三推薦</a-tag>
-        <a-tag class="font-extrabold bg-blue-500 text-white">第二推薦</a-tag>
         <a-tag class="font-extrabold bg-green-500 text-white">最推薦</a-tag>
+        <a-tag class="font-extrabold bg-blue-500 text-white">第二推薦</a-tag>
+        <a-tag class="font-extrabold bg-yellow-500 text-white">第三推薦</a-tag>
         <a-tag class="font-extrabold bg-red-500 text-white">目前位置</a-tag>
       </div>
       <a-button
@@ -143,7 +143,7 @@
                </a-tag>
             <a-divider class="bg-orange-500" type="vertical" />
           </a-form-item>
-          <a-form-item label="救護車">
+          <a-form-item label="救護車代碼">
             <a-input v-model="model.amb_id" />
             <a-divider class="bg-orange-500" type="vertical" />
           </a-form-item>

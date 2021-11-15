@@ -8,10 +8,13 @@
   "MODIFY_NAME" : "",
   "MODIFY_DATE" : "",
   "DATASTATUS" : "",
+  "DRIVING_SOURCE" : "",
+  "W2" : "",
   "CV" : "",
-  "PS" : "",
-  "SEVERE_PAT" : "",
-  "MODERATE_PAT" : "",
-  "MILD_PAT" : "",
-  "SOURCE" : ""
+  "SEVERE" : "",
+  "MODERATE" : "",
+  "MILD" : "",
+  "SEVERE_SOURCE" : "",
+  "MODERATE_SOURCE" : "",
+  "MILD_SOURCE" : ""
 }

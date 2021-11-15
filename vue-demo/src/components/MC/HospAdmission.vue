@@ -2,7 +2,7 @@
 </style>
 <template>
   <div class="m-4">
-    <a-card title="後送醫院時間圖">
+    <a-card  >
       <span slot="extra">
         <span v-if="hosp_id">
           {{ hosp_id }}
@@ -16,7 +16,7 @@
               :key="index"
               :value="i.HOSP_KEY"
             >
-              {{ i.HOSPITAL_SHOW_NAME }}
+              {{ i.HOSP_KEY.substring(10)  }}
             </option>
           </select>
         </span>

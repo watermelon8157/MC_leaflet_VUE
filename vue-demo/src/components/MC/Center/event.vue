@@ -32,55 +32,8 @@
   <div>
     <div class="card-container">
       <a-tabs type="card">
-        <a-tab-pane key="card" tab="事件維護">
-          <a-card>
-            <div slot="title">
-              事件清單
-              <a-button type="primary" @click="openSite(data)">
-                新增事件
-              </a-button>
-              <span class="float-right">共{{ siteList.length }}筆</span>
-            </div>
-            <a-table
-              class="table-striped"
-              :columns="columns"
-              :dataSource="siteList"
-              :pagination="false"
-              bordered
-              :customRow="clickCustomRow"
-            >
-              <span slot="select" slot-scope="select">
-                <a-tag class="bg-white">選擇</a-tag>
-              </span>
-            </a-table>
-          </a-card>
-        </a-tab-pane>
-        <a-tab-pane key="hosp" tab="醫院資料">
-          <a-card>
-            <div slot="title">
-              醫院資料
-              <span class="float-right">共{{ hospList.length }}筆</span>
-            </div>
-            <a-table
-              :scroll="{ x: 1700, y: 350 }"
-              class="table-striped"
-              :columns="columnshosp"
-              :dataSource="hospList"
-              :pagination="false"
-              bordered
-            >
-            </a-table>
-          </a-card>
-        </a-tab-pane>
-      </a-tabs>
-      <a-drawer
-        title="事件維護"
-        placement="right"
-        width="512"
-        :visible="SiteVisible"
-        @close="onSiteClose"
-      >
-        <a-form layout="inline">
+        <a-tab-pane key="card" tab="開案">
+         <a-form layout="inline">
           <div>
             <a-form-item label="事件代碼">
               <a-input v-model="form.SITE_ID" placeholder="事件代碼" />
@@ -133,7 +86,8 @@
             </a-form-item>
           </div>
         </a-form>
-      </a-drawer>
+        </a-tab-pane>
+      </a-tabs>
     </div>
   </div>
 </template>
@@ -168,7 +122,8 @@ const datahosp = {
   'MODIFY_DATE': '',
   'DATASTATUS': '',
   'LATITUDE': '',
-  'LONGITUDE': ''
+  'LONGITUDE': '',
+  'CLASS_TYPE': ''
 }
 const columns = [
   {
@@ -185,11 +140,6 @@ const columns = [
     title: '事件名稱',
     dataIndex: 'SITE_DESC',
     scopedSlots: { customRender: 'SITE_DESC' }
-  },
-  {
-    title: '災害類別',
-    dataIndex: 'CLASS_TYPE',
-    scopedSlots: { customRender: 'CLASS_TYPE' }
   },
   {
     title: '地區',
@@ -311,6 +261,10 @@ export default {
       })
       setTimeout(() => {
         vuethis.spinning = false
+        vuethis.form = JSON.parse(JSON.stringify(data))
+        vuethis.form.SITE_ID = vuethis.$moment().format('YYYYMMDDHHmmss')
+        vuethis.form.LATITUDE = vuethis.latitude
+        vuethis.form.LONGITUDE = vuethis.longitude
       }, 500)
     }).catch((err) => {
       console.log(err)
@@ -337,7 +291,6 @@ export default {
       vuethis.form.SITE_ID = vuethis.$moment().format('YYYYMMDDHHmmss')
       vuethis.form.LATITUDE = vuethis.latitude
       vuethis.form.LONGITUDE = vuethis.longitude
-      vuethis.SiteVisible = true
     },
     openSite (pData) {
       let vuethis = this
@@ -345,7 +298,6 @@ export default {
       vuethis.form.SITE_ID = vuethis.$moment().format('YYYYMMDDHHmmss')
       vuethis.form.LATITUDE = vuethis.latitude
       vuethis.form.LONGITUDE = vuethis.longitude
-      vuethis.SiteVisible = true
     },
     saveSite () {
       let vuethis = this

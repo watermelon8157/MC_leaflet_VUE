@@ -76,8 +76,8 @@ body {
         mode="vertical"
         @click="handleClick"
       >
-        <a-menu-item key="AreaForm">建立資料</a-menu-item>
-        <a-menu-item key="AreaSelectList">後送</a-menu-item>
+        <a-menu-item key="AreaForm">建立傷病患資料</a-menu-item>
+        <a-menu-item key="AreaSelectList">選擇後送醫院</a-menu-item>
         <a-menu-item key="AreaHospAdmission">後送醫院狀況</a-menu-item>
         <a-menu-item key="AreaHospEvacuation">到達醫院狀況</a-menu-item>
         <a-menu-item key="AreaPatList">傷患查詢</a-menu-item>

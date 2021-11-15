@@ -31,9 +31,18 @@ import Mixin from '@/mixin'
 
 const columns = [
   {
-    title: '事件',
-    dataIndex: 'SITE_ID',
-    scopedSlots: { customRender: 'SITE_ID' }
+    title: '姓名',
+    dataIndex: 'PATIENT_NAME',
+    scopedSlots: { customRender: 'PATIENT_NAME' }
+  },
+  {
+    title: '性別',
+    dataIndex: 'GENDER',
+    scopedSlots: { customRender: 'GENDER' }
+  },
+  {
+    title: '年齡',
+    dataIndex: 'AGE'
   },
   {
     title: '傷勢',
@@ -51,26 +60,18 @@ const columns = [
     scopedSlots: { customRender: 'EXPECTED_ARRIVAL_DATETIME' }
   },
   {
-    title: '性別',
-    dataIndex: 'GENDER',
-    scopedSlots: { customRender: 'GENDER' }
-  },
-  {
-    title: '年齡',
-    dataIndex: 'AGE'
-  },
-  {
-    title: '姓名',
-    dataIndex: 'PATIENT_NAME',
-    scopedSlots: { customRender: 'PATIENT_NAME' }
-  },
-  {
     title: '救護車代碼',
     dataIndex: 'AMB_ID'
   },
   {
     title: '醫院',
     dataIndex: 'HOSPITAL_SHOW_NAME'
+  },
+
+  {
+    title: '事件',
+    dataIndex: 'SITE_ID',
+    scopedSlots: { customRender: 'SITE_ID' }
   }
 ]
 

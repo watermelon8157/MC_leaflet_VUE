@@ -81,7 +81,7 @@ body {
         </a-select>
       </a-form-item>
       <a-menu v-model="$route.name" mode="vertical" @click="handleClick">
-        <a-menu-item key="HospHospAdmission">後送醫院狀況</a-menu-item>
+        <a-menu-item key="HospHospAdmission">醫院接收狀況</a-menu-item>
         <a-menu-item key="HospHospEvacuation">到達醫院狀況</a-menu-item>
         <a-menu-item key="HospPatList">傷患查詢</a-menu-item>
       </a-menu>

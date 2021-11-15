@@ -9,6 +9,7 @@ import HospAdmission from '@/components/MC/HospAdmission'
 import HospEvacuation from '@/components/MC/HospEvacuation'
 import AreaPatList from '@/components/MC/HospAllPatList'
 import CenterSystem from '@/components/MC/Center/system'
+import event from '@/components/MC/Center/event'
 import moment from 'moment'
 const webTitle = 'MC-'
 let _redirect = '/menu'
@@ -39,7 +40,7 @@ export default [
         name: 'AreaForm',
         component: Form,
         meta: {
-          title: '建立傷患資料'
+          title: '建立傷病患資料'
         }
       },
       {
@@ -47,7 +48,7 @@ export default [
         name: 'AreaSelectList',
         component: SelectList,
         meta: {
-          title: '選擇病人後送'
+          title: '選擇後送醫院'
         }
       },
       {
@@ -79,7 +80,7 @@ export default [
   {
     path: '/MC/Center',
     name: 'Center',
-    redirect: '/MC/Center/PatList/' + moment().format('YYYYMMDDHHmmss'),
+    redirect: '/MC/Center/Event/' + moment().format('YYYYMMDDHHmmss'),
     component: Center,
     children: [
       {
@@ -113,6 +114,14 @@ export default [
         meta: {
           title: '中心-' + '後臺管理'
         }
+      },
+      {
+        path: '/MC/Center/Event/:now',
+        name: 'CenterEvent',
+        component: event,
+        meta: {
+          title: '中心-' + '開案'
+        }
       }
     ]
   },
@@ -127,7 +136,7 @@ export default [
         name: 'HospHospAdmission',
         component: HospAdmission,
         meta: {
-          title: '醫院-' + '後送醫院狀況'
+          title: '醫院-' + '醫院接收狀況'
         }
       },
       {

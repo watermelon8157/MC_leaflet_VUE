@@ -71,7 +71,7 @@ namespace RCS_Data.Models.DB
                         case "Moderate":
                             val = "中傷";
                             break;
-                        case "中傷":
+                        case "Mild":
                             val = "輕傷";
                             break;
                         default:

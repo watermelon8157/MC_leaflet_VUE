@@ -86,6 +86,7 @@ body {
         mode="vertical"
         @click="handleClick"
       >
+        <a-menu-item key="CenterEvent">開案</a-menu-item>
         <a-menu-item key="CenterHospAdmission">後送醫院狀況</a-menu-item>
         <a-menu-item key="CenterHospEvacuation">到達醫院狀況</a-menu-item>
         <a-menu-item key="CenterPatList">傷患查詢</a-menu-item>

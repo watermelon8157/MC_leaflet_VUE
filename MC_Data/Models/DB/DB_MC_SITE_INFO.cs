@@ -33,6 +33,7 @@ namespace RCS_Data.Models.DB
         public string DATASTATUS { get; set; }
         public string LATITUDE { get; set; }
         public string LONGITUDE { get; set; }
+        public string CLASS_TYPE { get; set; }
 
 
 
